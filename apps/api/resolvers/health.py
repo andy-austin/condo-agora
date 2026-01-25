@@ -43,15 +43,11 @@ class HealthResolver:
                     health_data["status"] = StatusValues.DEGRADED
             except Exception:
                 health_data["database"]["status"] = StatusValues.ERROR
-                health_data["database"][
-                    "details"
-                ] = TranslationKeys.DB_QUERY_ERROR
+                health_data["database"]["details"] = TranslationKeys.DB_QUERY_ERROR
                 health_data["status"] = StatusValues.ERROR
         except Exception:
             health_data["database"]["status"] = StatusValues.ERROR
-            health_data["database"][
-                "details"
-            ] = TranslationKeys.DB_CONNECTION_ERROR
+            health_data["database"]["details"] = TranslationKeys.DB_CONNECTION_ERROR
             health_data["status"] = StatusValues.ERROR
 
         return health_data

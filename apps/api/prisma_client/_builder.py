@@ -29,52 +29,52 @@ if TYPE_CHECKING:
 
 log: logging.Logger = logging.getLogger(__name__)
 
-ChildType = Union['AbstractNode', str]
+ChildType = Union["AbstractNode", str]
 
 ITERABLES: tuple[type[Any], ...] = (list, tuple, set)
 
 METHOD_OPERATION_MAPPING: dict[PrismaMethod, Operation] = {
-    'create': 'mutation',
-    'delete': 'mutation',
-    'update': 'mutation',
-    'upsert': 'mutation',
-    'query_raw': 'mutation',
-    'query_first': 'mutation',
-    'create_many': 'mutation',
-    'execute_raw': 'mutation',
-    'delete_many': 'mutation',
-    'update_many': 'mutation',
-    'count': 'query',
-    'group_by': 'query',
-    'find_many': 'query',
-    'find_first': 'query',
-    'find_first_or_raise': 'query',
-    'find_unique': 'query',
-    'find_unique_or_raise': 'query',
+    "create": "mutation",
+    "delete": "mutation",
+    "update": "mutation",
+    "upsert": "mutation",
+    "query_raw": "mutation",
+    "query_first": "mutation",
+    "create_many": "mutation",
+    "execute_raw": "mutation",
+    "delete_many": "mutation",
+    "update_many": "mutation",
+    "count": "query",
+    "group_by": "query",
+    "find_many": "query",
+    "find_first": "query",
+    "find_first_or_raise": "query",
+    "find_unique": "query",
+    "find_unique_or_raise": "query",
 }
 
 METHOD_FORMAT_MAPPING: dict[PrismaMethod, str] = {
-    'create': 'createOne{model}',
-    'delete': 'deleteOne{model}',
-    'update': 'updateOne{model}',
-    'upsert': 'upsertOne{model}',
-    'query_raw': 'queryRaw',
-    'query_first': 'queryRaw',
-    'create_many': 'createMany{model}',
-    'execute_raw': 'executeRaw',
-    'delete_many': 'deleteMany{model}',
-    'update_many': 'updateMany{model}',
-    'count': 'aggregate{model}',
-    'group_by': 'groupBy{model}',
-    'find_many': 'findMany{model}',
-    'find_first': 'findFirst{model}',
-    'find_first_or_raise': 'findFirst{model}OrThrow',
-    'find_unique': 'findUnique{model}',
-    'find_unique_or_raise': 'findUnique{model}OrThrow',
+    "create": "createOne{model}",
+    "delete": "deleteOne{model}",
+    "update": "updateOne{model}",
+    "upsert": "upsertOne{model}",
+    "query_raw": "queryRaw",
+    "query_first": "queryRaw",
+    "create_many": "createMany{model}",
+    "execute_raw": "executeRaw",
+    "delete_many": "deleteMany{model}",
+    "update_many": "updateMany{model}",
+    "count": "aggregate{model}",
+    "group_by": "groupBy{model}",
+    "find_many": "findMany{model}",
+    "find_first": "findFirst{model}",
+    "find_first_or_raise": "findFirst{model}OrThrow",
+    "find_unique": "findUnique{model}",
+    "find_unique_or_raise": "findUnique{model}OrThrow",
 }
 
 MISSING = object()
-Operation = Literal['query', 'mutation']
+Operation = Literal["query", "mutation"]
 
 
 class QueryBuilder:
@@ -112,15 +112,15 @@ class QueryBuilder:
     """
 
     __slots__ = (
-        'method',
-        'method_format',
-        'operation',
-        'model',
-        'include',
-        'arguments',
-        'root_selection',
-        'prisma_models',
-        'relational_field_mappings',
+        "method",
+        "method_format",
+        "operation",
+        "model",
+        "include",
+        "arguments",
+        "root_selection",
+        "prisma_models",
+        "relational_field_mappings",
     )
 
     def __init__(
@@ -140,15 +140,17 @@ class QueryBuilder:
         self.prisma_models = prisma_models
         self.relational_field_mappings = relational_field_mappings
         self.arguments = args = self._transform_aliases(arguments)
-        self.include = args.pop('include', None)
+        self.include = args.pop("include", None)
 
         # Note: we ignore the `model` argument for raw queries as users may want to pass in a model
         # that isn't a `PrismaModel` because they've defined it manually & enforcing that
         # they subclass `PrismaModel` doesn't bring any real benefits.
-        if model is None or method in {'execute_raw', 'query_raw', 'query_first'}:
+        if model is None or method in {"execute_raw", "query_raw", "query_first"}:
             self.model = None
         else:
-            if not _is_prisma_model_type(model) or not hasattr(model, '__prisma_model__'):
+            if not _is_prisma_model_type(model) or not hasattr(
+                model, "__prisma_model__"
+            ):
                 raise InvalidModelError(model)
 
             self.model = model
@@ -156,9 +158,9 @@ class QueryBuilder:
     def build(self) -> str:
         """Build the payload that should be sent to the QueryEngine"""
         data: dict[str, object] = {
-            'variables': {},
-            'operation_name': self.operation,
-            'query': self.build_query(),
+            "variables": {},
+            "operation_name": self.operation,
+            "query": self.build_query(),
         }
         return dumps(data)
 
@@ -186,10 +188,10 @@ class QueryBuilder:
         }
         """
         query = self._create_root_node().render()
-        log.debug('Generated query: \n%s', query)
+        log.debug("Generated query: \n%s", query)
         return query
 
-    def _create_root_node(self) -> 'RootNode':
+    def _create_root_node(self) -> "RootNode":
         root = RootNode(builder=self)
         root.add(ResultNode.create(self))
         root.add(
@@ -207,7 +209,7 @@ class QueryBuilder:
 
         Raises UnknownModelError if the current model cannot be found.
         """
-        name = getattr(model, '__prisma_model__', MISSING)
+        name = getattr(model, "__prisma_model__", MISSING)
         if name is MISSING:
             raise InvalidModelError(model)
 
@@ -223,13 +225,15 @@ class QueryBuilder:
             if not _field_is_prisma_model(info, name=field, parent=model)
         ]
 
-    def get_relational_model(self, current_model: type[PrismaModel], field: str) -> type[PrismaModel]:
+    def get_relational_model(
+        self, current_model: type[PrismaModel], field: str
+    ) -> type[PrismaModel]:
         """Returns the model that the field is related to.
 
         Raises UnknownModelError if the current model is invalid.
         Raises UnknownRelationalFieldError if the field does not exist.
         """
-        name = getattr(current_model, '__prisma_model__', MISSING)
+        name = getattr(current_model, "__prisma_model__", MISSING)
         if name is MISSING:
             raise InvalidModelError(current_model)
 
@@ -246,13 +250,15 @@ class QueryBuilder:
         try:
             info = model_fields(current_model)[field]
         except KeyError as exc:
-            raise UnknownRelationalFieldError(model=current_model.__name__, field=field) from exc
+            raise UnknownRelationalFieldError(
+                model=current_model.__name__, field=field
+            ) from exc
 
         model = _prisma_model_for_field(info, name=field, parent=current_model)
         if not model:
             raise RuntimeError(
                 f"The `{field}` field doesn't appear to be a Prisma Model type. "
-                + 'Is the field a pydantic.BaseModel type and does it have a `__prisma_model__` class variable?'
+                + "Is the field a pydantic.BaseModel type and does it have a `__prisma_model__` class variable?"
             )
 
         return model
@@ -288,7 +294,7 @@ def _prisma_model_for_field(
     cls_name = parent.__name__
     type_ = model_field_type(field)
     if type_ is None:
-        raise RuntimeError(f'Unexpected field type is None for {cls_name}.{name}')
+        raise RuntimeError(f"Unexpected field type is None for {cls_name}.{name}")
 
     types: Iterable[type]
     if is_union(get_origin(type_)):
@@ -299,19 +305,21 @@ def _prisma_model_for_field(
     for type_ in types:
         if isinstance(type_, ForwardRef):
             raise RuntimeError(
-                f'Encountered forward reference for {cls_name}.{name}; Forward references must be evaluated using {cls_name}.update_forward_refs()'
+                f"Encountered forward reference for {cls_name}.{name}; Forward references must be evaluated using {cls_name}.update_forward_refs()"
             )
 
         if is_list_type(type_) and type_ is not None:
             type_ = get_args(type_)[0]
 
-        if hasattr(type_, '__prisma_model__'):
+        if hasattr(type_, "__prisma_model__"):
             return type_
 
     return None
 
 
-def _field_is_prisma_model(field: FieldInfo, *, name: str, parent: type[BaseModel]) -> bool:
+def _field_is_prisma_model(
+    field: FieldInfo, *, name: str, parent: type[BaseModel]
+) -> bool:
     """Whether or not the given field info represents a model at the database level.
 
     This will return `True` for cases where the field represents a list of models or a single model.
@@ -354,14 +362,19 @@ class Node(AbstractNode):
     children: list[ChildType]
 
     __slots__ = (
-        'joiner',
-        'indent',
-        'builder',
-        'children',
+        "joiner",
+        "indent",
+        "builder",
+        "children",
     )
 
     def __init__(
-        self, builder: QueryBuilder, *, joiner: str = '\n', indent: str = '  ', children: list[ChildType] | None = None
+        self,
+        builder: QueryBuilder,
+        *,
+        joiner: str = "\n",
+        indent: str = "  ",
+        children: list[ChildType] | None = None,
     ) -> None:
         self.builder = builder
         self.joiner = joiner
@@ -432,12 +445,12 @@ class Node(AbstractNode):
         return []
 
     @classmethod
-    def create(cls, builder: QueryBuilder | None = None, **kwargs: Any) -> 'Node':
+    def create(cls, builder: QueryBuilder | None = None, **kwargs: Any) -> "Node":
         """Create the node and its children
 
         This is useful for subclasses that add extra attributes in __init__
         """
-        kwargs.setdefault('builder', builder)
+        kwargs.setdefault("builder", builder)
         node = cls(**kwargs)
         node.children.extend(node.create_children())
         return node
@@ -461,11 +474,11 @@ class RootNode(Node):
 
     @override
     def enter(self) -> str:
-        return f'{self.builder.operation} {{'
+        return f"{self.builder.operation} {{"
 
     @override
     def depart(self) -> str:
-        return '}'
+        return "}"
 
     @override
     def render(self) -> str:
@@ -476,7 +489,7 @@ class RootNode(Node):
             # should not be rendered but as this node will
             # always be rendered it should always return
             # a non-empty string.
-            raise RuntimeError('Could not generate query.')
+            raise RuntimeError("Could not generate query.")
         return content
 
 
@@ -494,7 +507,7 @@ class ResultNode(Node):
 
     __slots__ = ()
 
-    def __init__(self, indent: str = '', **kwargs: Any) -> None:
+    def __init__(self, indent: str = "", **kwargs: Any) -> None:
         super().__init__(indent=indent, **kwargs)
 
     @override
@@ -503,10 +516,10 @@ class ResultNode(Node):
         if model is not None:
             model_name = model.__prisma_model__
         else:
-            model_name = ''
+            model_name = ""
 
         method = self.builder.method_format.format(model=model_name)
-        return f'result: {method}'
+        return f"result: {method}"
 
     @override
     def depart(self) -> str | None:
@@ -537,7 +550,7 @@ class Arguments(Node):
 
     arguments: dict[str, Any]
 
-    __slots__ = ('arguments',)
+    __slots__ = ("arguments",)
 
     def __init__(self, arguments: dict[str, Any], **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -549,14 +562,16 @@ class Arguments(Node):
 
     @override
     def enter(self) -> str:
-        return '('
+        return "("
 
     @override
     def depart(self) -> str:
-        return ')'
+        return ")"
 
     @override
-    def create_children(self, arguments: dict[str, Any] | None = None) -> list[ChildType]:
+    def create_children(
+        self, arguments: dict[str, Any] | None = None
+    ) -> list[ChildType]:
         children: list[ChildType] = []
 
         for arg, value in self.arguments.items():
@@ -571,12 +586,14 @@ class Arguments(Node):
                 # here as prisma expects parameters to be passed as a json string
                 # value like "[\"John\",\"123\"]", and we encode twice to ensure
                 # that only the inner quotes are escaped
-                if self.builder.method in {'query_raw', 'query_first', 'execute_raw'}:
-                    children.append(f'{arg}: {dumps(dumps(value))}')
+                if self.builder.method in {"query_raw", "query_first", "execute_raw"}:
+                    children.append(f"{arg}: {dumps(dumps(value))}")
                 else:
-                    children.append(Key(arg, node=ListNode.create(self.builder, data=value)))
+                    children.append(
+                        Key(arg, node=ListNode.create(self.builder, data=value))
+                    )
             else:
-                children.append(f'{arg}: {dumps(value)}')
+                children.append(f"{arg}: {dumps(value)}")
 
         return children
 
@@ -595,7 +612,7 @@ class Data(Node):
 
     data: Mapping[str, Any]
 
-    __slots__ = ('data',)
+    __slots__ = ("data",)
 
     def __init__(self, data: Mapping[str, Any], **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -603,11 +620,11 @@ class Data(Node):
 
     @override
     def enter(self) -> str:
-        return '{'
+        return "{"
 
     @override
     def depart(self) -> str:
-        return '}'
+        return "}"
 
     @override
     def create_children(self) -> list[ChildType]:
@@ -617,9 +634,11 @@ class Data(Node):
             if isinstance(value, dict):
                 children.append(Key(key, node=Data.create(self.builder, data=value)))
             elif isinstance(value, (list, tuple, set)):
-                children.append(Key(key, node=ListNode.create(self.builder, data=value)))
+                children.append(
+                    Key(key, node=ListNode.create(self.builder, data=value))
+                )
             else:
-                children.append(f'{key}: {dumps(value)}')
+                children.append(f"{key}: {dumps(value)}")
 
         return children
 
@@ -627,19 +646,19 @@ class Data(Node):
 class ListNode(Node):
     data: Iterable[Any]
 
-    __slots__ = ('data',)
+    __slots__ = ("data",)
 
-    def __init__(self, data: Iterable[Any], joiner: str = ',\n', **kwargs: Any) -> None:
+    def __init__(self, data: Iterable[Any], joiner: str = ",\n", **kwargs: Any) -> None:
         super().__init__(joiner=joiner, **kwargs)
         self.data = data
 
     @override
     def enter(self) -> str:
-        return '['
+        return "["
 
     @override
     def depart(self) -> str:
-        return ']'
+        return "]"
 
     @override
     def create_children(self) -> list[ChildType]:
@@ -699,9 +718,9 @@ class Selection(Node):
     root_selection: list[str] | None
 
     __slots__ = (
-        'model',
-        'include',
-        'root_selection',
+        "model",
+        "include",
+        "root_selection",
     )
 
     def __init__(
@@ -722,11 +741,11 @@ class Selection(Node):
 
     @override
     def enter(self) -> str:
-        return '{'
+        return "{"
 
     @override
     def depart(self) -> str:
-        return '}'
+        return "}"
 
     @override
     def create_children(self) -> list[ChildType]:
@@ -746,7 +765,7 @@ class Selection(Node):
 
         if include is not None:
             if model is None:
-                raise ValueError('Cannot include fields when model is None.')
+                raise ValueError("Cannot include fields when model is None.")
 
             for key, value in include.items():
                 if value is True:
@@ -754,11 +773,13 @@ class Selection(Node):
                     children.append(
                         Key(
                             key,
-                            sep=' ',
+                            sep=" ",
                             node=Selection.create(
                                 builder,
                                 include=None,
-                                model=builder.get_relational_model(current_model=model, field=key),
+                                model=builder.get_relational_model(
+                                    current_model=model, field=key
+                                ),
                             ),
                         )
                     )
@@ -766,25 +787,29 @@ class Selection(Node):
                     # e.g. given {'posts': {where': {'published': True}}} return
                     # posts( where: { published: true }) { post_fields }
                     args = value.copy()
-                    nested_include = args.pop('include', None)
+                    nested_include = args.pop("include", None)
                     children.extend(
                         [
                             Key(
                                 key,
-                                sep='',
+                                sep="",
                                 node=Arguments.create(builder, arguments=args),
                             ),
                             Selection.create(
                                 builder,
                                 include=nested_include,
-                                model=builder.get_relational_model(current_model=model, field=key),
+                                model=builder.get_relational_model(
+                                    current_model=model, field=key
+                                ),
                             ),
                         ]
                     )
                 elif value is False:
                     continue
                 else:
-                    raise TypeError(f'Expected `bool` or `dict` include value but got {type(value)} instead.')
+                    raise TypeError(
+                        f"Expected `bool` or `dict` include value but got {type(value)} instead."
+                    )
 
         return children
 
@@ -797,12 +822,12 @@ class Key(AbstractNode):
     node: Node
 
     __slots__ = (
-        'key',
-        'sep',
-        'node',
+        "key",
+        "sep",
+        "node",
     )
 
-    def __init__(self, key: str, node: Node, sep: str = ': ') -> None:
+    def __init__(self, key: str, node: Node, sep: str = ": ") -> None:
         self.key = key
         self.node = node
         self.sep = sep
@@ -811,8 +836,8 @@ class Key(AbstractNode):
     def render(self) -> str:
         content = self.node.render()
         if content:
-            return f'{self.key}{self.sep}{content}'
-        return f'{self.key}{self.sep}'
+            return f"{self.key}{self.sep}{content}"
+        return f"{self.key}{self.sep}"
 
 
 @singledispatch
@@ -823,7 +848,7 @@ def serializer(obj: Any) -> Serializable:
     else:
         typ = type(obj)
 
-    raise TypeError(f'Type {typ} not serializable')
+    raise TypeError(f"Type {typ} not serializable")
 
 
 @serializer.register(datetime.datetime)
@@ -869,8 +894,8 @@ def serialize_decimal(obj: decimal.Decimal) -> str:
 
 
 def dumps(obj: Any, **kwargs: Any) -> str:
-    kwargs.setdefault('default', serializer)
-    kwargs.setdefault('ensure_ascii', False)
+    kwargs.setdefault("default", serializer)
+    kwargs.setdefault("ensure_ascii", False)
     return json.dumps(obj, **kwargs)
 
 

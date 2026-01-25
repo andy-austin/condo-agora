@@ -14,10 +14,10 @@ from typing_extensions import (
 import httpx
 from pydantic import BaseModel
 
-Method = Literal['GET', 'POST']
+Method = Literal["GET", "POST"]
 
-CallableT = TypeVar('CallableT', bound='FuncType')
-BaseModelT = TypeVar('BaseModelT', bound=BaseModel)
+CallableT = TypeVar("CallableT", bound="FuncType")
+BaseModelT = TypeVar("BaseModelT", bound=BaseModel)
 
 # TODO: use a TypeVar everywhere
 FuncType = Callable[..., object]
@@ -26,7 +26,7 @@ CoroType = Callable[..., Coroutine[Any, Any, object]]
 
 @runtime_checkable
 class InheritsGeneric(Protocol):
-    __orig_bases__: Tuple['_GenericAlias']
+    __orig_bases__: Tuple["_GenericAlias"]
 
 
 class _GenericAlias(Protocol):
@@ -35,25 +35,25 @@ class _GenericAlias(Protocol):
 
 PrismaMethod = Literal[
     # raw queries
-    'query_raw',
-    'query_first',
-    'execute_raw',
+    "query_raw",
+    "query_first",
+    "execute_raw",
     # mutatitive queries
-    'create',
-    'delete',
-    'update',
-    'upsert',
-    'create_many',
-    'delete_many',
-    'update_many',
+    "create",
+    "delete",
+    "update",
+    "upsert",
+    "create_many",
+    "delete_many",
+    "update_many",
     # read queries
-    'count',
-    'group_by',
-    'find_many',
-    'find_first',
-    'find_first_or_raise',
-    'find_unique',
-    'find_unique_or_raise',
+    "count",
+    "group_by",
+    "find_many",
+    "find_first",
+    "find_first_or_raise",
+    "find_unique",
+    "find_unique_or_raise",
 ]
 
 
@@ -69,10 +69,10 @@ class HttpConfig(TypedDict, total=False):
     max_redirects: int
 
 
-SortMode = Literal['default', 'insensitive']
-SortOrder = Literal['asc', 'desc']
+SortMode = Literal["default", "insensitive"]
+SortOrder = Literal["asc", "desc"]
 
-MetricsFormat = Literal['json', 'prometheus']
+MetricsFormat = Literal["json", "prometheus"]
 
 
 class _DatasourceOverrideOptional(TypedDict, total=False):
@@ -94,4 +94,4 @@ class Datasource(_DatasourceOptional):
     url: str
 
 
-TransactionId = NewType('TransactionId', str)
+TransactionId = NewType("TransactionId", str)

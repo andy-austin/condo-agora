@@ -39,5 +39,3 @@ from typing_extensions import TypedDict, Literal
 LiteralString = str
 # -- template enums.py.jinja --
 from ._compat import StrEnum
-
-

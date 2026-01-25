@@ -9,40 +9,40 @@ from ._compat import model_parse
 
 # from https://github.com/prisma/prisma/blob/7da6f030350931eff8574e805acb9c0de9087e8e/packages/client/src/runtime/utils/deserializeRawResults.ts
 PrismaType = Literal[
-    'int',
-    'bigint',
-    'float',
-    'double',
-    'string',
-    'enum',
-    'bytes',
-    'bool',
-    'char',
-    'decimal',
-    'json',
-    'xml',
-    'uuid',
-    'datetime',
-    'date',
-    'time',
-    'int-array',
-    'bigint-array',
-    'float-array',
-    'double-array',
-    'string-array',
-    'enum-array',
-    'bytes-array',
-    'bool-array',
-    'char-array',
-    'decimal-array',
-    'json-array',
-    'xml-array',
-    'uuid-array',
-    'datetime-array',
-    'date-array',
-    'time-array',
-    'unknown-array',
-    'unknown',
+    "int",
+    "bigint",
+    "float",
+    "double",
+    "string",
+    "enum",
+    "bytes",
+    "bool",
+    "char",
+    "decimal",
+    "json",
+    "xml",
+    "uuid",
+    "datetime",
+    "date",
+    "time",
+    "int-array",
+    "bigint-array",
+    "float-array",
+    "double-array",
+    "string-array",
+    "enum-array",
+    "bytes-array",
+    "bool-array",
+    "char-array",
+    "decimal-array",
+    "json-array",
+    "xml-array",
+    "uuid-array",
+    "datetime-array",
+    "date-array",
+    "time-array",
+    "unknown-array",
+    "unknown",
 ]
 
 
@@ -84,14 +84,20 @@ def deserialize_raw_results(
     Otherwise results are returned as a dictionary
     """
     result = RawQueryResult(
-        columns=raw_result['columns'],
-        types=raw_result['types'],
-        rows=raw_result['rows'],
+        columns=raw_result["columns"],
+        types=raw_result["types"],
+        rows=raw_result["rows"],
     )
     if model is not None:
-        return [_deserialize_prisma_object(obj, result=result, model=model, for_model=True) for obj in result.rows]
+        return [
+            _deserialize_prisma_object(obj, result=result, model=model, for_model=True)
+            for obj in result.rows
+        ]
 
-    return [_deserialize_prisma_object(obj, result=result, for_model=False) for obj in result.rows]
+    return [
+        _deserialize_prisma_object(obj, result=result, for_model=False)
+        for obj in result.rows
+    ]
 
 
 # NOTE: this very weird `for_model` API is simply here as a workaround for
@@ -139,25 +145,31 @@ def _deserialize_prisma_object(
             new_obj[key] = None
             continue
 
-        if prisma_type.endswith('-array'):
+        if prisma_type.endswith("-array"):
             if not isinstance(field, list):
                 raise TypeError(
-                    f'Expected array data for {key} column with internal type {prisma_type}',
+                    f"Expected array data for {key} column with internal type {prisma_type}",
                 )
 
-            item_type, _ = prisma_type.split('-')
+            item_type, _ = prisma_type.split("-")
 
             new_obj[key] = [
-                _deserializers[item_type](value, for_model)
-                #
-                if item_type in _deserializers
-                else value
+                (
+                    _deserializers[item_type](value, for_model)
+                    #
+                    if item_type in _deserializers
+                    else value
+                )
                 for value in field
             ]
         else:
             value = field
 
-            new_obj[key] = _deserializers[prisma_type](value, for_model) if prisma_type in _deserializers else value
+            new_obj[key] = (
+                _deserializers[prisma_type](value, for_model)
+                if prisma_type in _deserializers
+                else value
+            )
 
     if model is not None:
         return model_parse(model, new_obj)
@@ -188,7 +200,7 @@ def _deserialize_json(value: object, for_model: bool) -> object:
 
 
 DESERIALIZERS: dict[PrismaType, Callable[[Any, bool], object]] = {
-    'bigint': _deserialize_bigint,
-    'decimal': _deserialize_decimal,
-    'json': _deserialize_json,
+    "bigint": _deserialize_bigint,
+    "decimal": _deserialize_decimal,
+    "json": _deserialize_json,
 }
