@@ -1,57 +1,52 @@
 from typing import Generic, List, Optional, Type, TypeVar
 
-from sqlalchemy.orm import Session
+from prisma import Prisma
 
-from ..models.base import BaseModel
-
-ModelType = TypeVar("ModelType", bound=BaseModel)
+ModelType = TypeVar("ModelType")
 CreateSchemaType = TypeVar("CreateSchemaType")
 UpdateSchemaType = TypeVar("UpdateSchemaType")
 
 
 class BaseResolver(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
-    model: Type[ModelType]
+    model_name: str  # e.g., 'note'
 
     @classmethod
-    def get_all(cls, db: Session) -> List[ModelType]:
-        return db.query(cls.model).all()
+    async def get_all(cls, db: Prisma) -> List[ModelType]:
+        model_delegate = getattr(db, cls.model_name)
+        return await model_delegate.find_many()
 
     @classmethod
-    def get_by_id(cls, db: Session, id: int) -> Optional[ModelType]:
-        return db.query(cls.model).filter(cls.model.id == id).first()
+    async def get_by_id(cls, db: Prisma, id: int) -> Optional[ModelType]:
+        model_delegate = getattr(db, cls.model_name)
+        return await model_delegate.find_unique(where={"id": id})
 
     @classmethod
-    def create(cls, db: Session, obj_in: CreateSchemaType) -> ModelType:
+    async def create(cls, db: Prisma, obj_in: CreateSchemaType) -> ModelType:
+        model_delegate = getattr(db, cls.model_name)
         obj_data = obj_in.__dict__
-        db_obj = cls.model(**obj_data)
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
+        # Convert GraphQL casing to Prisma model casing if needed
+        if "is_published" in obj_data:
+            obj_data["isPublished"] = obj_data.pop("is_published")
+
+        return await model_delegate.create(data=obj_data)
 
     @classmethod
-    def update(
-        cls, db: Session, id: int, obj_in: UpdateSchemaType
+    async def update(
+        cls, db: Prisma, id: int, obj_in: UpdateSchemaType
     ) -> Optional[ModelType]:
-        db_obj = cls.get_by_id(db, id)
-        if not db_obj:
-            return None
+        model_delegate = getattr(db, cls.model_name)
+        obj_data = {k: v for k, v in obj_in.__dict__.items() if v is not None}
 
-        obj_data = obj_in.__dict__
-        for field, value in obj_data.items():
-            if value is not None:
-                setattr(db_obj, field, value)
+        if "is_published" in obj_data:
+            obj_data["isPublished"] = obj_data.pop("is_published")
 
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
+        return await model_delegate.update(where={"id": id}, data=obj_data)
 
     @classmethod
-    def delete(cls, db: Session, id: int) -> bool:
-        db_obj = cls.get_by_id(db, id)
-        if not db_obj:
+    async def delete(cls, db: Prisma, id: int) -> bool:
+        model_delegate = getattr(db, cls.model_name)
+        try:
+            await model_delegate.delete(where={"id": id})
+            return True
+        except Exception:
             return False
-
-        db.delete(db_obj)
-        db.commit()
-        return True

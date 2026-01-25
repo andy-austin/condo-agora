@@ -1,14 +1,14 @@
 import strawberry
 
 from ..resolvers.health import HealthResolver
-from ..types.health import DatabaseStatus, HealthStatus, ServiceStatus
+from ..graphql_types.health import DatabaseStatus, HealthStatus, ServiceStatus
 
 
 @strawberry.type
 class HealthQueries:
     @strawberry.field
-    def health(self) -> HealthStatus:
-        health_data = HealthResolver.get_health_status()
+    async def health(self) -> HealthStatus:
+        health_data = await HealthResolver.get_health_status()
 
         return HealthStatus(
             status=health_data["status"],

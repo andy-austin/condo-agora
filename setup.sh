@@ -32,6 +32,35 @@ else
     echo "⚠️  No requirements.txt found in apps/api/"
 fi
 
+# Set up environment variables
+echo "🔑 Setting up environment variables..."
+if [ ! -f ".env.local" ]; then
+    if [ -f ".env.local.example" ]; then
+        echo "Creating .env.local from .env.local.example..."
+        cp .env.local.example .env.local
+        echo "⚠️  Please update .env.local with your actual database credentials."
+    else
+        echo "⚠️  .env.local.example not found. Skipping .env.local creation."
+    fi
+else
+    echo ".env.local already exists"
+fi
+
+# Ensure .env exists for Prisma (symlink or copy)
+if [ -f ".env.local" ] && [ ! -f ".env" ]; then
+    echo "Creating .env symlink for Prisma compatibility..."
+    ln -s .env.local .env
+fi
+
+# Generate Prisma client
+echo "💎 Generating Prisma client..."
+if [ -d "apps/api/prisma" ]; then
+    pnpm --filter api run prisma:generate
+    echo "✅ Prisma client generated!"
+else
+    echo "⚠️  Prisma schema directory not found in apps/api/prisma"
+fi
+
 # Set up pre-commit hooks (optional)
 echo "🔧 Setting up pre-commit hooks..."
 if command -v python3 &> /dev/null; then

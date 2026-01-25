@@ -3,7 +3,7 @@ from typing import List, Optional
 import strawberry
 
 from ..resolvers.note import NoteResolver
-from ..types.note import CreateNoteInput, Note, UpdateNoteInput
+from ..graphql_types.note import CreateNoteInput, Note, UpdateNoteInput
 from .base import BaseSchemaGenerator
 
 
@@ -17,24 +17,24 @@ class NoteSchemaGenerator(
 @strawberry.type
 class NoteQueries:
     @strawberry.field
-    def notes(self) -> List[Note]:
-        return NoteSchemaGenerator.get_all_query()
+    async def notes(self) -> List[Note]:
+        return await NoteSchemaGenerator.get_all_query()
 
     @strawberry.field
-    def note(self, id: int) -> Optional[Note]:
-        return NoteSchemaGenerator.get_by_id_query(id)
+    async def note(self, id: int) -> Optional[Note]:
+        return await NoteSchemaGenerator.get_by_id_query(id)
 
 
 @strawberry.type
 class NoteMutations:
     @strawberry.field
-    def create_note(self, input: CreateNoteInput) -> Note:
-        return NoteSchemaGenerator.create_mutation(input)
+    async def create_note(self, input: CreateNoteInput) -> Note:
+        return await NoteSchemaGenerator.create_mutation(input)
 
     @strawberry.field
-    def update_note(self, id: int, input: UpdateNoteInput) -> Optional[Note]:
-        return NoteSchemaGenerator.update_mutation(id, input)
+    async def update_note(self, id: int, input: UpdateNoteInput) -> Optional[Note]:
+        return await NoteSchemaGenerator.update_mutation(id, input)
 
     @strawberry.field
-    def delete_note(self, id: int) -> bool:
-        return NoteSchemaGenerator.delete_mutation(id)
+    async def delete_note(self, id: int) -> bool:
+        return await NoteSchemaGenerator.delete_mutation(id)
