@@ -239,7 +239,5 @@ node_modules/
 *.sqlite3
 *.db
 .gemini/
+.mcp.json
 .DS_Store
-
-# Prisma generated client
-apps/api/prisma_client/
