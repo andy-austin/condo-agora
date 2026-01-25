@@ -138,7 +138,7 @@ class Prisma(AsyncBasePrisma):
     def _default_datasource(self) -> Datasource:
         return {
             'name': 'db',
-            'url': OptionalValueFromEnvVar(**{'value': None, 'fromEnvVar': 'POSTGRES_URL_NON_POOLING'}).resolve(),
+            'url': OptionalValueFromEnvVar(**{'value': None, 'fromEnvVar': 'DATABASE_URL'}).resolve(),
             'source_file_path': '/Users/andyfernandez/Projects/condo-agora/apps/api/prisma/schema.prisma',
         }
 
