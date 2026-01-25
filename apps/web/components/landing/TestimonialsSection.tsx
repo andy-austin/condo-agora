@@ -52,7 +52,7 @@ export function TestimonialsSection() {
               </div>
 
               <p className="text-foreground mb-6 leading-relaxed">
-                "{testimonial.quote}"
+                &quot;{testimonial.quote}&quot;
               </p>
 
               <div>
