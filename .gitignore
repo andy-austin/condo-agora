@@ -217,7 +217,10 @@ node_modules/
 
 # Environment variables file
 .env
+.env.local
+.env.*
 !.env.example
+!.env.*.example
 
 # TurboRepo
 .turbo/
@@ -234,6 +237,7 @@ node_modules/
 .husky
 .husky/_/
 .vercel
+apps/web/.clerk/
 
 # Local SQLite database files
 *.sqlite3
