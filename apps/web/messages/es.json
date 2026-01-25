@@ -168,9 +168,14 @@
     "refresh": "Actualizar",
     "serviceStatus": "Estado de Servicios",
     "api": "API",
-    "database": "Base de Datos",
-    "connected": "Conectado",
-    "disconnected": "Desconectado",
+    "database": {
+      "label": "Base de Datos",
+      "connected": "Conectado",
+      "disconnected": "Desconectado",
+      "connectionError": "Error de conexión",
+      "queryError": "Error de consulta",
+      "unexpectedResult": "Resultado inesperado"
+    },
     "dbDetails": "Detalles BD",
     "serverTime": "Hora del servidor",
     "allOperational": "✓ Todos los sistemas operativos",

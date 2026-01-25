@@ -45,13 +45,13 @@ class HealthResolver:
                 health_data["database"]["status"] = StatusValues.ERROR
                 health_data["database"][
                     "details"
-                ] = f"{TranslationKeys.DB_QUERY_ERROR}: {str(db_error)}"
+                ] = TranslationKeys.DB_QUERY_ERROR
                 health_data["status"] = StatusValues.ERROR
         except Exception as connection_error:
             health_data["database"]["status"] = StatusValues.ERROR
             health_data["database"][
                 "details"
-            ] = f"{TranslationKeys.DB_CONNECTION_ERROR}: {str(connection_error)}"
+            ] = TranslationKeys.DB_CONNECTION_ERROR
             health_data["status"] = StatusValues.ERROR
 
         return health_data

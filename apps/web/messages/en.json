@@ -168,9 +168,14 @@
     "refresh": "Refresh",
     "serviceStatus": "Service Status",
     "api": "API",
-    "database": "Database",
-    "connected": "Connected",
-    "disconnected": "Disconnected",
+    "database": {
+      "label": "Database",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "connectionError": "Connection Error",
+      "queryError": "Query Error",
+      "unexpectedResult": "Unexpected Result"
+    },
     "dbDetails": "DB Details",
     "serverTime": "Server time",
     "allOperational": "✓ All systems operational",

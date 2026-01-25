@@ -86,14 +86,14 @@ export default function GraphQLStatusCard() {
 
                 <Card className="p-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{t('database')}</span>
+                    <span className="text-sm font-medium">{t('database.label')}</span>
                     <Badge
                       variant={
                         healthData.database.status === 'ok' ? 'default' :
                         healthData.database.status === 'error' ? 'destructive' : 'secondary'
                       }
                     >
-                      {healthData.database.connection ? t('connected') : t('disconnected')}
+                      {healthData.database.connection ? t('database.connected') : t('database.disconnected')}
                     </Badge>
                   </div>
                 </Card>
@@ -102,7 +102,7 @@ export default function GraphQLStatusCard() {
               {healthData.database.details && (
                 <Card className="mt-3 p-3 bg-muted/50">
                   <div className="text-sm">
-                    <strong>{t('dbDetails')}:</strong> {healthData.database.details}
+                    <strong>{t('dbDetails')}:</strong> {t(healthData.database.details)}
                   </div>
                 </Card>
               )}
