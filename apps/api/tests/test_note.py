@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 os.environ["POSTGRES_URL_NON_POOLING"] = "postgresql://test:test@localhost:5432/test_db"
 
 # Mock Prisma before any imports that might trigger connection
-with patch("prisma.Prisma") as mock_prisma:
+with patch("apps.api.prisma_client.Prisma") as mock_prisma:
     mock_instance = MagicMock()
     mock_instance.is_connected.return_value = True
     mock_prisma.return_value = mock_instance

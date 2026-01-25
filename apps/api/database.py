@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from prisma import Prisma
+from .prisma_client import Prisma
 
 # Load environment variables from the root directory
 env_path = os.path.join(

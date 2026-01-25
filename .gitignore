@@ -240,3 +240,6 @@ node_modules/
 *.db
 .gemini/
 .DS_Store
+
+# Prisma generated client
+apps/api/prisma_client/
