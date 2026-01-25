@@ -1,33 +1,32 @@
-# Implementation Plan: User Authentication Integration
+# Implementation Plan: User Authentication Integration (Clerk)
 
 **Branch**: `001-user-auth-integration` | **Date**: 2026-01-25 | **Spec**: [User Authentication Integration](spec.md)
 **Input**: Feature specification from `/docs/features/specs/001-user-auth-integration/spec.md`
 
 ## Summary
 
-Implement a secure, token-based authentication system using Python/FastAPI native tools (OAuth2, JWT) instead of the incompatible `better-auth` library. The solution will support Email/Password registration, Google SSO, Organization-based multi-tenancy, and secure Invitation/Password Reset flows.
+Integrate **Clerk** for authentication to offload complexity (security, UI, SSO, password management). The architecture relies on a "Split Responsibility" model:
+- **Identity (AuthN)**: Managed by Clerk.
+- **Data/Authorization (AuthZ)**: Managed by our Python Backend (FastAPI + Prisma).
+- **Bridge**: Webhooks sync Identity to Data.
 
 ## Technical Context
 
 **Language/Version**: Python 3.11 (Backend), TypeScript 5 (Frontend)
 **Primary Dependencies**: 
-- Backend: `fastapi`, `python-jose`, `passlib[bcrypt]`, `pydantic`
-- Frontend: `next`, `lucide-react` (icons), React Context (no external auth lib)
+- Backend: `svix` (Webhook verification), `httpx` (JWKS fetching), `pydantic`
+- Frontend: `@clerk/nextjs`
 **Storage**: PostgreSQL (via Prisma)
-**Testing**: `pytest` (Backend Auth Flows), `jest` (Frontend Components)
-**Target Platform**: Vercel (Next.js) + Vercel Functions (FastAPI)
-**Project Type**: Full-stack Monorepo (Turborepo)
-**Performance Goals**: Login < 500ms, JWT validation < 10ms
-**Constraints**: Strict Type Safety, 100% Test Coverage for Auth Logic
+**Testing**: `pytest` (Webhook handling, Token verification), `jest` (Component integration)
+**Target Platform**: Vercel
+**Performance Goals**: API Token validation < 10ms (using cached JWKS).
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
-
-- **I. Code Quality**: Uses standard Python typing and Next.js strict mode.
-- **II. Testing**: Includes comprehensive `pytest` plan for all auth flows.
-- **III. UX**: Adheres to existing design system; standard auth patterns.
-- **IV. Performance**: JWT is stateless and fast; no extra DB hits for session validation on read-heavy routes (unless checking revocation).
+- **I. Code Quality**: Uses strict typing. Python will define Pydantic models for Clerk Webhook payloads.
+- **II. Testing**: Webhook logic will be unit tested with mock payloads.
+- **III. UX**: Uses Clerk's pre-built components (consistent, accessible).
+- **IV. Performance**: API uses stateless JWT validation (fast).
 
 ## Project Structure
 
@@ -36,11 +35,8 @@ Implement a secure, token-based authentication system using Python/FastAPI nativ
 ```text
 docs/features/specs/001-user-auth-integration/
 ├── plan.md              # This file
-├── research.md          # Strategy decision (Reject better-auth, use Custom JWT)
-├── data-model.md        # User, Organization, Invitation entities
-├── quickstart.md        # Setup guide for Auth
-├── contracts/           # OpenAPI spec
-│   └── openapi.yaml
+├── research.md          # Decision to use Clerk
+├── data-model.md        # Updated User model (clerk_id)
 └── tasks.md             # To be generated
 ```
 
@@ -50,32 +46,31 @@ docs/features/specs/001-user-auth-integration/
 apps/api/
 ├── src/
 │   ├── auth/
-│   │   ├── router.py       # Auth endpoints
-│   │   ├── service.py      # Business logic (login, register, invite)
-│   │   ├── utils.py        # Hashing, JWT generation
-│   │   └── dependencies.py # current_user dependency
+│   │   ├── webhooks.py     # Clerk Webhook Handler (User Sync)
+│   │   ├── router.py       # Exposes /webhooks/clerk
+│   │   ├── utils.py        # JWT Verification Logic
+│   │   └── dependencies.py # get_current_user (extracts clerk_id from token)
 │   └── ...
 └── prisma/
-    └── schema.prisma       # Updated models
+    └── schema.prisma       # User model with clerk_id
 
 apps/web/
 ├── app/
-│   ├── (auth)/             # Auth pages layout
-│   │   ├── login/
-│   │   ├── register/
-│   │   ├── invite/
-│   │   └── forgot-password/
-│   └── ...
-├── lib/
-│   ├── auth-context.tsx    # React Context for auth state
-│   └── api.ts              # API client with interceptors
-└── middleware.ts           # Route protection
+│   ├── sign-in/[[...sign-in]]/page.tsx  # Clerk Page
+│   ├── sign-up/[[...sign-up]]/page.tsx  # Clerk Page
+│   └── layout.tsx                       # ClerkProvider wrapper
+└── middleware.ts                        # Clerk Middleware
 ```
-
-**Structure Decision**: Standard "Service-Controller" pattern in FastAPI for backend logic. Next.js App Router with Route Groups `(auth)` for frontend pages.
 
 ## Complexity Tracking
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| Custom Auth Implementation | `better-auth` is Node-only. | `FastAPI-Users` was rejected due to complex customization requirements for the "Organization" multi-tenant model. |
+| External Auth Provider | Reduces code liability (security). | Building own auth is error-prone and maintenance heavy. |
+| Webhooks | Necessary to keep local DB in sync. | Fetching user data on every request is too slow (latency). |
+
+## Data Flow
+
+1.  **Sign Up**: User -> Clerk Frontend -> Clerk Backend.
+2.  **Sync**: Clerk Backend -> Webhook (POST /api/webhooks/clerk) -> FastAPI -> DB (Create User).
+3.  **API Call**: Frontend -> API (Bearer Token) -> FastAPI (Verify Token + Lookup User by `clerk_id`) -> Response.
