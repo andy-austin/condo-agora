@@ -57,3 +57,10 @@ This is a full-stack monorepo combining **Next.js** (frontend) and **FastAPI** (
 - **TypeScript**: Strict mode enabled.
 - **GraphQL**: Used for all API communication. Schema defined in Python (`strawberry`), consumed by React.
 - **Styling**: Tailwind CSS for the frontend.
+
+## Active Technologies
+- Python 3.11 (Backend), TypeScript 5 (Frontend) (001-user-auth-integration)
+- PostgreSQL (via Prisma) (001-user-auth-integration)
+
+## Recent Changes
+- 001-user-auth-integration: Added Python 3.11 (Backend), TypeScript 5 (Frontend)

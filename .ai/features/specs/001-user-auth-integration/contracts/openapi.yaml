@@ -1,0 +1,189 @@
+openapi: 3.0.0
+info:
+  title: Condo Agora Auth API
+  version: 1.0.0
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user and create/join an organization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - full_name
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                full_name:
+                  type: string
+                org_name:
+                  type: string
+                  description: "Required if not joining via invite token"
+                invite_token:
+                  type: string
+                  description: "Optional token to join existing org"
+      responses:
+        '201':
+          description: User created and logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /auth/login:
+    post:
+      summary: Login with email and password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /auth/refresh:
+    post:
+      summary: Refresh access token using httpOnly refresh token cookie
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+
+  /auth/logout:
+    post:
+      summary: Logout user and clear cookies
+      responses:
+        '200':
+          description: Logged out successfully
+
+  /auth/google/login:
+    get:
+      summary: Initiate Google SSO
+      responses:
+        '302':
+          description: Redirect to Google
+
+  /auth/google/callback:
+    get:
+      summary: Handle Google callback
+      responses:
+        '302':
+          description: Redirect to frontend dashboard with tokens set
+
+  /auth/invite:
+    post:
+      summary: Invite a user to the organization
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - role
+                - organization_id
+              properties:
+                email:
+                  type: string
+                  format: email
+                role:
+                  type: string
+                  enum: [ADMIN, RESIDENT, MEMBER]
+                organization_id:
+                  type: string
+      responses:
+        '201':
+          description: Invitation sent
+
+  /auth/forgot-password:
+    post:
+      summary: Request password reset email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Reset email sent (if email exists)
+
+  /auth/reset-password:
+    post:
+      summary: Set new password using token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+                - new_password
+              properties:
+                token:
+                  type: string
+                new_password:
+                  type: string
+      responses:
+        '200':
+          description: Password updated
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        full_name:
+          type: string
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          default: bearer
+        user:
+          $ref: '#/components/schemas/User'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
