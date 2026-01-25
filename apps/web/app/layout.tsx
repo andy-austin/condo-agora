@@ -1,20 +1,34 @@
-import type { Metadata } from 'next'
-import { ReactNode } from 'react'
-import './globals.css'
+import type { Metadata } from 'next';
+import { ReactNode } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
+import './globals.css';
 
-export const metadata: Metadata = {
-  title: 'Vercel Python React',
-  description: 'Full-stack application with Next.js and Python FastAPI',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const messages = await getMessages();
+  const metadata = messages.metadata as { title: string; description: string };
 
-export default function RootLayout({
+  return {
+    title: metadata.title,
+    description: metadata.description,
+  };
+}
+
+export default async function RootLayout({
   children,
 }: {
-  children: ReactNode
+  children: ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang={locale}>
+      <body>
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
+      </body>
     </html>
-  )
+  );
 }

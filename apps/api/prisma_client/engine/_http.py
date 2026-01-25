@@ -45,27 +45,27 @@ class BaseHTTPEngine:
         parse_response: bool,
     ) -> tuple[str, dict[str, Any]]:
         if self.url is None:
-            raise errors.NotConnectedError("Not connected to the query engine")
+            raise errors.NotConnectedError('Not connected to the query engine')
 
         kwargs = {
-            "headers": {
+            'headers': {
                 **self.headers,
             }
         }
 
         if parse_response:
-            kwargs["headers"]["Accept"] = "application/json"
+            kwargs['headers']['Accept'] = 'application/json'
 
         if headers is not None:
-            kwargs["headers"].update(headers)
+            kwargs['headers'].update(headers)
 
         if content is not None:
-            kwargs["content"] = content
+            kwargs['content'] = content
 
         url = self.url + path
-        log.debug("Constructed %s request to %s", method, url)
-        log.debug("Request headers: %s", kwargs["headers"])
-        log.debug("Request content: %s", content)
+        log.debug('Constructed %s request to %s', method, url)
+        log.debug('Request headers: %s', kwargs['headers'])
+        log.debug('Request content: %s', content)
 
         return url, kwargs
 
@@ -80,11 +80,9 @@ class BaseHTTPEngine:
             data = json.loads(data)
 
         if not is_dict(data):
-            raise TypeError(
-                f"Expected deserialised engine response to be a dictionary, got {type(data)} - {data}"
-            )
+            raise TypeError(f'Expected deserialised engine response to be a dictionary, got {type(data)} - {data}')
 
-        errors_data = data.get("errors")
+        errors_data = data.get('errors')
         if errors_data:
             return utils.handle_response_errors(response, errors_data)
 
@@ -150,7 +148,7 @@ class SyncHTTPEngine(BaseHTTPEngine, SyncAbstractEngine):
         )
 
         response = self.session.request(method, url, **kwargs)
-        log.debug("%s %s returned status %s", method, url, response.status)
+        log.debug('%s %s returned status %s', method, url, response.status)
 
         if 300 > response.status >= 200:
             # In certain cases we just want to return the response content as-is.
@@ -159,11 +157,11 @@ class SyncHTTPEngine(BaseHTTPEngine, SyncAbstractEngine):
             # which is incompatible with JSON.
             if not parse_response:
                 text = response.text()
-                log.debug("%s %s returned text: %s", method, url, text)
+                log.debug('%s %s returned text: %s', method, url, text)
                 return text
 
             data = response.json()
-            log.debug("%s %s returned %s", method, url, data)
+            log.debug('%s %s returned %s', method, url, data)
 
             return self._process_response_data(data=data, response=response)
 
@@ -217,7 +215,7 @@ class AsyncHTTPEngine(BaseHTTPEngine, AsyncAbstractEngine):
         )
 
         response = await self.session.request(method, url, **kwargs)
-        log.debug("%s %s returned status %s", method, url, response.status)
+        log.debug('%s %s returned status %s', method, url, response.status)
 
         if 300 > response.status >= 200:
             # In certain cases we just want to return the response content as-is.
@@ -226,11 +224,11 @@ class AsyncHTTPEngine(BaseHTTPEngine, AsyncAbstractEngine):
             # which is incompatible with JSON.
             if not parse_response:
                 text = await response.text()
-                log.debug("%s %s returned text: %s", method, url, text)
+                log.debug('%s %s returned text: %s', method, url, text)
                 return text
 
             data = await response.json()
-            log.debug("%s %s returned %s", method, url, data)
+            log.debug('%s %s returned %s', method, url, data)
 
             return self._process_response_data(data=data, response=response)
 

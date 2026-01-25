@@ -1,0 +1,184 @@
+{
+  "metadata": {
+    "title": "Condo Ágora - Clear Decisions, Real Improvements",
+    "description": "The platform that transforms your building management. Propose, vote, and decide transparently and democratically."
+  },
+  "header": {
+    "brand": "Condo Ágora",
+    "features": "Features",
+    "howItWorks": "How It Works",
+    "testimonials": "Testimonials",
+    "login": "Sign In",
+    "requestDemo": "Request Demo"
+  },
+  "hero": {
+    "badge": "The new way to manage your community",
+    "headline1": "Clear",
+    "headline2": "decisions",
+    "headline3": "Real",
+    "headline4": "improvements",
+    "description": "The platform that transforms your building management. Propose, vote, and decide transparently and democratically.",
+    "ctaPrimary": "Request Free Demo",
+    "ctaSecondary": "Watch Video",
+    "mockupUrl": "app.condoagora.com.uy",
+    "mockupAlt": "Condo Ágora Dashboard"
+  },
+  "logoCloud": {
+    "title": "Trusted by over 200 buildings across Uruguay"
+  },
+  "problems": {
+    "label": "The Problem",
+    "title": "Tired of endless debates in the group chat?",
+    "description": "Buildings face communication problems that affect harmony and community progress. It's time for change.",
+    "cta": "Discover the solution",
+    "items": {
+      "lost": {
+        "title": "Lost proposals",
+        "description": "Important ideas get lost in the chaos of WhatsApp groups."
+      },
+      "transparency": {
+        "title": "Lack of transparency",
+        "description": "Decisions without consulting everyone generate distrust."
+      },
+      "slow": {
+        "title": "Slow processes",
+        "description": "Months of debates without reaching concrete agreements."
+      }
+    }
+  },
+  "features": {
+    "label": "Features",
+    "title": "Tools designed for community harmony",
+    "description": "Everything you need to manage your building efficiently and transparently.",
+    "items": {
+      "proposals": {
+        "title": "Centralized Proposals",
+        "description": "All proposals organized in one place. Easy to create, comment, and track.",
+        "benefits": ["Complete history", "Organized comments", "Automatic notifications"]
+      },
+      "voting": {
+        "title": "Priority Voting",
+        "description": "Intelligent voting system that allows prioritizing the most important proposals.",
+        "benefits": ["Anonymous voting", "Real-time results", "Multiple voting methods"]
+      },
+      "transparency": {
+        "title": "Total Transparency",
+        "description": "Clear and accessible reports for all community members.",
+        "benefits": ["Real-time dashboard", "Exportable reports", "Complete audit"]
+      },
+      "roles": {
+        "title": "Roles and Delegation",
+        "description": "Flexible permission management for different types of users.",
+        "benefits": ["Customizable roles", "Vote delegation", "Access control"]
+      }
+    }
+  },
+  "howItWorks": {
+    "label": "How It Works",
+    "title": "Simple, fast, and effective",
+    "description": "In four simple steps, transform your community management.",
+    "steps": {
+      "create": {
+        "number": "01",
+        "title": "Create your community",
+        "description": "Register your building and add all residents in minutes."
+      },
+      "propose": {
+        "number": "02",
+        "title": "Propose improvements",
+        "description": "Any member can create clear and structured proposals."
+      },
+      "vote": {
+        "number": "03",
+        "title": "Vote and decide",
+        "description": "Democratic voting system with transparent results."
+      },
+      "execute": {
+        "number": "04",
+        "title": "Execute and track",
+        "description": "Monitor the progress of approved improvements."
+      }
+    }
+  },
+  "testimonials": {
+    "label": "Testimonials",
+    "title": "What our communities say",
+    "description": "Over 200 buildings already trust Condo Ágora.",
+    "items": {
+      "maria": {
+        "name": "María González",
+        "role": "Board President",
+        "location": "Torres del Sol, Montevideo",
+        "quote": "Condo Ágora completely transformed our communication. Votes that used to take weeks are now resolved in days."
+      },
+      "carlos": {
+        "name": "Carlos Rodríguez",
+        "role": "Resident",
+        "location": "Residencial Aurora, Punta del Este",
+        "quote": "Finally I can see exactly how the community's money is being spent. The transparency is incredible."
+      },
+      "ana": {
+        "name": "Ana Martínez",
+        "role": "Property Manager",
+        "location": "Vista Mar, Colonia",
+        "quote": "I manage 3 buildings and this tool saves me hours of work every week. Essential."
+      }
+    }
+  },
+  "cta": {
+    "title": "Ready to transform your building management?",
+    "description": "Join the communities that are already making smarter and more transparent decisions.",
+    "ctaPrimary": "Request Free Demo",
+    "ctaSecondary": "Talk to Sales"
+  },
+  "footer": {
+    "brand": "Condo Ágora",
+    "description": "Clear decisions, real improvements. The platform that transforms your condominium's community management.",
+    "product": "Product",
+    "company": "Company",
+    "legal": "Legal",
+    "links": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "demo": "Demo",
+      "updates": "Updates",
+      "about": "About",
+      "blog": "Blog",
+      "careers": "Careers",
+      "contact": "Contact",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "cookies": "Cookies"
+    },
+    "copyright": "© 2024 Condo Ágora. All rights reserved.",
+    "tagline": "Made with ❤️ for more united communities"
+  },
+  "health": {
+    "title": "System Health",
+    "subtitle": "Monitor the health of your API services",
+    "status": {
+      "checking": "Checking...",
+      "healthy": "Healthy",
+      "degraded": "Degraded",
+      "error": "Error",
+      "unknown": "Unknown"
+    },
+    "endpoint": "Endpoint",
+    "lastChecked": "Last checked",
+    "refresh": "Refresh",
+    "serviceStatus": "Service Status",
+    "api": "API",
+    "database": "Database",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "dbDetails": "DB Details",
+    "serverTime": "Server time",
+    "allOperational": "✓ All systems operational",
+    "someIssues": "⚠ Some services may be experiencing issues"
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "es": "Español",
+    "en": "English"
+  }
+}

@@ -39,14 +39,11 @@ def parse_schema_dsl(text: str) -> ParseResult:
     """
     parts = scan_for_declarations(text)
     if not parts:
-        return {"type": "not_applicable"}
+        return {'type': 'not_applicable'}
 
     if len(parts) > 1:
         # TODO: include context in error message
-        return {
-            "type": "invalid",
-            "error": f"Encountered multiple `@Python` declarations",
-        }
+        return {'type': 'invalid', 'error': f'Encountered multiple `@Python` declarations'}
 
     start, end = parts[0]
 
@@ -55,10 +52,10 @@ def parse_schema_dsl(text: str) -> ParseResult:
     try:
         parsed = schema_extension_parser.parse(snippet)
     except UnexpectedInput as exc:
-        return {"type": "invalid", "error": str(exc) + exc.get_context(snippet)}
+        return {'type': 'invalid', 'error': str(exc) + exc.get_context(snippet)}
 
     transformed = transformer.transform(parsed)
-    return {"type": "ok", "value": transformed}
+    return {'type': 'ok', 'value': transformed}
 
 
 def scan_for_declarations(text: str) -> list[tuple[int, int]]:
@@ -74,17 +71,17 @@ def scan_for_declarations(text: str) -> list[tuple[int, int]]:
 
 
 class ParseResultOk(TypedDict):
-    type: Literal["ok"]
+    type: Literal['ok']
     value: TransformResult
 
 
 class ParseResultInvalid(TypedDict):
-    type: Literal["invalid"]
+    type: Literal['invalid']
     error: str
 
 
 class ParseResultNotApplicable(TypedDict):
-    type: Literal["not_applicable"]
+    type: Literal['not_applicable']
 
 
 ParseResult = Union[ParseResultOk, ParseResultInvalid, ParseResultNotApplicable]

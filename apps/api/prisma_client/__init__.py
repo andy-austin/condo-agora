@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-__title__ = "prisma"
-__author__ = "RobertCraigie"
-__license__ = "APACHE"
-__copyright__ = "Copyright 2020-2023 RobertCraigie"
-__version__ = "0.15.0"
+__title__ = 'prisma'
+__author__ = 'RobertCraigie'
+__license__ = 'APACHE'
+__copyright__ = 'Copyright 2020-2023 RobertCraigie'
+__version__ = '0.15.0'
 
 from typing import TYPE_CHECKING
 
@@ -48,12 +48,12 @@ except ModuleNotFoundError:
                 return globals()[name]
             except KeyError as err:
                 # TODO: support checking for 'models' here too
-                if name in {"Prisma", "Client"}:
+                if name in {'Prisma', 'Client'}:
                     # TODO: remove this frame from the stack trace
                     raise RuntimeError(
                         "The Client hasn't been generated yet, "
-                        "you must run `prisma generate` before you can use the client.\n"
-                        "See https://prisma-client-py.readthedocs.io/en/stable/reference/troubleshooting/#client-has-not-been-generated-yet"
+                        'you must run `prisma generate` before you can use the client.\n'
+                        'See https://prisma-client-py.readthedocs.io/en/stable/reference/troubleshooting/#client-has-not-been-generated-yet'
                     ) from None
 
                 # leaves handling of this potential error to Python as per PEP 562

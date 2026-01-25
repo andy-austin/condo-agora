@@ -2,38 +2,40 @@
 
 import { ArrowRight, Play } from "lucide-react";
 import Image from 'next/image';
+import { useTranslations } from "next-intl";
 
 export function HeroSection() {
+  const t = useTranslations('hero');
+
   return (
     <section className="pt-32 lg:pt-40 pb-20 lg:pb-32 overflow-hidden">
       <div className="container-tight">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            La nueva forma de gestionar tu comunidad
+            {t('badge')}
           </div>
 
           <h1 className="heading-xl mb-6">
-            Decisiones{" "}
-            <span className="text-gradient">claras</span>
+            {t('headline1')}{" "}
+            <span className="text-gradient">{t('headline2')}</span>
             <br />
-            Mejoras{" "}
-            <span className="text-gradient">reales</span>
+            {t('headline3')}{" "}
+            <span className="text-gradient">{t('headline4')}</span>
           </h1>
 
           <p className="text-body max-w-2xl mx-auto mb-10">
-            La plataforma que transforma la gestión de tu edificio. 
-            Proponé, votá y decidí de forma transparente y democrática.
+            {t('description')}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <button className="btn-primary">
-              Solicitar Demo Gratuita
+              {t('ctaPrimary')}
               <ArrowRight className="ml-2 w-5 h-5" />
             </button>
             <button className="btn-outline">
               <Play className="mr-2 w-5 h-5" />
-              Ver Video
+              {t('ctaSecondary')}
             </button>
           </div>
 
@@ -47,12 +49,12 @@ export function HeroSection() {
                   <div className="w-3 h-3 rounded-full bg-green-400" />
                 </div>
                 <div className="flex-1 text-center">
-                  <span className="text-xs text-muted-foreground">app.condoagora.com.uy</span>
+                  <span className="text-xs text-muted-foreground">{t('mockupUrl')}</span>
                 </div>
               </div>
               <Image
-                src="/app-mockup.jpg"
-                alt="Condo Ágora Dashboard"
+                src="/app-mockup.png"
+                alt={t('mockupAlt')}
                 width={1200}
                 height={800}
                 className="w-full h-auto"

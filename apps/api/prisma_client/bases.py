@@ -82,3 +82,5 @@ class BaseNote(_PrismaModel):
         from .client import get_client
 
         return actions.NoteActions[_PrismaModelT](client or get_client(), cls)
+
+

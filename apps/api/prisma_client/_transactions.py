@@ -16,8 +16,8 @@ if TYPE_CHECKING:
 log: logging.Logger = logging.getLogger(__name__)
 
 
-_SyncPrismaT = TypeVar("_SyncPrismaT", bound="SyncBasePrisma")
-_AsyncPrismaT = TypeVar("_AsyncPrismaT", bound="AsyncBasePrisma")
+_SyncPrismaT = TypeVar('_SyncPrismaT', bound='SyncBasePrisma')
+_AsyncPrismaT = TypeVar('_AsyncPrismaT', bound='AsyncBasePrisma')
 
 
 class AsyncTransactionManager(Generic[_AsyncPrismaT]):
@@ -38,9 +38,9 @@ class AsyncTransactionManager(Generic[_AsyncPrismaT]):
 
         if isinstance(max_wait, int):
             message = (
-                "Passing an int as `max_wait` argument is deprecated "
-                "and will be removed in the next major release. "
-                "Use a `datetime.timedelta` instance instead."
+                'Passing an int as `max_wait` argument is deprecated '
+                'and will be removed in the next major release. '
+                'Use a `datetime.timedelta` instance instead.'
             )
             warnings.warn(message, DeprecationWarning, stacklevel=3)
             max_wait = timedelta(milliseconds=max_wait)
@@ -49,9 +49,9 @@ class AsyncTransactionManager(Generic[_AsyncPrismaT]):
 
         if isinstance(timeout, int):
             message = (
-                "Passing an int as `timeout` argument is deprecated "
-                "and will be removed in the next major release. "
-                "Use a `datetime.timedelta` instance instead."
+                'Passing an int as `timeout` argument is deprecated '
+                'and will be removed in the next major release. '
+                'Use a `datetime.timedelta` instance instead.'
             )
             warnings.warn(message, DeprecationWarning, stacklevel=3)
             timeout = timedelta(milliseconds=timeout)
@@ -66,7 +66,7 @@ class AsyncTransactionManager(Generic[_AsyncPrismaT]):
             # if we were called from the context manager then the stacklevel
             # needs to be one higher to warn on the actual offending code
             warnings.warn(
-                "The current client is already in a transaction. This can lead to surprising behaviour.",
+                'The current client is already in a transaction. This can lead to surprising behaviour.',
                 UserWarning,
                 stacklevel=3 if _from_context else 2,
             )
@@ -74,8 +74,8 @@ class AsyncTransactionManager(Generic[_AsyncPrismaT]):
         tx_id = await self.__client._engine.start_transaction(
             content=dumps(
                 {
-                    "timeout": int(self._timeout.total_seconds() * 1000),
-                    "max_wait": int(self._max_wait.total_seconds() * 1000),
+                    'timeout': int(self._timeout.total_seconds() * 1000),
+                    'max_wait': int(self._max_wait.total_seconds() * 1000),
                 }
             ),
         )
@@ -108,18 +108,17 @@ class AsyncTransactionManager(Generic[_AsyncPrismaT]):
         exc_tb: TracebackType | None,
     ) -> None:
         if exc is None:
-            log.debug("Transaction exited with no exception - commiting")
+            log.debug('Transaction exited with no exception - commiting')
             await self.commit()
             return
 
-        log.debug("Transaction exited with exc type: %s - rolling back", exc_type)
+        log.debug('Transaction exited with exc type: %s - rolling back', exc_type)
 
         try:
             await self.rollback()
         except Exception as exc:
             log.warning(
-                "Encountered exc `%s` while rolling back a transaction. Ignoring and raising original exception",
-                exc,
+                'Encountered exc `%s` while rolling back a transaction. Ignoring and raising original exception', exc
             )
 
 
@@ -141,9 +140,9 @@ class SyncTransactionManager(Generic[_SyncPrismaT]):
 
         if isinstance(max_wait, int):
             message = (
-                "Passing an int as `max_wait` argument is deprecated "
-                "and will be removed in the next major release. "
-                "Use a `datetime.timedelta` instance instead."
+                'Passing an int as `max_wait` argument is deprecated '
+                'and will be removed in the next major release. '
+                'Use a `datetime.timedelta` instance instead.'
             )
             warnings.warn(message, DeprecationWarning, stacklevel=3)
             max_wait = timedelta(milliseconds=max_wait)
@@ -152,9 +151,9 @@ class SyncTransactionManager(Generic[_SyncPrismaT]):
 
         if isinstance(timeout, int):
             message = (
-                "Passing an int as `timeout` argument is deprecated "
-                "and will be removed in the next major release. "
-                "Use a `datetime.timedelta` instance instead."
+                'Passing an int as `timeout` argument is deprecated '
+                'and will be removed in the next major release. '
+                'Use a `datetime.timedelta` instance instead.'
             )
             warnings.warn(message, DeprecationWarning, stacklevel=3)
             timeout = timedelta(milliseconds=timeout)
@@ -169,7 +168,7 @@ class SyncTransactionManager(Generic[_SyncPrismaT]):
             # if we were called from the context manager then the stacklevel
             # needs to be one higher to warn on the actual offending code
             warnings.warn(
-                "The current client is already in a transaction. This can lead to surprising behaviour.",
+                'The current client is already in a transaction. This can lead to surprising behaviour.',
                 UserWarning,
                 stacklevel=3 if _from_context else 2,
             )
@@ -177,8 +176,8 @@ class SyncTransactionManager(Generic[_SyncPrismaT]):
         tx_id = self.__client._engine.start_transaction(
             content=dumps(
                 {
-                    "timeout": int(self._timeout.total_seconds() * 1000),
-                    "max_wait": int(self._max_wait.total_seconds() * 1000),
+                    'timeout': int(self._timeout.total_seconds() * 1000),
+                    'max_wait': int(self._max_wait.total_seconds() * 1000),
                 }
             ),
         )
@@ -211,16 +210,15 @@ class SyncTransactionManager(Generic[_SyncPrismaT]):
         exc_tb: TracebackType | None,
     ) -> None:
         if exc is None:
-            log.debug("Transaction exited with no exception - commiting")
+            log.debug('Transaction exited with no exception - commiting')
             self.commit()
             return
 
-        log.debug("Transaction exited with exc type: %s - rolling back", exc_type)
+        log.debug('Transaction exited with exc type: %s - rolling back', exc_type)
 
         try:
             self.rollback()
         except Exception as exc:
             log.warning(
-                "Encountered exc `%s` while rolling back a transaction. Ignoring and raising original exception",
-                exc,
+                'Encountered exc `%s` while rolling back a transaction. Ignoring and raising original exception', exc
             )

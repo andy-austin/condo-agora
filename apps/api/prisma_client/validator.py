@@ -8,10 +8,10 @@ from pydantic import BaseModel
 from ._types import Protocol, runtime_checkable
 from ._compat import PYDANTIC_V2, Extra, is_typeddict
 
-__all__ = ("validate",)
+__all__ = ('validate',)
 
 # NOTE: we should use bound=TypedDict but mypy does not support this
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class Config:
@@ -43,7 +43,7 @@ def patch_pydantic() -> None:
     create_model = annotated_types.create_model_from_typeddict
 
     def patched_create_model(typeddict_cls: Any, **kwargs: Any) -> Type[BaseModel]:
-        kwargs.setdefault("__module__", typeddict_cls.__module__)
+        kwargs.setdefault('__module__', typeddict_cls.__module__)
         return create_model(typeddict_cls, **kwargs)  # type: ignore[no-any-return]
 
     annotated_types.create_model_from_typeddict = patched_create_model
@@ -76,7 +76,7 @@ def validate(type: Type[T], data: Any) -> T:
     patch_pydantic()
 
     if not is_typeddict(type):
-        raise TypeError(f"Only TypedDict types are supported, got: {type} instead.")
+        raise TypeError(f'Only TypedDict types are supported, got: {type} instead.')
 
     # we cannot use pydantic's builtin type -> model resolver
     # as we need to be able to update forward references

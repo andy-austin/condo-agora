@@ -1,11 +1,14 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Menu } from "lucide-react";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const t = useTranslations('header');
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -15,27 +18,28 @@ export function Header() {
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">C</span>
             </div>
-            <span className="text-xl font-bold">Condo Ágora</span>
+            <span className="text-xl font-bold">{t('brand')}</span>
           </div>
 
           <nav className="hidden lg:flex items-center gap-8">
             <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Características
+              {t('features')}
             </a>
             <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Cómo Funciona
+              {t('howItWorks')}
             </a>
             <a href="#testimonials" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Testimonios
+              {t('testimonials')}
             </a>
           </nav>
 
           <div className="hidden lg:flex items-center gap-4">
+            <LanguageSwitcher />
             <Button variant="ghost" className="text-sm font-medium">
-              Iniciar Sesión
+              {t('login')}
             </Button>
             <Button className="btn-primary text-sm py-2.5 px-6">
-              Solicitar Demo
+              {t('requestDemo')}
             </Button>
           </div>
 
@@ -51,20 +55,21 @@ export function Header() {
           <div className="lg:hidden py-4 border-t border-border">
             <nav className="flex flex-col gap-4">
               <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Características
+                {t('features')}
               </a>
               <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Cómo Funciona
+                {t('howItWorks')}
               </a>
               <a href="#testimonials" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Testimonios
+                {t('testimonials')}
               </a>
               <div className="flex flex-col gap-2 pt-4">
+                <LanguageSwitcher />
                 <Button variant="ghost" className="justify-start">
-                  Iniciar Sesión
+                  {t('login')}
                 </Button>
                 <Button className="btn-primary">
-                  Solicitar Demo
+                  {t('requestDemo')}
                 </Button>
               </div>
             </nav>

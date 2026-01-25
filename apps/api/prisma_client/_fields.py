@@ -20,8 +20,8 @@ if TYPE_CHECKING:
     from .types import Serializable  # noqa: TID251
 
 __all__ = (
-    "Json",
-    "Base64",
+    'Json',
+    'Base64',
 )
 
 
@@ -40,7 +40,7 @@ _JsonKeys = Union[
 
 # Base64 data should only be valid ascii, we limit our encoding to ascii so that
 # any erroneous data is caught as early on as possible.
-BASE64_ENCODING = "ascii"
+BASE64_ENCODING = 'ascii'
 
 
 # inherit from _PydanticJson so that pydantic will automatically
@@ -85,14 +85,12 @@ class Json(BaseJson):
         def __getitem__(self, i: _JsonKeys) -> Serializable: ...
 
         @override
-        def __getitem__(
-            self, i: Union[_JsonKeys, slice]
-        ) -> Serializable:  # pyright: ignore[reportIncompatibleMethodOverride]
+        def __getitem__(self, i: Union[_JsonKeys, slice]) -> Serializable:  # pyright: ignore[reportIncompatibleMethodOverride]
             ...
 
 
 class Base64:
-    __slots__ = ("_raw",)
+    __slots__ = ('_raw',)
 
     def __init__(self, raw: bytes) -> None:
         self._raw = raw
@@ -120,7 +118,7 @@ class Base64:
     # NOTE: we explicitly use a different encoding here as we are decoding
     # to the original data provided by the user, this data does not have
     # the limitation of being ascii only that the raw Base64 data does
-    def decode_str(self, encoding: str = "utf-8") -> str:
+    def decode_str(self, encoding: str = 'utf-8') -> str:
         """Decode from Base64 to the original string
 
         This decodes using the `utf-8` encoding by default,
@@ -136,21 +134,18 @@ class Base64:
     if PYDANTIC_V2:
 
         @classmethod
-        def __get_pydantic_json_schema__(
-            cls, core_schema: CoreSchema, handler: Any
-        ) -> Any:
+        def __get_pydantic_json_schema__(cls, core_schema: CoreSchema, handler: Any) -> Any:
             json_schema = handler(core_schema)
             json_schema = handler.resolve_ref_schema(json_schema)
-            json_schema["type"] = "string"
-            json_schema["format"] = "byte"
+            json_schema['type'] = 'string'
+            json_schema['format'] = 'byte'
             return json_schema
-
     else:
 
         @classmethod
         def __modify_schema__(cls, field_schema: Dict[str, object]) -> None:
-            field_schema["type"] = "string"
-            field_schema["format"] = "byte"
+            field_schema['type'] = 'string'
+            field_schema['format'] = 'byte'
 
     # Support converting objects into Base64 at the Pydantic level
     if PYDANTIC_V2:
@@ -165,11 +160,8 @@ class Base64:
             return core_schema.no_info_before_validator_function(
                 cls._validate,
                 schema=core_schema.any_schema(),
-                serialization=core_schema.plain_serializer_function_ser_schema(
-                    lambda instance: str(instance)
-                ),
+                serialization=core_schema.plain_serializer_function_ser_schema(lambda instance: str(instance)),
             )
-
     else:
 
         @classmethod
@@ -188,9 +180,7 @@ class Base64:
         if isinstance(value, bytes):
             return cls(value)
 
-        raise ValueError(
-            f"Could not convert type: {type(value)} to a Base64 object; Expected a string or bytes object"
-        )
+        raise ValueError(f'Could not convert type: {type(value)} to a Base64 object; Expected a string or bytes object')
 
     @override
     def __str__(self) -> str:
@@ -198,7 +188,7 @@ class Base64:
 
     @override
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self._raw})"  # type: ignore[str-bytes-safe]
+        return f'{self.__class__.__name__}({self._raw})'  # type: ignore[str-bytes-safe]
 
     @override
     def __eq__(self, other: Any) -> bool:

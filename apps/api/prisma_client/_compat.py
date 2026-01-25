@@ -11,12 +11,12 @@ from pydantic.fields import FieldInfo
 
 from .utils import make_optional
 
-_T = TypeVar("_T")
-_ModelT = TypeVar("_ModelT", bound=BaseModel)
+_T = TypeVar('_T')
+_ModelT = TypeVar('_ModelT', bound=BaseModel)
 
 
 # Pydantic v2 compat
-PYDANTIC_V2 = pydantic.VERSION.startswith("2.")
+PYDANTIC_V2 = pydantic.VERSION.startswith('2.')
 
 # ---- validators ----
 
@@ -35,16 +35,16 @@ def field_validator(
             pydantic.field_validator(
                 __field,
                 *fields,
-                mode="before" if pre else "after",
+                mode='before' if pre else 'after',
                 check_fields=check_fields,
             ),
         )
 
     kwargs = {}
     if always is not None:
-        kwargs["always"] = always
+        kwargs['always'] = always
     if allow_reuse is not None:
-        kwargs["allow_reuse"] = allow_reuse
+        kwargs['allow_reuse'] = allow_reuse
 
     return pydantic.validator(__field, *fields, pre=pre, **kwargs)  # type: ignore
 
@@ -57,7 +57,7 @@ def root_validator(
 ) -> Callable[[_T], _T]:
     if PYDANTIC_V2:
         return pydantic.model_validator(  # type: ignore
-            mode="before" if pre else "after",
+            mode='before' if pre else 'after',
         )
 
     return cast(Any, pydantic.root_validator)(  # type: ignore[no-any-return]
@@ -70,7 +70,9 @@ def root_validator(
 
 if TYPE_CHECKING:
     BaseSettings = BaseModel
-    BaseSettingsConfig = pydantic.BaseConfig  # pyright: ignore[reportDeprecated]
+    BaseSettingsConfig = (
+        pydantic.BaseConfig  # pyright: ignore[reportDeprecated]
+    )
 
     class BaseConfig: ...
 
@@ -106,7 +108,7 @@ else:
         from pydantic import model_validator
 
         class BaseSettings(BaseModel):
-            @model_validator(mode="before")
+            @model_validator(mode='before')
             def root_validator(cls, values: Any) -> Any:
                 return _env_var_resolver(cls, values)
 
@@ -173,7 +175,7 @@ else:
         ConfigDict = None
 
 
-ENV_VAR_KEY = "$env"
+ENV_VAR_KEY = '$env'
 
 
 # minimal re-implementation of BaseSettings for v2
@@ -198,7 +200,7 @@ def _env_var_resolver(model_cls: type[BaseModel], values: Any) -> dict[str, Any]
 
 def _get_field_env_var(field: FieldInfo, name: str) -> str | None:
     if not PYDANTIC_V2:
-        return field.field_info.extra.get("env")  # type: ignore
+        return field.field_info.extra.get('env')  # type: ignore
 
     extra = field.json_schema_extra
     if not extra:
@@ -354,7 +356,6 @@ if TYPE_CHECKING:
         from enum import Enum
 
         class StrEnum(str, Enum): ...
-
 else:
     if sys.version_info >= (3, 11):
         from enum import StrEnum as StrEnum

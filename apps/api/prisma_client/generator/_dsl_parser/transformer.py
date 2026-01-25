@@ -18,7 +18,7 @@ ParseTree = Tree[Token]
 class DefinitionTransformer(LarkTransformer[Token, TransformResult]):
     def start(self, items: tuple[ParseTree, Arguments | None]) -> TransformResult:
         _, args = items
-        return {"arguments": args or {}}
+        return {'arguments': args or {}}
 
     def argument_list(self, items: list[tuple[str, str] | None] | None) -> Arguments:
         if not items:

@@ -1,0 +1,184 @@
+{
+  "metadata": {
+    "title": "Condo Ágora - Decisiones claras, mejoras reales",
+    "description": "La plataforma que transforma la gestión de tu edificio. Proponé, votá y decidí de forma transparente y democrática."
+  },
+  "header": {
+    "brand": "Condo Ágora",
+    "features": "Características",
+    "howItWorks": "Cómo Funciona",
+    "testimonials": "Testimonios",
+    "login": "Iniciar Sesión",
+    "requestDemo": "Solicitar Demo"
+  },
+  "hero": {
+    "badge": "La nueva forma de gestionar tu comunidad",
+    "headline1": "Decisiones",
+    "headline2": "claras",
+    "headline3": "Mejoras",
+    "headline4": "reales",
+    "description": "La plataforma que transforma la gestión de tu edificio. Proponé, votá y decidí de forma transparente y democrática.",
+    "ctaPrimary": "Solicitar Demo Gratuita",
+    "ctaSecondary": "Ver Video",
+    "mockupUrl": "app.condoagora.com.uy",
+    "mockupAlt": "Condo Ágora Dashboard"
+  },
+  "logoCloud": {
+    "title": "Con la confianza de más de 200 edificios en todo Uruguay"
+  },
+  "problems": {
+    "label": "El problema",
+    "title": "¿Cansado de los debates eternos en el grupo de chat?",
+    "description": "Los edificios enfrentan problemas de comunicación que afectan la armonía y el progreso de la comunidad. Es hora de cambiar.",
+    "cta": "Descubrí la solución",
+    "items": {
+      "lost": {
+        "title": "Propuestas perdidas",
+        "description": "Las ideas importantes se pierden en el caos de los grupos de WhatsApp."
+      },
+      "transparency": {
+        "title": "Falta de transparencia",
+        "description": "Decisiones sin consultar a todos generan desconfianza."
+      },
+      "slow": {
+        "title": "Procesos lentos",
+        "description": "Meses de debates sin llegar a acuerdos concretos."
+      }
+    }
+  },
+  "features": {
+    "label": "Características",
+    "title": "Herramientas diseñadas para la armonía comunitaria",
+    "description": "Todo lo que necesitás para gestionar tu edificio de manera eficiente y transparente.",
+    "items": {
+      "proposals": {
+        "title": "Propuestas Centralizadas",
+        "description": "Todas las propuestas organizadas en un solo lugar. Fácil de crear, comentar y dar seguimiento.",
+        "benefits": ["Historial completo", "Comentarios organizados", "Notificaciones automáticas"]
+      },
+      "voting": {
+        "title": "Votaciones por Prioridad",
+        "description": "Sistema de votación inteligente que permite priorizar las propuestas más importantes.",
+        "benefits": ["Votación anónima", "Resultados en tiempo real", "Múltiples métodos de votación"]
+      },
+      "transparency": {
+        "title": "Transparencia Total",
+        "description": "Reportes claros y accesibles para todos los miembros de la comunidad.",
+        "benefits": ["Dashboard en tiempo real", "Reportes exportables", "Auditoría completa"]
+      },
+      "roles": {
+        "title": "Roles y Delegación",
+        "description": "Gestión flexible de permisos para diferentes tipos de usuarios.",
+        "benefits": ["Roles personalizables", "Delegación de voto", "Control de acceso"]
+      }
+    }
+  },
+  "howItWorks": {
+    "label": "Cómo funciona",
+    "title": "Simple, rápido y efectivo",
+    "description": "En cuatro simples pasos, transformá la gestión de tu comunidad.",
+    "steps": {
+      "create": {
+        "number": "01",
+        "title": "Creá tu comunidad",
+        "description": "Registrá tu edificio y agregá a todos los residentes en minutos."
+      },
+      "propose": {
+        "number": "02",
+        "title": "Proponé mejoras",
+        "description": "Cualquier miembro puede crear propuestas claras y estructuradas."
+      },
+      "vote": {
+        "number": "03",
+        "title": "Votá y decidí",
+        "description": "Sistema de votación democrático con resultados transparentes."
+      },
+      "execute": {
+        "number": "04",
+        "title": "Ejecutá y dale seguimiento",
+        "description": "Monitorea el progreso de las mejoras aprobadas."
+      }
+    }
+  },
+  "testimonials": {
+    "label": "Testimonios",
+    "title": "Lo que dicen nuestras comunidades",
+    "description": "Más de 200 edificios ya confían en Condo Ágora.",
+    "items": {
+      "maria": {
+        "name": "María González",
+        "role": "Presidenta de Junta",
+        "location": "Torres del Sol, Montevideo",
+        "quote": "Condo Ágora transformó completamente nuestra comunicación. Las votaciones que antes llevaban semanas ahora se resuelven en días."
+      },
+      "carlos": {
+        "name": "Carlos Rodríguez",
+        "role": "Residente",
+        "location": "Residencial Aurora, Punta del Este",
+        "quote": "Por fin puedo ver exactamente en qué se gasta la plata de la comunidad. La transparencia es increíble."
+      },
+      "ana": {
+        "name": "Ana Martínez",
+        "role": "Administradora",
+        "location": "Vista Mar, Colonia",
+        "quote": "Gestiono 3 edificios y esta herramienta me ahorra horas de trabajo cada semana. Indispensable."
+      }
+    }
+  },
+  "cta": {
+    "title": "¿Listo para transformar la gestión de tu edificio?",
+    "description": "Unite a las comunidades que ya están tomando decisiones de forma más inteligente y transparente.",
+    "ctaPrimary": "Solicitar Demo Gratuita",
+    "ctaSecondary": "Hablar con Ventas"
+  },
+  "footer": {
+    "brand": "Condo Ágora",
+    "description": "Decisiones claras, mejoras reales. La plataforma que transforma la gestión comunitaria de tu condominio.",
+    "product": "Producto",
+    "company": "Empresa",
+    "legal": "Legal",
+    "links": {
+      "features": "Características",
+      "pricing": "Precios",
+      "demo": "Demo",
+      "updates": "Actualizaciones",
+      "about": "Acerca de",
+      "blog": "Blog",
+      "careers": "Carreras",
+      "contact": "Contacto",
+      "privacy": "Privacidad",
+      "terms": "Términos",
+      "cookies": "Cookies"
+    },
+    "copyright": "© 2024 Condo Ágora. Todos los derechos reservados.",
+    "tagline": "Hecho con ❤️ para comunidades más unidas"
+  },
+  "health": {
+    "title": "Estado del Sistema",
+    "subtitle": "Monitorea el estado de los servicios de la API",
+    "status": {
+      "checking": "Verificando...",
+      "healthy": "Saludable",
+      "degraded": "Degradado",
+      "error": "Error",
+      "unknown": "Desconocido"
+    },
+    "endpoint": "Endpoint",
+    "lastChecked": "Última verificación",
+    "refresh": "Actualizar",
+    "serviceStatus": "Estado de Servicios",
+    "api": "API",
+    "database": "Base de Datos",
+    "connected": "Conectado",
+    "disconnected": "Desconectado",
+    "dbDetails": "Detalles BD",
+    "serverTime": "Hora del servidor",
+    "allOperational": "✓ Todos los sistemas operativos",
+    "someIssues": "⚠ Algunos servicios pueden estar experimentando problemas"
+  },
+  "languageSwitcher": {
+    "label": "Idioma",
+    "es": "Español",
+    "en": "English"
+  }
+}

@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from .client import Prisma  # noqa: TID251
 
 
-RegisteredClient = Union["Prisma", Callable[[], "Prisma"]]
+RegisteredClient = Union['Prisma', Callable[[], 'Prisma']]
 _registered_client: RegisteredClient | None = None
 
 
@@ -27,7 +27,7 @@ def register(client: RegisteredClient) -> None:
 
     if not isinstance(client, Prisma) and not callable(client):
         raise TypeError(
-            f"Expected either a {Prisma} instance or a function that returns a {Prisma} but got {client} instead."
+            f'Expected either a {Prisma} instance or a function that returns a {Prisma} but got {client} instead.'
         )
 
     _registered_client = client
@@ -49,8 +49,6 @@ def get_client() -> Prisma:
 
     client = registered()
     if not isinstance(client, Prisma):  # pyright: ignore[reportUnnecessaryIsInstance]
-        raise TypeError(
-            f"Registered function returned {client} instead of a {Prisma} instance."
-        )
+        raise TypeError(f'Registered function returned {client} instead of a {Prisma} instance.')
 
     return client

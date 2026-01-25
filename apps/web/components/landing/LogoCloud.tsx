@@ -1,19 +1,24 @@
 'use client';
 
+import { useTranslations } from "next-intl";
+
 export function LogoCloud() {
+  // These are client names, not translated
   const logos = [
     "Torres del Sol",
-    "Residencial Pocitos", 
+    "Residencial Pocitos",
     "Edificio Vista Mar",
     "Jardines del Prado",
     "Plaza Residencial"
   ];
 
+  const t = useTranslations('logoCloud');
+
   return (
     <section className="py-16 border-y border-border">
       <div className="container-tight">
         <p className="text-center text-sm text-muted-foreground mb-8">
-          Con la confianza de más de 200 edificios en todo Uruguay
+          {t('title')}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-16">
           {logos.map((logo, index) => (

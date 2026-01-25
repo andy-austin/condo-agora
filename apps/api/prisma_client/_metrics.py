@@ -8,13 +8,13 @@ from pydantic import BaseModel
 from ._compat import GenericModel, model_rebuild
 
 __all__ = (
-    "Metrics",
-    "Metric",
-    "MetricHistogram",
+    'Metrics',
+    'Metric',
+    'MetricHistogram',
 )
 
 
-_T = TypeVar("_T")
+_T = TypeVar('_T')
 
 
 # TODO: check if int / float is right

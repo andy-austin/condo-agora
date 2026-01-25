@@ -10,14 +10,7 @@ from typing_extensions import Self, Literal
 
 from pydantic import BaseModel
 
-from ._types import (
-    Datasource,
-    HttpConfig,
-    PrismaMethod,
-    MetricsFormat,
-    TransactionId,
-    DatasourceOverride,
-)
+from ._types import Datasource, HttpConfig, PrismaMethod, MetricsFormat, TransactionId, DatasourceOverride
 from .engine import (
     SyncQueryEngine,
     AsyncQueryEngine,
@@ -68,11 +61,11 @@ def load_env(*, override: bool = False, **kwargs: Any) -> None:
     """
     from dotenv import load_dotenv
 
-    load_dotenv(".env", override=override, **kwargs)
-    load_dotenv("prisma/.env", override=override, **kwargs)
+    load_dotenv('.env', override=override, **kwargs)
+    load_dotenv('prisma/.env', override=override, **kwargs)
 
 
-_EngineT = TypeVar("_EngineT", bound=BaseAbstractEngine)
+_EngineT = TypeVar('_EngineT', bound=BaseAbstractEngine)
 
 
 class BasePrisma(Generic[_EngineT]):
@@ -94,21 +87,21 @@ class BasePrisma(Generic[_EngineT]):
     _relational_field_mappings: dict[str, dict[str, str]]
 
     __slots__ = (
-        "_copied",
-        "_tx_id",
-        "_datasource",
-        "_log_queries",
-        "_http_config",
-        "_schema_path",
-        "_engine_type",
-        "_prisma_models",
-        "_active_provider",
-        "_connect_timeout",
-        "_internal_engine",
-        "_packaged_schema_path",
-        "_preview_features",
-        "_default_datasource_name",
-        "_relational_field_mappings",
+        '_copied',
+        '_tx_id',
+        '_datasource',
+        '_log_queries',
+        '_http_config',
+        '_schema_path',
+        '_engine_type',
+        '_prisma_models',
+        '_active_provider',
+        '_connect_timeout',
+        '_internal_engine',
+        '_packaged_schema_path',
+        '_preview_features',
+        '_default_datasource_name',
+        '_relational_field_mappings',
     )
 
     def __init__(
@@ -128,9 +121,9 @@ class BasePrisma(Generic[_EngineT]):
 
         if isinstance(connect_timeout, int):
             message = (
-                "Passing an int as `connect_timeout` argument is deprecated "
-                "and will be removed in the next major release. "
-                "Use a `datetime.timedelta` instance instead."
+                'Passing an int as `connect_timeout` argument is deprecated '
+                'and will be removed in the next major release. '
+                'Use a `datetime.timedelta` instance instead.'
             )
             warnings.warn(message, DeprecationWarning, stacklevel=2)
             connect_timeout = timedelta(seconds=connect_timeout)
@@ -171,9 +164,7 @@ class BasePrisma(Generic[_EngineT]):
 
     @property
     def _default_datasource(self) -> Datasource:
-        raise NotImplementedError(
-            "`_default_datasource` should be implemented in a subclass"
-        )
+        raise NotImplementedError('`_default_datasource` should be implemented in a subclass')
 
     def is_registered(self) -> bool:
         """Returns True if this client instance is registered"""
@@ -196,7 +187,7 @@ class BasePrisma(Generic[_EngineT]):
         # be `free`d before the transaction is finished. So stopping the engine
         # here should be safe.
         if self._internal_engine is not None and not self._copied:
-            log.debug("unclosed client - stopping engine")
+            log.debug('unclosed client - stopping engine')
             engine = self._internal_engine
             self._internal_engine = None
             engine.stop()
@@ -235,24 +226,20 @@ class BasePrisma(Generic[_EngineT]):
         """Override the default SQLite path to protect against
         https://github.com/RobertCraigie/prisma-client-py/issues/409
         """
-        source_file_path: str | Path | None = self._default_datasource.get(
-            "source_file_path"
-        )
+        source_file_path: str | Path | None = self._default_datasource.get('source_file_path')
         if source_file_path:
             source_file_path = Path(source_file_path).parent
 
         return {
-            "name": self._default_datasource["name"],
-            "url": self._make_sqlite_url(
-                self._default_datasource["url"],
+            'name': self._default_datasource['name'],
+            'url': self._make_sqlite_url(
+                self._default_datasource['url'],
                 relative_to=source_file_path,
             ),
         }
 
-    def _make_sqlite_url(
-        self, url: str, *, relative_to: Path | str | None = None
-    ) -> str:
-        url_path = removeprefix(removeprefix(url, "file:"), "sqlite:")
+    def _make_sqlite_url(self, url: str, *, relative_to: Path | str | None = None) -> str:
+        url_path = removeprefix(removeprefix(url, 'file:'), 'sqlite:')
         if url_path == url:
             return url
 
@@ -265,7 +252,7 @@ class BasePrisma(Generic[_EngineT]):
         if isinstance(relative_to, str):
             relative_to = Path(relative_to)
 
-        return f"file:{relative_to.joinpath(url_path).resolve()}"
+        return f'file:{relative_to.joinpath(url_path).resolve()}'
 
     def _prepare_connect_args(
         self,
@@ -278,9 +265,9 @@ class BasePrisma(Generic[_EngineT]):
 
         if isinstance(timeout, int):
             message = (
-                "Passing an int as `timeout` argument is deprecated "
-                "and will be removed in the next major release. "
-                "Use a `datetime.timedelta` instance instead."
+                'Passing an int as `timeout` argument is deprecated '
+                'and will be removed in the next major release. '
+                'Use a `datetime.timedelta` instance instead.'
             )
             warnings.warn(message, DeprecationWarning, stacklevel=2)
             timeout = timedelta(seconds=timeout)
@@ -288,15 +275,15 @@ class BasePrisma(Generic[_EngineT]):
         datasources: list[DatasourceOverride] | None = None
         if self._datasource is not None:
             ds = self._datasource.copy()
-            ds.setdefault("name", self._default_datasource_name)
+            ds.setdefault('name', self._default_datasource_name)
             datasources = [ds]
-        elif self._active_provider == "sqlite":
-            log.debug("overriding default SQLite datasource path")
+        elif self._active_provider == 'sqlite':
+            log.debug('overriding default SQLite datasource path')
             # Override the default SQLite path to protect against
             # https://github.com/RobertCraigie/prisma-client-py/issues/409
             datasources = [self._make_sqlite_datasource()]
 
-        log.debug("datasources: %s", datasources)
+        log.debug('datasources: %s', datasources)
         return timeout, datasources
 
     def _make_query_builder(
@@ -329,9 +316,7 @@ class SyncBasePrisma(BasePrisma[SyncAbstractEngine]):
         It is required to call this before accessing data.
         """
         if self._internal_engine is None:
-            self._internal_engine = self._create_engine(
-                dml_path=self._packaged_schema_path
-            )
+            self._internal_engine = self._create_engine(dml_path=self._packaged_schema_path)
 
         timeout, datasources = self._prepare_connect_args(timeout=timeout)
 
@@ -348,9 +333,9 @@ class SyncBasePrisma(BasePrisma[SyncAbstractEngine]):
 
             if isinstance(timeout, (int, float)):
                 message = (
-                    "Passing a number as `timeout` argument is deprecated "
-                    "and will be removed in the next major release. "
-                    "Use a `datetime.timedelta` instead."
+                    'Passing a number as `timeout` argument is deprecated '
+                    'and will be removed in the next major release. '
+                    'Use a `datetime.timedelta` instead.'
                 )
                 warnings.warn(message, DeprecationWarning, stacklevel=2)
                 timeout = timedelta(seconds=timeout)
@@ -374,7 +359,7 @@ class SyncBasePrisma(BasePrisma[SyncAbstractEngine]):
     @overload
     def get_metrics(
         self,
-        format: Literal["json"] = "json",
+        format: Literal['json'] = 'json',
         *,
         global_labels: dict[str, str] | None = None,
     ) -> Metrics: ...
@@ -382,14 +367,14 @@ class SyncBasePrisma(BasePrisma[SyncAbstractEngine]):
     @overload
     def get_metrics(
         self,
-        format: Literal["prometheus"],
+        format: Literal['prometheus'],
         *,
         global_labels: dict[str, str] | None = None,
     ) -> str: ...
 
     def get_metrics(
         self,
-        format: MetricsFormat = "json",
+        format: MetricsFormat = 'json',
         *,
         global_labels: dict[str, str] | None = None,
     ) -> str | Metrics:
@@ -400,7 +385,7 @@ class SyncBasePrisma(BasePrisma[SyncAbstractEngine]):
         For more details see https://www.prisma.io/docs/concepts/components/prisma-client/metrics.
         """
         response = self._engine.metrics(format=format, global_labels=global_labels)
-        if format == "prometheus":
+        if format == 'prometheus':
             # For the prometheus format we return the response as-is
             assert isinstance(response, str)
             return response
@@ -415,14 +400,14 @@ class SyncBasePrisma(BasePrisma[SyncAbstractEngine]):
                 http_config=self._http_config,
             )
 
-        raise NotImplementedError(f"Unsupported engine type: {self._engine_type}")
+        raise NotImplementedError(f'Unsupported engine type: {self._engine_type}')
 
     @property
     def _engine_class(self) -> type[SyncAbstractEngine]:
         if self._engine_type == EngineType.binary:
             return SyncQueryEngine
 
-        raise RuntimeError(f"Unhandled engine type: {self._engine_type}")
+        raise RuntimeError(f'Unhandled engine type: {self._engine_type}')
 
     # TODO: don't return Any
     def _execute(
@@ -433,10 +418,7 @@ class SyncBasePrisma(BasePrisma[SyncAbstractEngine]):
         root_selection: list[str] | None = None,
     ) -> Any:
         builder = self._make_query_builder(
-            method=method,
-            model=model,
-            arguments=arguments,
-            root_selection=root_selection,
+            method=method, model=model, arguments=arguments, root_selection=root_selection
         )
         return self._engine.query(builder.build(), tx_id=self._tx_id)
 
@@ -453,9 +435,7 @@ class AsyncBasePrisma(BasePrisma[AsyncAbstractEngine]):
         It is required to call this before accessing data.
         """
         if self._internal_engine is None:
-            self._internal_engine = self._create_engine(
-                dml_path=self._packaged_schema_path
-            )
+            self._internal_engine = self._create_engine(dml_path=self._packaged_schema_path)
 
         timeout, datasources = self._prepare_connect_args(timeout=timeout)
 
@@ -472,9 +452,9 @@ class AsyncBasePrisma(BasePrisma[AsyncAbstractEngine]):
 
             if isinstance(timeout, (int, float)):
                 message = (
-                    "Passing a number as `timeout` argument is deprecated "
-                    "and will be removed in the next major release. "
-                    "Use a `datetime.timedelta` instead."
+                    'Passing a number as `timeout` argument is deprecated '
+                    'and will be removed in the next major release. '
+                    'Use a `datetime.timedelta` instead.'
                 )
                 warnings.warn(message, DeprecationWarning, stacklevel=2)
                 timeout = timedelta(seconds=timeout)
@@ -498,7 +478,7 @@ class AsyncBasePrisma(BasePrisma[AsyncAbstractEngine]):
     @overload
     async def get_metrics(
         self,
-        format: Literal["json"] = "json",
+        format: Literal['json'] = 'json',
         *,
         global_labels: dict[str, str] | None = None,
     ) -> Metrics: ...
@@ -506,14 +486,14 @@ class AsyncBasePrisma(BasePrisma[AsyncAbstractEngine]):
     @overload
     async def get_metrics(
         self,
-        format: Literal["prometheus"],
+        format: Literal['prometheus'],
         *,
         global_labels: dict[str, str] | None = None,
     ) -> str: ...
 
     async def get_metrics(
         self,
-        format: MetricsFormat = "json",
+        format: MetricsFormat = 'json',
         *,
         global_labels: dict[str, str] | None = None,
     ) -> str | Metrics:
@@ -523,10 +503,8 @@ class AsyncBasePrisma(BasePrisma[AsyncAbstractEngine]):
 
         For more details see https://www.prisma.io/docs/concepts/components/prisma-client/metrics.
         """
-        response = await self._engine.metrics(
-            format=format, global_labels=global_labels
-        )
-        if format == "prometheus":
+        response = await self._engine.metrics(format=format, global_labels=global_labels)
+        if format == 'prometheus':
             # For the prometheus format we return the response as-is
             assert isinstance(response, str)
             return response
@@ -541,14 +519,14 @@ class AsyncBasePrisma(BasePrisma[AsyncAbstractEngine]):
                 http_config=self._http_config,
             )
 
-        raise NotImplementedError(f"Unsupported engine type: {self._engine_type}")
+        raise NotImplementedError(f'Unsupported engine type: {self._engine_type}')
 
     @property
     def _engine_class(self) -> type[AsyncAbstractEngine]:
         if self._engine_type == EngineType.binary:
             return AsyncQueryEngine
 
-        raise RuntimeError(f"Unhandled engine type: {self._engine_type}")
+        raise RuntimeError(f'Unhandled engine type: {self._engine_type}')
 
     # TODO: don't return Any
     async def _execute(
@@ -560,9 +538,6 @@ class AsyncBasePrisma(BasePrisma[AsyncAbstractEngine]):
         root_selection: list[str] | None = None,
     ) -> Any:
         builder = self._make_query_builder(
-            method=method,
-            model=model,
-            arguments=arguments,
-            root_selection=root_selection,
+            method=method, model=model, arguments=arguments, root_selection=root_selection
         )
         return await self._engine.query(builder.build(), tx_id=self._tx_id)
