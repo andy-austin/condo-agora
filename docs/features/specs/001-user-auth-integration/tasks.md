@@ -11,12 +11,12 @@ description: "Task list for User Authentication Integration (Clerk)"
 
 **Purpose**: Install dependencies and configure environment.
 
-- [ ] T001 [P] Install `@clerk/nextjs` in apps/web/package.json
-- [ ] T002 [P] Install `svix` and `pyjwt` (or `python-jose`) in apps/api/package.json
-- [ ] T003 [P] Configure Clerk Env Vars (NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY, CLERK_SECRET_KEY) in apps/web/.env.local
-- [ ] T004 [P] Configure Backend Env Vars (CLERK_WEBHOOK_SECRET, CLERK_ISSUER_URL) in apps/api/.env
-- [ ] T005 [P] Wrap Root Layout with `<ClerkProvider>` in apps/web/app/layout.tsx
-- [ ] T006 [P] Add Clerk Middleware for route protection in apps/web/middleware.ts
+- [X] T001 [P] Install `@clerk/nextjs` in apps/web/package.json
+- [X] T002 [P] Install `svix` and `pyjwt` (or `python-jose`) in apps/api/package.json
+- [X] T003 [P] Configure Clerk Env Vars (NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY, CLERK_SECRET_KEY) in apps/web/.env.local
+- [X] T004 [P] Configure Backend Env Vars (CLERK_WEBHOOK_SECRET, CLERK_ISSUER_URL) in apps/api/.env
+- [X] T005 [P] Wrap Root Layout with `<ClerkProvider>` in apps/web/app/layout.tsx
+- [X] T006 [P] Add Clerk Middleware for route protection in apps/web/middleware.ts
 
 ---
 
