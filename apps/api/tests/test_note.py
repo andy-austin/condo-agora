@@ -67,7 +67,9 @@ class TestNoteGraphQLEndpoints:
 
     @patch("apps.api.database.db.note.find_unique", new_callable=AsyncMock)
     @patch("apps.api.database.db.is_connected")
-    def test_note_by_id_query_accessible(self, mock_is_connected, mock_find_unique, client):
+    def test_note_by_id_query_accessible(
+        self, mock_is_connected, mock_find_unique, client
+    ):
         """Test that note by ID query is accessible via GraphQL"""
         mock_is_connected.return_value = True
         mock_find_unique.return_value = None  # Non-existent note
@@ -94,7 +96,9 @@ class TestNoteGraphQLEndpoints:
 
     @patch("apps.api.database.db.note.create", new_callable=AsyncMock)
     @patch("apps.api.database.db.is_connected")
-    def test_create_note_mutation_accessible(self, mock_is_connected, mock_create, client, mock_note):
+    def test_create_note_mutation_accessible(
+        self, mock_is_connected, mock_create, client, mock_note
+    ):
         """Test that create note mutation is accessible via GraphQL"""
         mock_is_connected.return_value = True
         mock_create.return_value = mock_note

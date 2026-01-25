@@ -25,7 +25,9 @@ if platform.system() == "Linux":
             # Make binary executable if not already
             _current_mode = _engine_path.stat().st_mode
             if not (_current_mode & stat.S_IXUSR):
-                _engine_path.chmod(_current_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+                _engine_path.chmod(
+                    _current_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
+                )
             os.environ["PRISMA_QUERY_ENGINE_BINARY"] = str(_engine_path)
             break
 
@@ -33,9 +35,7 @@ from .prisma_client import Prisma
 
 # Load environment variables from the root directory
 env_path = os.path.join(
-    os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    ),
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
     ".env",
 )
 load_dotenv(env_path)

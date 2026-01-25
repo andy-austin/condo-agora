@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    'SyncAbstractEngine',
-    'AsyncAbstractEngine',
+    "SyncAbstractEngine",
+    "AsyncAbstractEngine",
 )
 
 
@@ -90,7 +90,7 @@ class SyncAbstractEngine(BaseAbstractEngine):
     def metrics(
         self,
         *,
-        format: Literal['json'],
+        format: Literal["json"],
         global_labels: dict[str, str] | None,
     ) -> dict[str, Any]: ...
 
@@ -99,7 +99,7 @@ class SyncAbstractEngine(BaseAbstractEngine):
     def metrics(
         self,
         *,
-        format: Literal['prometheus'],
+        format: Literal["prometheus"],
         global_labels: dict[str, str] | None,
     ) -> str: ...
 
@@ -156,7 +156,7 @@ class AsyncAbstractEngine(BaseAbstractEngine):
     async def metrics(
         self,
         *,
-        format: Literal['json'],
+        format: Literal["json"],
         global_labels: dict[str, str] | None,
     ) -> dict[str, Any]: ...
 
@@ -165,7 +165,7 @@ class AsyncAbstractEngine(BaseAbstractEngine):
     async def metrics(
         self,
         *,
-        format: Literal['prometheus'],
+        format: Literal["prometheus"],
         global_labels: dict[str, str] | None,
     ) -> str: ...
 

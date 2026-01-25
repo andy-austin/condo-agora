@@ -6,4 +6,5 @@ exclude =
     .git,
     .tox,
     dist,
-    *.egg
+    *.egg,
+    prisma_client

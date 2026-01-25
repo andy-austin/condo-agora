@@ -12,73 +12,75 @@ from ..._compat import PYDANTIC_V2
 from ...generator.models import InterfaceChoices
 
 ARG_TO_CONFIG_KEY = {
-    'partials': 'partial_type_generator',
-    'type_depth': 'recursive_type_depth',
+    "partials": "partial_type_generator",
+    "type_depth": "recursive_type_depth",
 }
 
 log: logging.Logger = logging.getLogger(__name__)
 
 
 # not sure why this type ignore is needed
-@click.command('generate')  # type: ignore
+@click.command("generate")  # type: ignore
 @options.schema
 @options.watch
 @click.option(
-    '--interface',
+    "--interface",
     type=EnumChoice(InterfaceChoices),
-    help='Method that the client will use to interface with Prisma',
+    help="Method that the client will use to interface with Prisma",
 )
 @click.option(
-    '--partials',
+    "--partials",
     type=PathlibPath(exists=True, readable=True),
-    help='Partial type generator location',
+    help="Partial type generator location",
 )
 @click.option(
-    '-t',
-    '--type-depth',
+    "-t",
+    "--type-depth",
     type=int,
-    help='Depth to generate pseudo-recursive types to; -1 signifies fully recursive types',
+    help="Depth to generate pseudo-recursive types to; -1 signifies fully recursive types",
 )
 @click.option(
-    '--generator',
+    "--generator",
     multiple=True,
-    help='Specifies which generator to use. Can be specified multiple times. By default, all generators will be ran',
+    help="Specifies which generator to use. Can be specified multiple times. By default, all generators will be ran",
 )
-def cli(schema: Optional[Path], watch: bool, generator: Tuple[str], **kwargs: Any) -> None:
+def cli(
+    schema: Optional[Path], watch: bool, generator: Tuple[str], **kwargs: Any
+) -> None:
     """Generate prisma artifacts with modified config options"""
     # context https://github.com/microsoft/pyright/issues/6099
-    if pydantic.VERSION.split('.') < ['1', '8']:  # pyright: ignore
+    if pydantic.VERSION.split(".") < ["1", "8"]:  # pyright: ignore
         warning(
-            'Unsupported version of pydantic installed, this command may not work as intended\n'
-            'Please update pydantic to 1.8 or greater.\n'
+            "Unsupported version of pydantic installed, this command may not work as intended\n"
+            "Please update pydantic to 1.8 or greater.\n"
         )
 
-    args = ['generate']
+    args = ["generate"]
     if schema is not None:
-        args.append(f'--schema={schema}')
+        args.append(f"--schema={schema}")
 
     if watch:
-        args.append('--watch')
+        args.append("--watch")
 
     if generator:
         for name in generator:
-            args.append(f'--generator={name}')
+            args.append(f"--generator={name}")
 
     env: Dict[str, str] = {}
-    prefix = 'PRISMA_PY_CONFIG_'
+    prefix = "PRISMA_PY_CONFIG_"
     for key, value in kwargs.items():
         if value is None:
             continue
 
         env[prefix + ARG_TO_CONFIG_KEY.get(key, key).upper()] = serialize(key, value)
 
-    log.debug('Running generate with env: %s', env)
+    log.debug("Running generate with env: %s", env)
     sys.exit(prisma.run(args, env=env))
 
 
 def serialize(key: str, obj: Any) -> str:
     if not PYDANTIC_V2:
-        if key == 'partials':
+        if key == "partials":
             # partials has to be JSON serializable
             return f'"{obj}"'
     return str(obj)

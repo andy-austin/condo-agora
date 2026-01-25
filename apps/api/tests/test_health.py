@@ -1,7 +1,6 @@
 import os
 from unittest.mock import MagicMock, AsyncMock, patch
 
-import pytest
 from fastapi.testclient import TestClient
 
 # Mock environment variable before any imports

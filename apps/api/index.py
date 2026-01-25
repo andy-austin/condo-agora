@@ -18,6 +18,7 @@ async def shutdown():
     if db.is_connected():
         await db.disconnect()
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -48,11 +49,13 @@ def debug():
     if prisma_dir.exists():
         for f in prisma_dir.iterdir():
             if f.is_file():
-                files_info.append({
-                    "name": f.name,
-                    "size": f.stat().st_size,
-                    "mode": oct(f.stat().st_mode),
-                })
+                files_info.append(
+                    {
+                        "name": f.name,
+                        "size": f.stat().st_size,
+                        "mode": oct(f.stat().st_mode),
+                    }
+                )
 
     return {
         "platform": platform.system(),

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, Iterable, cast
 from typing_extensions import override
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 # NOTE: this is not an exhaustive list of supported data methods.
