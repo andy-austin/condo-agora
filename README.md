@@ -13,63 +13,112 @@
 - **Linting**: ESLint, Prettier, Black, and Flake8
 - **CI/CD**: GitHub Actions for automated testing and linting
 
+## Prerequisites
+
+- Node.js >= 18
+- pnpm (install with `npm install -g pnpm`)
+- Docker (for local PostgreSQL database)
+
 ## Quick Start
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/condo-agora.git
+git clone https://github.com/andy-austin/condo-agora.git
 cd condo-agora
 ```
 
-### 2. Install dependencies
+### 2. Run the setup script
 
 ```bash
 ./setup.sh
 ```
 
 This script will:
-- Install Python dependencies (including creating a virtual environment)
-- Install Node.js dependencies
-- Initialize `.env.local` from the example file
+- Install Node.js dependencies (pnpm)
+- Install Python dependencies (uv + virtual environment)
+- Start a PostgreSQL database in Docker
+- Create `.env.local` with default database configuration
 - Generate the Prisma client
-- Set up git hooks
+- Run database migrations
+- Set up git pre-commit hooks
 
-### 3. Configure Environment Variables
-
-The setup script creates a `.env.local` file for you. Edit it to match your database configuration:
-
-```bash
-# Edit .env.local if needed
-nano .env.local
-```
-
-**Note:** You must have a PostgreSQL database running. If you have Docker installed, you can start one easily:
-```bash
-docker run --name postgres-db -e POSTGRES_PASSWORD=docker -p 5432:5432 -d postgres
-```
-
-### 4. Run Development Server
-
-Ensure your database is accessible and migrations are applied:
+### 3. Start development servers
 
 ```bash
-pnpm migrate
 pnpm dev
 ```
 
 The application will be available at:
-- Frontend: [http://localhost:3000](http://localhost:3000)
-- API GraphQL Playground: [http://localhost:3000/api/graphql](http://localhost:3000/api/graphql) (Proxied) or [http://localhost:8000/graphql](http://localhost:8000/graphql) (Direct)
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **API (direct)**: [http://localhost:8000](http://localhost:8000)
+- **GraphQL Playground**: [http://localhost:8000/graphql](http://localhost:8000/graphql)
+
+## Manual Database Setup
+
+If you prefer to manage the database manually instead of using the setup script:
+
+```bash
+# Start PostgreSQL in Docker
+docker run --name condo-agora-db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=condo_agora \
+  -p 5432:5432 \
+  -d postgres:15
+
+# Create .env.local with the connection string
+echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/condo_agora" > .env.local
+
+# Run migrations
+pnpm migrate
+```
+
+## Common Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start development servers |
+| `pnpm build` | Build for production |
+| `pnpm lint` | Run all linters |
+| `pnpm lint:fix` | Fix linting issues |
+| `pnpm test` | Run tests |
+| `pnpm typecheck` | Check TypeScript types |
+| `pnpm migrate` | Run database migrations |
 
 ## Project Structure
 
 ```
+condo-agora/
 ├── apps/
 │   ├── web/                 # Next.js frontend
+│   │   ├── app/             # App router pages
+│   │   └── ...
 │   └── api/                 # FastAPI backend
+│       ├── prisma/          # Prisma schema
+│       ├── prisma_client/   # Generated Prisma client
+│       ├── resolvers/       # GraphQL resolvers
+│       └── ...
+├── .env.local               # Local environment variables
+├── setup.sh                 # Development setup script
 └── ...
 ```
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://postgres:postgres@localhost:5432/condo_agora` |
+
+## Deployment
+
+The project is configured for deployment on Vercel:
+
+- **Frontend**: Deployed as a Next.js application
+- **Backend**: Deployed as a Python serverless function
+- **Database**: Use Vercel Postgres or any PostgreSQL provider
+
+Set the `DATABASE_URL` environment variable in your Vercel project settings.
 
 ## Documentation
 
