@@ -1,0 +1,50 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "lib/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "lint:fix": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "py:install": {
+      "cache": false,
+      "outputs": []
+    },
+    "py:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "py:test": {
+      "dependsOn": ["py:install"],
+      "outputs": []
+    },
+    "py:lint": {
+      "dependsOn": ["py:install"],
+      "outputs": []
+    },
+    "py:typecheck": {
+      "dependsOn": ["py:install"],
+      "outputs": []
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}

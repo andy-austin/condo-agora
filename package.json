@@ -1,0 +1,40 @@
+{
+  "name": "vercel-python-react-supabase",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck",
+    "clean": "turbo clean",
+    "prepare": "husky install",
+    "migrate": "source .venv/bin/activate && cd apps/api && PYTHONPATH=../.. alembic upgrade head",
+    "migrate:create": "source .venv/bin/activate && cd apps/api && PYTHONPATH=../.. alembic revision --autogenerate"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0"
+  },
+  "packageManager": "pnpm@8.15.6",
+  "engines": {
+    "node": ">=18"
+  },
+  "lint-staged": {
+    "apps/web/**/*.{js,jsx,ts,tsx}": [
+      "cd apps/web && eslint --fix"
+    ],
+    "apps/api/**/*.py": [
+      "bash -c 'cd apps/api && python -m black .'",
+      "bash -c 'cd apps/api && python -m isort .'",
+      "bash -c 'cd apps/api && python -m flake8 --max-line-length=120 .'"
+    ]
+  }
+}

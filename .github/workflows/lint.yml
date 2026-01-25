@@ -1,0 +1,68 @@
+name: Lint and Type Check
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  lint-typescript:
+    name: Lint TypeScript/JavaScript
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.15.6
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint
+        run: pnpm lint
+
+      - name: Run TypeScript type check
+        run: pnpm typecheck
+
+  lint-python:
+    name: Lint Python
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v1
+        with:
+          version: "latest"
+
+      - name: Create virtual environment and install Python dependencies
+        run: |
+          uv venv .venv
+          uv pip install -r apps/api/requirements.txt --python .venv/bin/python
+
+      - name: Run flake8
+        run: .venv/bin/python -m flake8 --max-line-length=120 apps/api/
+
+      - name: Run mypy
+        run: .venv/bin/python -m mypy apps/api/ || true
+
+      - name: Check black formatting
+        run: .venv/bin/python -m black --check apps/api/
+
+      - name: Check isort formatting
+        run: .venv/bin/python -m isort --check-only --profile black apps/api/
