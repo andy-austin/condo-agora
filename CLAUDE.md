@@ -94,3 +94,18 @@ Handled by `vercel.json`: `/api/*` routes to Python serverless function, everyth
 
 - `DATABASE_URL`: PostgreSQL connection string (required)
 - For Vercel deployment: `POSTGRES_URL_NON_POOLING` is checked in `database.py`
+
+## Detailed Documentation
+
+For comprehensive documentation, see the `.ai/` folder:
+
+| Document | Purpose |
+|----------|---------|
+| [.ai/OVERVIEW.md](.ai/OVERVIEW.md) | System architecture and data flow |
+| [.ai/BACKEND.md](.ai/BACKEND.md) | FastAPI, GraphQL, resolver patterns |
+| [.ai/FRONTEND.md](.ai/FRONTEND.md) | Next.js, React components, hooks |
+| [.ai/DATABASE.md](.ai/DATABASE.md) | Prisma schema, migrations, queries |
+| [.ai/GRAPHQL.md](.ai/GRAPHQL.md) | GraphQL types, queries, mutations |
+| [.ai/TESTING.md](.ai/TESTING.md) | Jest and Pytest patterns |
+| [.ai/DEPLOYMENT.md](.ai/DEPLOYMENT.md) | Vercel deployment configuration |
+| [.ai/PATTERNS.md](.ai/PATTERNS.md) | Code patterns for extending the codebase |
