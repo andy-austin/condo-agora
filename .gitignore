@@ -244,3 +244,8 @@ node_modules/
 # AI Agents local config files
 .gemini/
 .claude/
+/.specify/
+/apps/web/.clerk/.tmp/keyless.json
+/apps/web/.clerk/.tmp/README.md
+/apps/web/.clerk/.tmp/telemetry.json
+/apps/web/.env.local
