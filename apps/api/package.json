@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cd ../.. && python3 -m uvicorn apps.api.index:app --reload --host 0.0.0.0 --port 8000",
+    "dev": "cd ../.. && .venv/bin/python -m uvicorn apps.api.index:app --reload --host 0.0.0.0 --port 8000",
     "build": "echo 'API build complete'",
     "test": "cd ../.. && .venv/bin/python -m pytest apps/api/tests/",
     "test:watch": "cd ../.. && python -m pytest apps/api/tests/ --watch",
-    "test:coverage": "cd ../.. && python -m pytest apps/api/tests/ --cov=apps.api --cov-report=html"
+    "test:coverage": "cd ../.. && python -m pytest apps/api/tests/ --cov=apps.api --cov-report=html",
+    "prisma:generate": "cd ../.. && PATH=$PWD/.venv/bin:$PATH .venv/bin/python -m prisma generate --schema=apps/api/prisma/schema.prisma",
+    "prisma:migrate": "cd ../.. && PATH=$PWD/.venv/bin:$PATH .venv/bin/python -m prisma migrate dev --schema=apps/api/prisma/schema.prisma",
+    "prisma:studio": "cd ../.. && .venv/bin/python -m prisma studio --schema=apps/api/prisma/schema.prisma"
   },
   "dependencies": {}
 }

@@ -1,8 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from prisma import Prisma
 
 # Load environment variables from the root directory
 env_path = os.path.join(
@@ -13,22 +12,10 @@ env_path = os.path.join(
 )
 load_dotenv(env_path)
 
-DATABASE_URL = os.getenv("POSTGRES_URL_NON_POOLING")
-if not DATABASE_URL:
-    raise ValueError("POSTGRES_URL_NON_POOLING environment variable is required")
-
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base = declarative_base()
+db = Prisma()
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db():
+    if not db.is_connected():
+        await db.connect()
+    return db

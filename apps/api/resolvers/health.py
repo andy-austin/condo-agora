@@ -1,15 +1,12 @@
 from datetime import datetime, timezone
 from typing import Any, Dict
 
-from sqlalchemy import text
-from sqlalchemy.orm import Session
-
 from ..database import get_db
 
 
 class HealthResolver:
     @classmethod
-    def get_health_status(cls) -> Dict[str, Any]:
+    async def get_health_status(cls) -> Dict[str, Any]:
         """Get comprehensive health status including database connectivity"""
         health_data = {
             "status": "ok",
@@ -20,11 +17,12 @@ class HealthResolver:
 
         # Check database connectivity
         try:
-            db: Session = next(get_db())
+            db = await get_db()
             try:
                 # Simple query to test connection
-                result = db.execute(text("SELECT 1")).scalar()
-                if result == 1:
+                # query_raw returns a list of dicts
+                result = await db.query_raw("SELECT 1")
+                if result:
                     health_data["database"]["status"] = "ok"
                     health_data["database"]["connection"] = True
                     health_data["database"]["details"] = "Connected successfully"
@@ -36,8 +34,6 @@ class HealthResolver:
                 health_data["database"]["status"] = "error"
                 health_data["database"]["details"] = f"Database error: {str(db_error)}"
                 health_data["status"] = "error"
-            finally:
-                db.close()
         except Exception as connection_error:
             health_data["database"]["status"] = "error"
             health_data["database"][

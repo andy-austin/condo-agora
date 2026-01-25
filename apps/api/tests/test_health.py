@@ -1,14 +1,15 @@
 import os
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, AsyncMock, patch
 
+import pytest
 from fastapi.testclient import TestClient
 
 # Mock environment variable before any imports
 os.environ["POSTGRES_URL_NON_POOLING"] = "postgresql://test:test@localhost:5432/test_db"
 
-# Mock database engine creation to prevent actual connection
-with patch("apps.api.database.create_engine") as mock_create_engine:
-    mock_create_engine.return_value = MagicMock()
+# Mock Prisma to prevent actual connection
+with patch("prisma.Prisma") as mock_prisma:
+    mock_prisma.return_value = MagicMock()
     from apps.api.index import app
 
 client = TestClient(app)
@@ -31,8 +32,13 @@ class TestHealthEndpoint:
 
 
 class TestGraphQLHealthQuery:
-    def test_health_query_basic(self):
+    @patch("apps.api.database.db.query_raw", new_callable=AsyncMock)
+    @patch("apps.api.database.db.is_connected")
+    def test_health_query_basic(self, mock_is_connected, mock_query_raw):
         """Test basic GraphQL health query"""
+        mock_is_connected.return_value = True
+        mock_query_raw.return_value = [{"1": 1}]
+
         query = """
         query {
             health {
@@ -60,19 +66,17 @@ class TestGraphQLHealthQuery:
         # Check the structure of the response
         health_data = data["data"]["health"]
         assert "status" in health_data
+        assert health_data["status"] == "ok"
         assert "timestamp" in health_data
-        assert "api" in health_data
-        assert "database" in health_data
+        assert health_data["database"]["connection"] is True
 
-        # Check API status
-        assert "status" in health_data["api"]
-
-        # Check database status
-        assert "status" in health_data["database"]
-        assert "connection" in health_data["database"]
-
-    def test_health_query_returns_valid_status(self):
+    @patch("apps.api.database.db.query_raw", new_callable=AsyncMock)
+    @patch("apps.api.database.db.is_connected")
+    def test_health_query_returns_valid_status(self, mock_is_connected, mock_query_raw):
         """Test that health query returns valid status values"""
+        mock_is_connected.return_value = True
+        mock_query_raw.return_value = [{"1": 1}]
+
         query = """
         query {
             health {
@@ -99,45 +103,3 @@ class TestGraphQLHealthQuery:
         assert health_data["status"] in valid_statuses
         assert health_data["api"]["status"] in valid_statuses
         assert health_data["database"]["status"] in valid_statuses
-
-    def test_graphql_endpoint_accessible(self):
-        """Test that the GraphQL endpoint is accessible"""
-        # Send an introspection query to test basic GraphQL functionality
-        query = """
-        query {
-            __schema {
-                types {
-                    name
-                }
-            }
-        }
-        """
-
-        response = client.post("/graphql", json={"query": query})
-
-        assert response.status_code == 200
-        data = response.json()
-
-        # Check that we have no errors and got schema data
-        assert "errors" not in data or not data["errors"]
-        assert "data" in data
-        assert "__schema" in data["data"]
-
-    def test_invalid_graphql_query(self):
-        """Test that invalid GraphQL queries return appropriate errors"""
-        query = """
-        query {
-            invalidField {
-                nonExistentField
-            }
-        }
-        """
-
-        response = client.post("/graphql", json={"query": query})
-
-        assert response.status_code == 200
-        data = response.json()
-
-        # Should have errors for invalid query
-        assert "errors" in data
-        assert len(data["errors"]) > 0

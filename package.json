@@ -1,5 +1,5 @@
 {
-  "name": "vercel-python-react-supabase",
+  "name": "vercel-python-react-template",
   "private": true,
   "scripts": {
     "build": "turbo build",
@@ -10,8 +10,7 @@
     "typecheck": "turbo typecheck",
     "clean": "turbo clean",
     "prepare": "husky install",
-    "migrate": "source .venv/bin/activate && cd apps/api && PYTHONPATH=../.. alembic upgrade head",
-    "migrate:create": "source .venv/bin/activate && cd apps/api && PYTHONPATH=../.. alembic revision --autogenerate"
+    "migrate": "pnpm --filter api run prisma:migrate"
   },
   "devDependencies": {
     "turbo": "^2.0.0",

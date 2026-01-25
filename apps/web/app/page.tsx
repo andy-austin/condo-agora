@@ -6,10 +6,10 @@ export default function Home() {
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                        Vercel Python React Supabase
-                    </h1>
-                    <p className="text-xl text-gray-600">
-                        Full-stack template with Next.js, Python FastAPI, and Supabase
+          Vercel Python React
+        </h1>
+        <p className="text-xl text-gray-600 mb-8">
+          Full-stack template with Next.js and Python FastAPI
                     </p>
                 </div>
 

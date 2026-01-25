@@ -2,9 +2,21 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from strawberry.fastapi import GraphQLRouter
 
+from .database import db
 from .schema import schema
 
 app = FastAPI(root_path="/api")
+
+
+@app.on_event("startup")
+async def startup():
+    await db.connect()
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    if db.is_connected():
+        await db.disconnect()
 
 app.add_middleware(
     CORSMiddleware,
