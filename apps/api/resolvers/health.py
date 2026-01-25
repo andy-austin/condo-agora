@@ -41,13 +41,13 @@ class HealthResolver:
                         "details"
                     ] = TranslationKeys.DB_UNEXPECTED_RESULT
                     health_data["status"] = StatusValues.DEGRADED
-            except Exception as db_error:
+            except Exception as _:
                 health_data["database"]["status"] = StatusValues.ERROR
                 health_data["database"][
                     "details"
                 ] = TranslationKeys.DB_QUERY_ERROR
                 health_data["status"] = StatusValues.ERROR
-        except Exception as connection_error:
+        except Exception as _:
             health_data["database"]["status"] = StatusValues.ERROR
             health_data["database"][
                 "details"

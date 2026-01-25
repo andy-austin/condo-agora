@@ -1,7 +1,7 @@
 # Implementation Plan: User Authentication Integration
 
 **Branch**: `001-user-auth-integration` | **Date**: 2026-01-25 | **Spec**: [User Authentication Integration](spec.md)
-**Input**: Feature specification from `/.ai/features/specs/001-user-auth-integration/spec.md`
+**Input**: Feature specification from `/docs/features/specs/001-user-auth-integration/spec.md`
 
 ## Summary
 
@@ -34,7 +34,7 @@ Implement a secure, token-based authentication system using Python/FastAPI nativ
 ### Documentation (this feature)
 
 ```text
-.ai/features/specs/001-user-auth-integration/
+docs/features/specs/001-user-auth-integration/
 ├── plan.md              # This file
 ├── research.md          # Strategy decision (Reject better-auth, use Custom JWT)
 ├── data-model.md        # User, Organization, Invitation entities

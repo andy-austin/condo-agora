@@ -4,7 +4,7 @@ description: "Task list for User Authentication Integration"
 
 # Tasks: User Authentication Integration
 
-**Input**: Design documents from `/.ai/features/specs/001-user-auth-integration/`
+**Input**: Design documents from `/docs/features/specs/001-user-auth-integration/`
 **Prerequisites**: plan.md, spec.md, data-model.md, contracts/openapi.yaml
 **Tests**: Included as per "Strict Type Safety, 100% Test Coverage for Auth Logic" constraint.
 
