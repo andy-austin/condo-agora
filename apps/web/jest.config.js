@@ -9,6 +9,9 @@ const customJestConfig = {
   testEnvironment: 'jsdom',
   testMatch: ['<rootDir>/tests/**/*.test.{js,jsx,ts,tsx}'],
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!(next-intl|@radix-ui|lucide-react)/)'
+  ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },

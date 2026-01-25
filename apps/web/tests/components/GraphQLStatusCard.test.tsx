@@ -7,6 +7,34 @@ jest.mock('@/hooks/useGraphQLStatus', () => ({
   useGraphQLStatus: jest.fn()
 }))
 
+jest.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      'title': 'GraphQL API Status',
+      'subtitle': 'Monitor connection to backend services',
+      'refresh': 'Refresh',
+      'status.checking': 'Checking...',
+      'status.healthy': 'Healthy',
+      'status.degraded': 'Degraded',
+      'status.error': 'Error',
+      'status.unknown': 'Unknown',
+      'endpoint': 'Endpoint',
+      'lastChecked': 'Last checked',
+      'serviceStatus': 'Service Status',
+      'api': 'API',
+      'database.label': 'Database',
+      'database.connected': 'Connected',
+      'database.disconnected': 'Disconnected',
+      'dbDetails': 'Details',
+      'serverTime': 'Server Time',
+      'allOperational': '✓ All systems operational',
+      'someIssues': '⚠ Some services may be experiencing issues',
+      'PostgreSQL connected': 'PostgreSQL connected'
+    }
+    return translations[key] || key
+  }
+}))
+
 const mockUseGraphQLStatus = require('@/hooks/useGraphQLStatus').useGraphQLStatus
 
 describe('GraphQLStatusCard', () => {
