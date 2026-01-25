@@ -27,8 +27,8 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    'SyncQueryEngine',
-    'AsyncQueryEngine',
+    "SyncQueryEngine",
+    "AsyncQueryEngine",
 )
 
 log: logging.Logger = logging.getLogger(__name__)
@@ -64,51 +64,51 @@ class BaseQueryEngine:
         datasources: list[DatasourceOverride] | None,
     ) -> tuple[str, subprocess.Popen[bytes] | subprocess.Popen[str]]:
         port = utils.get_open_port()
-        log.debug('Running query engine on port %i', port)
+        log.debug("Running query engine on port %i", port)
 
-        self.url = f'http://localhost:{port}'
+        self.url = f"http://localhost:{port}"
 
         env = os.environ.copy()
         env.update(
             PRISMA_DML_PATH=str(self.dml_path.absolute()),
-            RUST_LOG='error',
-            RUST_LOG_FORMAT='json',
-            PRISMA_CLIENT_ENGINE_TYPE='binary',
-            PRISMA_ENGINE_PROTOCOL='graphql',
+            RUST_LOG="error",
+            RUST_LOG_FORMAT="json",
+            PRISMA_CLIENT_ENGINE_TYPE="binary",
+            PRISMA_ENGINE_PROTOCOL="graphql",
         )
 
         if DEBUG:
-            env.update(RUST_LOG='info')
+            env.update(RUST_LOG="info")
 
         if datasources is not None:
             env.update(OVERWRITE_DATASOURCES=dumps(datasources))
 
         # TODO: remove the noise from these query logs
         if self._log_queries:
-            env.update(LOG_QUERIES='y')
+            env.update(LOG_QUERIES="y")
 
         args: list[str] = [
             str(file.absolute()),
-            '-p',
+            "-p",
             str(port),
-            '--enable-metrics',
-            '--enable-raw-queries',
+            "--enable-metrics",
+            "--enable-raw-queries",
         ]
-        if _env_bool('__PRISMA_PY_PLAYGROUND'):
-            env.update(RUST_LOG='info')
-            args.append('--enable-playground')
+        if _env_bool("__PRISMA_PY_PLAYGROUND"):
+            env.update(RUST_LOG="info")
+            args.append("--enable-playground")
 
-        log.debug('Starting query engine...')
+        log.debug("Starting query engine...")
         popen_kwargs: dict[str, Any] = {
-            'env': env,
-            'stdout': sys.stdout,
-            'stderr': sys.stderr,
-            'text': False,
+            "env": env,
+            "stdout": sys.stdout,
+            "stderr": sys.stderr,
+            "text": False,
         }
-        if platform.name() != 'windows':
+        if platform.name() != "windows":
             # ensure SIGINT is unblocked before forking the query engine
             # https://github.com/RobertCraigie/prisma-client-py/pull/678
-            popen_kwargs['preexec_fn'] = lambda: signal.pthread_sigmask(
+            popen_kwargs["preexec_fn"] = lambda: signal.pthread_sigmask(
                 signal.SIG_UNBLOCK, [signal.SIGINT, signal.SIGTERM]
             )
 
@@ -125,7 +125,7 @@ class BaseQueryEngine:
         else:
             total_seconds = None
 
-        if platform.name() == 'windows':
+        if platform.name() == "windows":
             self.process.kill()
             self.process.wait(timeout=total_seconds)
         else:
@@ -158,12 +158,12 @@ class SyncQueryEngine(BaseQueryEngine, SyncHTTPEngine):
 
     @override
     def close(self, *, timeout: timedelta | None = None) -> None:
-        log.debug('Disconnecting query engine...')
+        log.debug("Disconnecting query engine...")
 
         self._kill_process(timeout=timeout)
         self._close_session()
 
-        log.debug('Disconnected query engine')
+        log.debug("Disconnected query engine")
 
     @override
     async def aclose(self, *, timeout: timedelta | None = None) -> None:
@@ -176,12 +176,12 @@ class SyncQueryEngine(BaseQueryEngine, SyncHTTPEngine):
         timeout: timedelta = DEFAULT_CONNECT_TIMEOUT,
         datasources: list[DatasourceOverride] | None = None,
     ) -> None:
-        log.debug('Connecting to query engine')
+        log.debug("Connecting to query engine")
         if datasources:
-            log.debug('Datasources: %s', datasources)
+            log.debug("Datasources: %s", datasources)
 
         if self.process is not None:
-            raise errors.AlreadyConnectedError('Already connected to the query engine')
+            raise errors.AlreadyConnectedError("Already connected to the query engine")
 
         start = time.monotonic()
         self.file = file = self._ensure_file()
@@ -192,7 +192,7 @@ class SyncQueryEngine(BaseQueryEngine, SyncHTTPEngine):
             self.close()
             raise
 
-        log.debug('Connecting to query engine took %s', time_since(start))
+        log.debug("Connecting to query engine took %s", time_since(start))
 
     def spawn(
         self,
@@ -205,7 +205,7 @@ class SyncQueryEngine(BaseQueryEngine, SyncHTTPEngine):
         last_exc = None
         for _ in range(int(timeout.total_seconds() / 0.1)):
             try:
-                data = self.request('GET', '/status')
+                data = self.request("GET", "/status")
             except Exception as exc:
                 # TODO(someday): only retry on ConnectionError
                 if isinstance(exc, AttributeError):
@@ -213,20 +213,22 @@ class SyncQueryEngine(BaseQueryEngine, SyncHTTPEngine):
 
                 last_exc = exc
                 log.debug(
-                    'Could not connect to query engine due to %s; retrying...',
+                    "Could not connect to query engine due to %s; retrying...",
                     exc,
                 )
                 time.sleep(0.1)
                 continue
 
-            if data.get('Errors') is not None:
-                log.debug('Could not connect due to gql errors; retrying...')
+            if data.get("Errors") is not None:
+                log.debug("Could not connect due to gql errors; retrying...")
                 time.sleep(0.1)
                 continue
 
             break
         else:
-            raise errors.EngineConnectionError('Could not connect to the query engine') from last_exc
+            raise errors.EngineConnectionError(
+                "Could not connect to the query engine"
+            ) from last_exc
 
     @override
     def query(
@@ -237,11 +239,11 @@ class SyncQueryEngine(BaseQueryEngine, SyncHTTPEngine):
     ) -> Any:
         headers: dict[str, str] = {}
         if tx_id is not None:
-            headers['X-transaction-id'] = tx_id
+            headers["X-transaction-id"] = tx_id
 
         return self.request(
-            'POST',
-            '/',
+            "POST",
+            "/",
             content=content,
             headers=headers,
         )
@@ -249,25 +251,25 @@ class SyncQueryEngine(BaseQueryEngine, SyncHTTPEngine):
     @override
     def start_transaction(self, *, content: str) -> TransactionId:
         result = self.request(
-            'POST',
-            '/transaction/start',
+            "POST",
+            "/transaction/start",
             content=content,
         )
-        return TransactionId(result['id'])
+        return TransactionId(result["id"])
 
     @override
     def commit_transaction(self, tx_id: TransactionId) -> None:
-        self.request('POST', f'/transaction/{tx_id}/commit')
+        self.request("POST", f"/transaction/{tx_id}/commit")
 
     @override
     def rollback_transaction(self, tx_id: TransactionId) -> None:
-        self.request('POST', f'/transaction/{tx_id}/rollback')
+        self.request("POST", f"/transaction/{tx_id}/rollback")
 
     @overload
     def metrics(
         self,
         *,
-        format: Literal['json'],
+        format: Literal["json"],
         global_labels: dict[str, str] | None,
     ) -> dict[str, Any]: ...
 
@@ -275,7 +277,7 @@ class SyncQueryEngine(BaseQueryEngine, SyncHTTPEngine):
     def metrics(
         self,
         *,
-        format: Literal['prometheus'],
+        format: Literal["prometheus"],
         global_labels: dict[str, str] | None,
     ) -> str: ...
 
@@ -292,10 +294,10 @@ class SyncQueryEngine(BaseQueryEngine, SyncHTTPEngine):
             content = None
 
         return self.request(  # type: ignore[no-any-return]
-            'GET',
-            f'/metrics?format={format}',
+            "GET",
+            f"/metrics?format={format}",
             content=content,
-            parse_response=format == 'json',
+            parse_response=format == "json",
         )
 
 
@@ -319,11 +321,11 @@ class AsyncQueryEngine(BaseQueryEngine, AsyncHTTPEngine):
 
     @override
     def close(self, *, timeout: timedelta | None = None) -> None:
-        log.debug('Disconnecting query engine...')
+        log.debug("Disconnecting query engine...")
 
         self._kill_process(timeout=timeout)
 
-        log.debug('Disconnected query engine')
+        log.debug("Disconnected query engine")
 
     @override
     async def aclose(self, *, timeout: timedelta | None = None) -> None:
@@ -336,12 +338,12 @@ class AsyncQueryEngine(BaseQueryEngine, AsyncHTTPEngine):
         timeout: timedelta = DEFAULT_CONNECT_TIMEOUT,
         datasources: list[DatasourceOverride] | None = None,
     ) -> None:
-        log.debug('Connecting to query engine')
+        log.debug("Connecting to query engine")
         if datasources:
-            log.debug('Datasources: %s', datasources)
+            log.debug("Datasources: %s", datasources)
 
         if self.process is not None:
-            raise errors.AlreadyConnectedError('Already connected to the query engine')
+            raise errors.AlreadyConnectedError("Already connected to the query engine")
 
         start = time.monotonic()
         self.file = file = self._ensure_file()
@@ -352,7 +354,7 @@ class AsyncQueryEngine(BaseQueryEngine, AsyncHTTPEngine):
             self.close()
             raise
 
-        log.debug('Connecting to query engine took %s', time_since(start))
+        log.debug("Connecting to query engine took %s", time_since(start))
 
     async def spawn(
         self,
@@ -365,7 +367,7 @@ class AsyncQueryEngine(BaseQueryEngine, AsyncHTTPEngine):
         last_exc = None
         for _ in range(int(timeout.total_seconds() / 0.1)):
             try:
-                data = await self.request('GET', '/status')
+                data = await self.request("GET", "/status")
             except Exception as exc:
                 # TODO(someday): only retry on ConnectionError
                 if isinstance(exc, AttributeError):
@@ -373,20 +375,22 @@ class AsyncQueryEngine(BaseQueryEngine, AsyncHTTPEngine):
 
                 last_exc = exc
                 log.debug(
-                    'Could not connect to query engine due to %s; retrying...',
+                    "Could not connect to query engine due to %s; retrying...",
                     exc,
                 )
                 await asyncio.sleep(0.1)
                 continue
 
-            if data.get('Errors') is not None:
-                log.debug('Could not connect due to gql errors; retrying...')
+            if data.get("Errors") is not None:
+                log.debug("Could not connect due to gql errors; retrying...")
                 await asyncio.sleep(0.1)
                 continue
 
             break
         else:
-            raise errors.EngineConnectionError('Could not connect to the query engine') from last_exc
+            raise errors.EngineConnectionError(
+                "Could not connect to the query engine"
+            ) from last_exc
 
     @override
     async def query(
@@ -397,11 +401,11 @@ class AsyncQueryEngine(BaseQueryEngine, AsyncHTTPEngine):
     ) -> Any:
         headers: dict[str, str] = {}
         if tx_id is not None:
-            headers['X-transaction-id'] = tx_id
+            headers["X-transaction-id"] = tx_id
 
         return await self.request(
-            'POST',
-            '/',
+            "POST",
+            "/",
             content=content,
             headers=headers,
         )
@@ -409,25 +413,25 @@ class AsyncQueryEngine(BaseQueryEngine, AsyncHTTPEngine):
     @override
     async def start_transaction(self, *, content: str) -> TransactionId:
         result = await self.request(
-            'POST',
-            '/transaction/start',
+            "POST",
+            "/transaction/start",
             content=content,
         )
-        return TransactionId(result['id'])
+        return TransactionId(result["id"])
 
     @override
     async def commit_transaction(self, tx_id: TransactionId) -> None:
-        await self.request('POST', f'/transaction/{tx_id}/commit')
+        await self.request("POST", f"/transaction/{tx_id}/commit")
 
     @override
     async def rollback_transaction(self, tx_id: TransactionId) -> None:
-        await self.request('POST', f'/transaction/{tx_id}/rollback')
+        await self.request("POST", f"/transaction/{tx_id}/rollback")
 
     @overload
     async def metrics(
         self,
         *,
-        format: Literal['json'],
+        format: Literal["json"],
         global_labels: dict[str, str] | None,
     ) -> dict[str, Any]: ...
 
@@ -435,7 +439,7 @@ class AsyncQueryEngine(BaseQueryEngine, AsyncHTTPEngine):
     async def metrics(
         self,
         *,
-        format: Literal['prometheus'],
+        format: Literal["prometheus"],
         global_labels: dict[str, str] | None,
     ) -> str: ...
 
@@ -452,8 +456,8 @@ class AsyncQueryEngine(BaseQueryEngine, AsyncHTTPEngine):
             content = None
 
         return await self.request(  # type: ignore[no-any-return]
-            'GET',
-            f'/metrics?format={format}',
+            "GET",
+            f"/metrics?format={format}",
             content=content,
-            parse_response=format == 'json',
+            parse_response=format == "json",
         )

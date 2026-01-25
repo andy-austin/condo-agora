@@ -68,7 +68,7 @@ condo-agora/
 │       ├── prisma_client/      # Generated Prisma client
 │       └── tests/              # Pytest tests
 │
-├── .ai/                        # AI agent documentation (this folder)
+├── docs/                        # AI agent documentation (this folder)
 ├── .env                        # Environment variables
 ├── package.json                # Root monorepo scripts
 ├── turbo.json                  # TurboRepo configuration

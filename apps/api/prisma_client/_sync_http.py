@@ -6,7 +6,7 @@ import httpx
 from ._types import Method
 from .http_abstract import AbstractHTTP, AbstractResponse
 
-__all__ = ('HTTP', 'SyncHTTP', 'Response', 'client')
+__all__ = ("HTTP", "SyncHTTP", "Response", "client")
 
 
 class SyncHTTP(AbstractHTTP[httpx.Client, httpx.Response]):
@@ -14,14 +14,14 @@ class SyncHTTP(AbstractHTTP[httpx.Client, httpx.Response]):
 
     @override
     def download(self, url: str, dest: str) -> None:
-        with self.session.stream('GET', url, timeout=None) as resp:
+        with self.session.stream("GET", url, timeout=None) as resp:
             resp.raise_for_status()
-            with open(dest, 'wb') as fd:
+            with open(dest, "wb") as fd:
                 for chunk in resp.iter_bytes():
                     fd.write(chunk)
 
     @override
-    def request(self, method: Method, url: str, **kwargs: Any) -> 'Response':
+    def request(self, method: Method, url: str, **kwargs: Any) -> "Response":
         return Response(self.session.request(method, url, **kwargs))
 
     @override

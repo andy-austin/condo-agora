@@ -1,50 +1,82 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+SYNC IMPACT REPORT
+Version: 1.0.0 (Initial Ratification)
+Changes:
+- Replaced templates with concrete principles based on user request and project context.
+- Defined Principles:
+  1. Code Quality & Type Safety
+  2. Comprehensive Testing Strategy
+  3. User Experience & Design Consistency
+  4. Performance & Scalability
+- Defined Technical Constraints (Stack details from README)
+- Defined Development Workflow
+- Governance: Established version 1.0.0
+
+Templates Status:
+- .specify/templates/plan-template.md: ✅ Compatible (Generic checks align)
+- .specify/templates/spec-template.md: ✅ Compatible (Testing section aligns)
+- .specify/templates/tasks-template.md: ✅ Compatible (Test tasks included)
+
+Follow-up:
+- Ensure CI pipelines in .github/workflows enforce the mentioned linting/testing rules (Already present in file tree).
+-->
+# Condo Agora Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Code Quality & Type Safety
+Strict adherence to project standards is required to maintain maintainability and reduce bugs.
+- **Type Safety**: TypeScript `strict` mode is mandatory for web. Python code must be fully type-hinted (mypy/pyright compliant). `any` or `Dict[Any, Any]` usage must be explicitly justified.
+- **Linting**: No code is committed without passing ESLint/Prettier (Web) and Black/Isort/Flake8 (API).
+- **Style**: Follow established patterns (e.g., Service layer for logic, Resolvers for transport). Comments should explain "why", not "what".
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Comprehensive Testing Strategy
+Confidence in deployment comes from rigorous automated testing.
+- **Mandate**: No feature is complete without tests. Logic without tests is considered technical debt.
+- **Unit Tests**: Cover individual functions and business logic (Jest/Pytest).
+- **Integration Tests**: Verify API endpoints, GraphQL resolvers, and database interactions (using test DB).
+- **Failure**: A failed test in CI blocks merging. Flaky tests must be fixed or isolated immediately.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. User Experience & Design Consistency
+The application must feel cohesive, responsive, and professional.
+- **Design System**: UI must use existing components and Tailwind utility classes. Do not introduce arbitrary CSS values.
+- **Feedback**: Every user action (save, load, delete) requires visible feedback (spinners, toasts, error messages).
+- **Accessibility**: Components must be accessible (keyboard navigation, ARIA labels).
+- **Error Handling**: Graceful degradation; users should never see raw stack traces or "white screens of death".
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Performance & Scalability
+Performance is a feature, not an afterthought.
+- **Frontend**: Optimize Core Web Vitals (LCP, CLS, INP). Minimise bundle sizes. Use Next.js image optimization.
+- **Backend**: Avoid N+1 queries in GraphQL resolvers (use Dataloaders). Optimize database indices.
+- **Latency**: API responses should aim for <100ms for standard reads.
+- **Resources**: Clean up subscriptions and connections.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+## Technical Constraints & Standards
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### Technology Stack
+- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS.
+- **Backend**: Python FastAPI, Strawberry GraphQL, Prisma (Python Client).
+- **Database**: PostgreSQL.
+- **Communication**: All Client-Server data exchange must occur via GraphQL.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### Security
+- **Auth**: Secure authentication flows (e.g., HttpOnly cookies).
+- **Data**: Validate all inputs at the API boundary (Pydantic/Strawberry).
+- **Secrets**: Never commit `.env` files or secrets to git.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Development Workflow
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### Process
+1.  **Specs**: Features begin with a clear specification and plan (using `.specify` templates).
+2.  **Branches**: Use descriptive names (`feat/user-auth`, `fix/login-bug`).
+3.  **Reviews**: Peer reviews required. Reviewers must verify compliance with this Constitution.
+4.  **CI/CD**: Automation guards the `main` branch.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This Constitution serves as the primary source of truth for engineering standards.
+- **Amendments**: Proposed changes must be submitted via PR to `.specify/memory/constitution.md` and ratified by the team lead.
+- **Compliance**: "Constitution Check" is a mandatory step in the planning phase.
+- **Versioning**: Follows Semantic Versioning (MAJOR.MINOR.PATCH).
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-01-25 | **Last Amended**: 2026-01-25
