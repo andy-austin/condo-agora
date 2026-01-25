@@ -3,13 +3,13 @@
 ## Entities
 
 ### User
-Represents a registered identity in the system.
-- `id`: String (UUID, PK)
+Represents a registered identity in the system, synchronized from Clerk.
+- `id`: String (UUID, PK) - Our internal ID.
+- `clerk_id`: String (Unique, Indexed) - The External ID from Clerk.
 - `email`: String (Unique)
-- `hashed_password`: String (Nullable, for OAuth users)
-- `full_name`: String
+- `first_name`: String (Nullable)
+- `last_name`: String (Nullable)
 - `avatar_url`: String (Nullable)
-- `is_active`: Boolean (Default: true)
 - `created_at`: DateTime
 - `updated_at`: DateTime
 
@@ -41,17 +41,8 @@ A pending invitation to join an organization.
 - `created_at`: DateTime
 - `accepted_at`: DateTime (Nullable)
 
-### Account (Optional/Implicit)
-To handle multiple OAuth providers per user, we might normalize this, but for MVP (Google-only), we can store `google_id` on the `User` table or a simple `SocialAccount` table.
-- `id`: String (UUID, PK)
-- `user_id`: String (FK -> User.id)
-- `provider`: String (e.g., "google")
-- `provider_id`: String (Unique per provider)
-- `created_at`: DateTime
-
 ## Relationships
 - `User` 1:N `OrganizationMember`
 - `Organization` 1:N `OrganizationMember`
 - `Organization` 1:N `Invitation`
 - `User` 1:N `Invitation` (as inviter)
-- `User` 1:N `SocialAccount`
