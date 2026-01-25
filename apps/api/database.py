@@ -1,6 +1,6 @@
 import os
-import stat
 import platform
+import stat
 from pathlib import Path
 
 from dotenv import load_dotenv

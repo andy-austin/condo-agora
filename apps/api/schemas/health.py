@@ -1,7 +1,7 @@
 import strawberry
 
-from ..resolvers.health import HealthResolver
 from ..graphql_types.health import DatabaseStatus, HealthStatus, ServiceStatus
+from ..resolvers.health import HealthResolver
 
 
 @strawberry.type

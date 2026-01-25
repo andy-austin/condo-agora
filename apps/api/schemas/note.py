@@ -2,8 +2,8 @@ from typing import List, Optional
 
 import strawberry
 
-from ..resolvers.note import NoteResolver
 from ..graphql_types.note import CreateNoteInput, Note, UpdateNoteInput
+from ..resolvers.note import NoteResolver
 from .base import BaseSchemaGenerator
 
 

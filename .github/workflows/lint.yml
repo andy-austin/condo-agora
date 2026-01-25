@@ -65,4 +65,4 @@ jobs:
         run: .venv/bin/python -m black --check apps/api/
 
       - name: Check isort formatting
-        run: .venv/bin/python -m isort --check-only --profile black apps/api/
+        run: .venv/bin/python -m isort --check-only --profile black --skip apps/api/prisma_client/ apps/api/
