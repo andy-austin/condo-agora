@@ -38,7 +38,7 @@ This script will:
 - Install Node.js dependencies (pnpm)
 - Install Python dependencies (uv + virtual environment)
 - Start a PostgreSQL database in Docker
-- Create `.env.local` with default database configuration
+- Create `.env` with default database configuration
 - Generate the Prisma client
 - Run database migrations
 - Set up git pre-commit hooks
@@ -67,8 +67,8 @@ docker run --name condo-agora-db \
   -p 5432:5432 \
   -d postgres:15
 
-# Create .env.local with the connection string
-echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/condo_agora" > .env.local
+# Create .env with the connection string
+echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/condo_agora" > .env
 
 # Run migrations
 pnpm migrate
@@ -99,7 +99,8 @@ condo-agora/
 │       ├── prisma_client/   # Generated Prisma client
 │       ├── resolvers/       # GraphQL resolvers
 │       └── ...
-├── .env.local               # Local environment variables
+├── .env                     # Environment variables (created by setup.sh)
+├── .env.example             # Example environment variables
 ├── setup.sh                 # Development setup script
 └── ...
 ```

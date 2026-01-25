@@ -216,8 +216,8 @@ node_modules/
 
 
 # Environment variables file
-.env.local
-.env.*.local
+.env
+!.env.example
 
 # TurboRepo
 .turbo/
@@ -241,4 +241,3 @@ node_modules/
 .gemini/
 .mcp.json
 .DS_Store
-.env*.local

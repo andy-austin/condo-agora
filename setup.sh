@@ -36,22 +36,16 @@ fi
 
 # Set up environment variables
 echo "Setting up environment variables..."
-if [ ! -f ".env.local" ]; then
-    if [ -f ".env.local.example" ]; then
-        echo "Creating .env.local from .env.local.example..."
-        cp .env.local.example .env.local
-        echo "Please update .env.local with your actual database credentials if needed."
+if [ ! -f ".env" ]; then
+    if [ -f ".env.example" ]; then
+        echo "Creating .env from .env.example..."
+        cp .env.example .env
+        echo "Please update .env with your actual database credentials if needed."
     else
-        echo "Warning: .env.local.example not found. Skipping .env.local creation."
+        echo "Warning: .env.example not found. Skipping .env creation."
     fi
 else
-    echo ".env.local already exists"
-fi
-
-# Ensure .env exists for Prisma (symlink or copy)
-if [ -f ".env.local" ] && [ ! -f ".env" ]; then
-    echo "Creating .env symlink for Prisma compatibility..."
-    ln -s .env.local .env
+    echo ".env already exists"
 fi
 
 # Start Docker Postgres if Docker is available and no database is running

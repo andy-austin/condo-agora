@@ -35,8 +35,8 @@ from .prisma_client import Prisma
 env_path = os.path.join(
     os.path.dirname(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    ),  # noqa: E501
-    ".env.local",
+    ),
+    ".env",
 )
 load_dotenv(env_path)
 
