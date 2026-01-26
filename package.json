@@ -2,7 +2,7 @@
   "name": "vercel-python-react-template",
   "private": true,
   "scripts": {
-    "build": "turbo build",
+    "build": "python3 -m pip install prisma && python3 -m prisma generate --schema=apps/api/prisma/schema.prisma && turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
@@ -20,6 +20,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^9.0.0",
     "lint-staged": "^15.0.0",
+    "prisma": "^5.22.0",
     "turbo": "^2.0.0"
   },
   "packageManager": "pnpm@10.28.1",
