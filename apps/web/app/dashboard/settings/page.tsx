@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const { getAuthToken } = useAuthToken();
 
-  const handleInvite = async (e: React.FormEvent) => {
+  const handleInvite = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
