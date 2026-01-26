@@ -1,9 +1,8 @@
 import uuid
 from datetime import datetime, timedelta
 
-from ...prisma_client.enums import Role
-
 from ...database import db
+from ...prisma_client.enums import Role
 
 
 async def create_invitation(
