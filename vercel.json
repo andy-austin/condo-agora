@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "buildCommand": "cd apps/api && prisma generate --schema=prisma/schema.prisma && cd ../.. && pnpm build",
   "builds": [
     {
       "src": "apps/web/package.json",

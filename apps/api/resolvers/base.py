@@ -1,6 +1,6 @@
 from typing import Generic, List, Optional, TypeVar
 
-from ..prisma_client import Prisma
+from prisma import Prisma
 
 ModelType = TypeVar("ModelType")
 CreateSchemaType = TypeVar("CreateSchemaType")
