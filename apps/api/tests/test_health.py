@@ -1,16 +1,10 @@
-import os
-from unittest.mock import AsyncMock, MagicMock, patch
-
 from fastapi.testclient import TestClient
 
-# Mock environment variable before any imports
-os.environ["POSTGRES_URL_NON_POOLING"] = "postgresql://test:test@localhost:5432/test_db"
+from apps.api.i18n import TranslationKeys
+from apps.api.index import app
 
-# Mock Prisma to prevent actual connection
-with patch("apps.api.prisma_client.Prisma") as mock_prisma:
-    mock_prisma.return_value = MagicMock()
-    from apps.api.i18n import TranslationKeys
-    from apps.api.index import app
+# Import shared mocks from conftest
+from .conftest import mock_db
 
 client = TestClient(app)
 
@@ -32,12 +26,11 @@ class TestHealthEndpoint:
 
 
 class TestGraphQLHealthQuery:
-    @patch("apps.api.database.db.query_raw", new_callable=AsyncMock)
-    @patch("apps.api.database.db.is_connected")
-    def test_health_query_basic(self, mock_is_connected, mock_query_raw):
+    def test_health_query_basic(self):
         """Test basic GraphQL health query"""
-        mock_is_connected.return_value = True
-        mock_query_raw.return_value = [{"1": 1}]
+        mock_db.is_connected.return_value = True
+        mock_db.query_raw.return_value = [{"1": 1}]
+        mock_db.query_raw.side_effect = None
 
         query = """
         query {
@@ -70,12 +63,11 @@ class TestGraphQLHealthQuery:
         assert "timestamp" in health_data
         assert health_data["database"]["connection"] is True
 
-    @patch("apps.api.database.db.query_raw", new_callable=AsyncMock)
-    @patch("apps.api.database.db.is_connected")
-    def test_health_query_returns_valid_status(self, mock_is_connected, mock_query_raw):
+    def test_health_query_returns_valid_status(self):
         """Test that health query returns valid status values"""
-        mock_is_connected.return_value = True
-        mock_query_raw.return_value = [{"1": 1}]
+        mock_db.is_connected.return_value = True
+        mock_db.query_raw.return_value = [{"1": 1}]
+        mock_db.query_raw.side_effect = None
 
         query = """
         query {
@@ -104,12 +96,11 @@ class TestGraphQLHealthQuery:
         assert health_data["api"]["status"] in valid_statuses
         assert health_data["database"]["status"] in valid_statuses
 
-    @patch("apps.api.database.db.query_raw", new_callable=AsyncMock)
-    @patch("apps.api.database.db.is_connected")
-    def test_health_query_details_success(self, mock_is_connected, mock_query_raw):
+    def test_health_query_details_success(self):
         """Test that health query returns correct translation key on success"""
-        mock_is_connected.return_value = True
-        mock_query_raw.return_value = [{"1": 1}]
+        mock_db.is_connected.return_value = True
+        mock_db.query_raw.return_value = [{"1": 1}]
+        mock_db.query_raw.side_effect = None
 
         query = """
         query {
@@ -130,12 +121,10 @@ class TestGraphQLHealthQuery:
         details = data["data"]["health"]["database"]["details"]
         assert details == TranslationKeys.DB_CONNECTED
 
-    @patch("apps.api.database.db.query_raw", new_callable=AsyncMock)
-    @patch("apps.api.database.db.is_connected")
-    def test_health_query_details_error(self, mock_is_connected, mock_query_raw):
+    def test_health_query_details_error(self):
         """Test that health query returns correct translation key on error (no connection)"""
         # Simulate connection error by raising exception
-        mock_query_raw.side_effect = Exception("Connection refused")
+        mock_db.query_raw.side_effect = Exception("Connection refused")
 
         query = """
         query {
@@ -153,5 +142,8 @@ class TestGraphQLHealthQuery:
         data = response.json()
 
         details = data["data"]["health"]["database"]["details"]
-        # With my change, it should return just the key, not "key: error message"
         assert details == TranslationKeys.DB_QUERY_ERROR
+
+        # Reset mock for other tests
+        mock_db.query_raw.side_effect = None
+        mock_db.query_raw.return_value = [{"1": 1}]
