@@ -51,7 +51,7 @@ jobs:
       - name: Create virtual environment and install Python dependencies
         run: |
           uv venv .venv
-          uv pip install -r apps/api/requirements.txt --python .venv/bin/python
+          uv pip install -r apps/api/requirements-dev.txt --python .venv/bin/python
 
       - name: Run flake8
         run: .venv/bin/python -m flake8 --config=apps/api/.flake8 --max-line-length=120 apps/api/

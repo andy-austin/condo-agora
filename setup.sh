@@ -25,13 +25,13 @@ else
     echo ".venv already exists"
 fi
 
-# Install Python dependencies from apps/api/requirements.txt
-if [ -f "apps/api/requirements.txt" ]; then
+# Install Python dependencies (dev + production)
+if [ -f "apps/api/requirements-dev.txt" ]; then
     echo "Installing Python dependencies..."
-    uv pip install -r apps/api/requirements.txt --python .venv/bin/python
+    uv pip install -r apps/api/requirements-dev.txt --python .venv/bin/python
     echo "Python dependencies installed in .venv!"
 else
-    echo "Warning: No requirements.txt found in apps/api/"
+    echo "Warning: No requirements-dev.txt found in apps/api/"
 fi
 
 # Set up environment variables
