@@ -1,5 +1,6 @@
-from ..graphql_types.note import CreateNoteInput, UpdateNoteInput
 from prisma.models import Note as NoteModel
+
+from ..graphql_types.note import CreateNoteInput, UpdateNoteInput
 from .base import BaseResolver
 
 
