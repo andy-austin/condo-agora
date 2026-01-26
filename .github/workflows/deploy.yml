@@ -71,14 +71,14 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         id: deploy-prod
         run: |
-          URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          URL=$(vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Vercel (Preview)
         if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
         id: deploy-preview
         run: |
-          URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          URL=$(vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Comment preview URL on PR
