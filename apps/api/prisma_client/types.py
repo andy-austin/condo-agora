@@ -1139,6 +1139,49 @@ DecimalListUpdate = Union[
     _DecimalListUpdatePush,
 ]
 
+class _RoleListFilterEqualsInput(TypedDict):
+    equals: Optional[List['enums.Role']]
+
+
+class _RoleListFilterHasInput(TypedDict):
+    has: 'enums.Role'
+
+
+class _RoleListFilterHasEveryInput(TypedDict):
+    has_every: List['enums.Role']
+
+
+class _RoleListFilterHasSomeInput(TypedDict):
+    has_some: List['enums.Role']
+
+
+class _RoleListFilterIsEmptyInput(TypedDict):
+    is_empty: bool
+
+
+RoleListFilter = Union[
+    _RoleListFilterHasInput,
+    _RoleListFilterEqualsInput,
+    _RoleListFilterHasSomeInput,
+    _RoleListFilterIsEmptyInput,
+    _RoleListFilterHasEveryInput,
+]
+
+
+class _RoleListUpdateSet(TypedDict):
+    set: List['enums.Role']
+
+
+class _RoleListUpdatePush(TypedDict):
+    push: List['enums.Role']
+
+
+RoleListUpdate = Union[
+    List['enums.Role'],
+    _RoleListUpdateSet,
+    _RoleListUpdatePush,
+]
+
 
 # Note types
 
@@ -1457,6 +1500,442 @@ class FindManyNoteArgsFromNoteRecursive4(TypedDict, total=False):
     cursor: 'NoteWhereUniqueInput'
     distinct: List['NoteScalarFieldKeys']
     
+    
+
+class UserIncludeFromNote(TypedDict, total=False):
+    """Relational arguments for Note"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromNoteRecursive1']
+    invitations: Union[bool, 'FindManyInvitationArgsFromNoteRecursive1']
+
+
+class UserIncludeFromNoteRecursive1(TypedDict, total=False):
+    """Relational arguments for Note"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromNoteRecursive2']
+    invitations: Union[bool, 'FindManyInvitationArgsFromNoteRecursive2']
+
+
+class UserIncludeFromNoteRecursive2(TypedDict, total=False):
+    """Relational arguments for Note"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromNoteRecursive3']
+    invitations: Union[bool, 'FindManyInvitationArgsFromNoteRecursive3']
+
+
+class UserIncludeFromNoteRecursive3(TypedDict, total=False):
+    """Relational arguments for Note"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromNoteRecursive4']
+    invitations: Union[bool, 'FindManyInvitationArgsFromNoteRecursive4']
+
+
+class UserIncludeFromNoteRecursive4(TypedDict, total=False):
+    """Relational arguments for Note"""
+
+    
+
+class UserArgsFromNote(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'UserIncludeFromUserRecursive1'
+
+
+class UserArgsFromNoteRecursive1(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'UserIncludeFromUserRecursive2'
+
+
+class UserArgsFromNoteRecursive2(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'UserIncludeFromUserRecursive3'
+
+
+class UserArgsFromNoteRecursive3(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'UserIncludeFromUserRecursive4'
+
+
+class UserArgsFromNoteRecursive4(TypedDict, total=False):
+    """Arguments for Note"""
+    
+    
+
+class FindManyUserArgsFromNote(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive1'
+
+
+class FindManyUserArgsFromNoteRecursive1(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive2'
+
+
+class FindManyUserArgsFromNoteRecursive2(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive3'
+
+
+class FindManyUserArgsFromNoteRecursive3(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive4'
+
+
+class FindManyUserArgsFromNoteRecursive4(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    
+    
+
+class OrganizationIncludeFromNote(TypedDict, total=False):
+    """Relational arguments for Note"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromNoteRecursive1']
+    invitations: Union[bool, 'FindManyInvitationArgsFromNoteRecursive1']
+
+
+class OrganizationIncludeFromNoteRecursive1(TypedDict, total=False):
+    """Relational arguments for Note"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromNoteRecursive2']
+    invitations: Union[bool, 'FindManyInvitationArgsFromNoteRecursive2']
+
+
+class OrganizationIncludeFromNoteRecursive2(TypedDict, total=False):
+    """Relational arguments for Note"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromNoteRecursive3']
+    invitations: Union[bool, 'FindManyInvitationArgsFromNoteRecursive3']
+
+
+class OrganizationIncludeFromNoteRecursive3(TypedDict, total=False):
+    """Relational arguments for Note"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromNoteRecursive4']
+    invitations: Union[bool, 'FindManyInvitationArgsFromNoteRecursive4']
+
+
+class OrganizationIncludeFromNoteRecursive4(TypedDict, total=False):
+    """Relational arguments for Note"""
+
+    
+
+class OrganizationArgsFromNote(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'OrganizationIncludeFromOrganizationRecursive1'
+
+
+class OrganizationArgsFromNoteRecursive1(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'OrganizationIncludeFromOrganizationRecursive2'
+
+
+class OrganizationArgsFromNoteRecursive2(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'OrganizationIncludeFromOrganizationRecursive3'
+
+
+class OrganizationArgsFromNoteRecursive3(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'OrganizationIncludeFromOrganizationRecursive4'
+
+
+class OrganizationArgsFromNoteRecursive4(TypedDict, total=False):
+    """Arguments for Note"""
+    
+    
+
+class FindManyOrganizationArgsFromNote(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive1'
+
+
+class FindManyOrganizationArgsFromNoteRecursive1(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive2'
+
+
+class FindManyOrganizationArgsFromNoteRecursive2(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive3'
+
+
+class FindManyOrganizationArgsFromNoteRecursive3(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive4'
+
+
+class FindManyOrganizationArgsFromNoteRecursive4(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    
+    
+
+class OrganizationMemberIncludeFromNote(TypedDict, total=False):
+    """Relational arguments for Note"""
+    user: Union[bool, 'UserArgsFromNoteRecursive1']
+    organization: Union[bool, 'OrganizationArgsFromNoteRecursive1']
+
+
+class OrganizationMemberIncludeFromNoteRecursive1(TypedDict, total=False):
+    """Relational arguments for Note"""
+    user: Union[bool, 'UserArgsFromNoteRecursive2']
+    organization: Union[bool, 'OrganizationArgsFromNoteRecursive2']
+
+
+class OrganizationMemberIncludeFromNoteRecursive2(TypedDict, total=False):
+    """Relational arguments for Note"""
+    user: Union[bool, 'UserArgsFromNoteRecursive3']
+    organization: Union[bool, 'OrganizationArgsFromNoteRecursive3']
+
+
+class OrganizationMemberIncludeFromNoteRecursive3(TypedDict, total=False):
+    """Relational arguments for Note"""
+    user: Union[bool, 'UserArgsFromNoteRecursive4']
+    organization: Union[bool, 'OrganizationArgsFromNoteRecursive4']
+
+
+class OrganizationMemberIncludeFromNoteRecursive4(TypedDict, total=False):
+    """Relational arguments for Note"""
+
+    
+
+class OrganizationMemberArgsFromNote(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive1'
+
+
+class OrganizationMemberArgsFromNoteRecursive1(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive2'
+
+
+class OrganizationMemberArgsFromNoteRecursive2(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive3'
+
+
+class OrganizationMemberArgsFromNoteRecursive3(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive4'
+
+
+class OrganizationMemberArgsFromNoteRecursive4(TypedDict, total=False):
+    """Arguments for Note"""
+    
+    
+
+class FindManyOrganizationMemberArgsFromNote(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive1'
+
+
+class FindManyOrganizationMemberArgsFromNoteRecursive1(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive2'
+
+
+class FindManyOrganizationMemberArgsFromNoteRecursive2(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive3'
+
+
+class FindManyOrganizationMemberArgsFromNoteRecursive3(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive4'
+
+
+class FindManyOrganizationMemberArgsFromNoteRecursive4(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    
+    
+
+class InvitationIncludeFromNote(TypedDict, total=False):
+    """Relational arguments for Note"""
+    organization: Union[bool, 'OrganizationArgsFromNoteRecursive1']
+    inviter: Union[bool, 'UserArgsFromNoteRecursive1']
+
+
+class InvitationIncludeFromNoteRecursive1(TypedDict, total=False):
+    """Relational arguments for Note"""
+    organization: Union[bool, 'OrganizationArgsFromNoteRecursive2']
+    inviter: Union[bool, 'UserArgsFromNoteRecursive2']
+
+
+class InvitationIncludeFromNoteRecursive2(TypedDict, total=False):
+    """Relational arguments for Note"""
+    organization: Union[bool, 'OrganizationArgsFromNoteRecursive3']
+    inviter: Union[bool, 'UserArgsFromNoteRecursive3']
+
+
+class InvitationIncludeFromNoteRecursive3(TypedDict, total=False):
+    """Relational arguments for Note"""
+    organization: Union[bool, 'OrganizationArgsFromNoteRecursive4']
+    inviter: Union[bool, 'UserArgsFromNoteRecursive4']
+
+
+class InvitationIncludeFromNoteRecursive4(TypedDict, total=False):
+    """Relational arguments for Note"""
+
+    
+
+class InvitationArgsFromNote(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'InvitationIncludeFromInvitationRecursive1'
+
+
+class InvitationArgsFromNoteRecursive1(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'InvitationIncludeFromInvitationRecursive2'
+
+
+class InvitationArgsFromNoteRecursive2(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'InvitationIncludeFromInvitationRecursive3'
+
+
+class InvitationArgsFromNoteRecursive3(TypedDict, total=False):
+    """Arguments for Note"""
+    include: 'InvitationIncludeFromInvitationRecursive4'
+
+
+class InvitationArgsFromNoteRecursive4(TypedDict, total=False):
+    """Arguments for Note"""
+    
+    
+
+class FindManyInvitationArgsFromNote(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive1'
+
+
+class FindManyInvitationArgsFromNoteRecursive1(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive2'
+
+
+class FindManyInvitationArgsFromNoteRecursive2(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive3'
+
+
+class FindManyInvitationArgsFromNoteRecursive3(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive4'
+
+
+class FindManyInvitationArgsFromNoteRecursive4(TypedDict, total=False):
+    """Arguments for Note"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    
 
 
 FindManyNoteArgs = FindManyNoteArgsFromNote
@@ -1727,6 +2206,4321 @@ NoteScalarFieldKeys = Literal[
 NoteScalarFieldKeysT = TypeVar('NoteScalarFieldKeysT', bound=NoteScalarFieldKeys)
 
 NoteRelationalFieldKeys = _NoneType
+
+# User types
+
+class UserOptionalCreateInput(TypedDict, total=False):
+    """Optional arguments to the User create method"""
+    id: _str
+    firstName: Optional[_str]
+    lastName: Optional[_str]
+    avatarUrl: Optional[_str]
+    createdAt: datetime.datetime
+    updatedAt: datetime.datetime
+    memberships: 'OrganizationMemberCreateManyNestedWithoutRelationsInput'
+    invitations: 'InvitationCreateManyNestedWithoutRelationsInput'
+
+
+class UserCreateInput(UserOptionalCreateInput):
+    """Required arguments to the User create method"""
+    clerkId: _str
+    email: _str
+
+
+# TODO: remove this in favour of without explicit relations
+# e.g. PostCreateWithoutAuthorInput
+
+class UserOptionalCreateWithoutRelationsInput(TypedDict, total=False):
+    """Optional arguments to the User create method, without relations"""
+    id: _str
+    firstName: Optional[_str]
+    lastName: Optional[_str]
+    avatarUrl: Optional[_str]
+    createdAt: datetime.datetime
+    updatedAt: datetime.datetime
+
+
+class UserCreateWithoutRelationsInput(UserOptionalCreateWithoutRelationsInput):
+    """Required arguments to the User create method, without relations"""
+    clerkId: _str
+    email: _str
+
+class UserConnectOrCreateWithoutRelationsInput(TypedDict):
+    create: 'UserCreateWithoutRelationsInput'
+    where: 'UserWhereUniqueInput'
+
+class UserCreateNestedWithoutRelationsInput(TypedDict, total=False):
+    create: 'UserCreateWithoutRelationsInput'
+    connect: 'UserWhereUniqueInput'
+    connect_or_create: 'UserConnectOrCreateWithoutRelationsInput'
+
+
+class UserCreateManyNestedWithoutRelationsInput(TypedDict, total=False):
+    create: Union['UserCreateWithoutRelationsInput', List['UserCreateWithoutRelationsInput']]
+    connect: Union['UserWhereUniqueInput', List['UserWhereUniqueInput']]
+    connect_or_create: Union['UserConnectOrCreateWithoutRelationsInput', List['UserConnectOrCreateWithoutRelationsInput']]
+
+_UserWhereUnique_id_Input = TypedDict(
+    '_UserWhereUnique_id_Input',
+    {
+        'id': '_str',
+    },
+    total=True
+)
+
+_UserWhereUnique_clerkId_Input = TypedDict(
+    '_UserWhereUnique_clerkId_Input',
+    {
+        'clerkId': '_str',
+    },
+    total=True
+)
+
+_UserWhereUnique_email_Input = TypedDict(
+    '_UserWhereUnique_email_Input',
+    {
+        'email': '_str',
+    },
+    total=True
+)
+
+UserWhereUniqueInput = Union[
+    '_UserWhereUnique_id_Input',
+    '_UserWhereUnique_clerkId_Input',
+    '_UserWhereUnique_email_Input',
+]
+
+
+class UserUpdateInput(TypedDict, total=False):
+    """Optional arguments for updating a record"""
+    id: _str
+    clerkId: _str
+    email: _str
+    firstName: Optional[_str]
+    lastName: Optional[_str]
+    avatarUrl: Optional[_str]
+    createdAt: datetime.datetime
+    updatedAt: datetime.datetime
+    memberships: 'OrganizationMemberUpdateManyWithoutRelationsInput'
+    invitations: 'InvitationUpdateManyWithoutRelationsInput'
+
+
+class UserUpdateManyMutationInput(TypedDict, total=False):
+    """Arguments for updating many records"""
+    id: _str
+    clerkId: _str
+    email: _str
+    firstName: Optional[_str]
+    lastName: Optional[_str]
+    avatarUrl: Optional[_str]
+    createdAt: datetime.datetime
+    updatedAt: datetime.datetime
+
+
+class UserUpdateManyWithoutRelationsInput(TypedDict, total=False):
+    create: List['UserCreateWithoutRelationsInput']
+    connect: List['UserWhereUniqueInput']
+    connect_or_create: List['UserConnectOrCreateWithoutRelationsInput']
+    set: List['UserWhereUniqueInput']
+    disconnect: List['UserWhereUniqueInput']
+    delete: List['UserWhereUniqueInput']
+
+    # TODO
+    # update: List['UserUpdateWithWhereUniqueWithoutRelationsInput']
+    # updateMany: List['UserUpdateManyWithWhereUniqueWithoutRelationsInput']
+    # deleteMany: List['UserScalarWhereInput']
+    # upsert: List['UserUpserteWithWhereUniqueWithoutRelationsInput']
+
+
+class UserUpdateOneWithoutRelationsInput(TypedDict, total=False):
+    create: 'UserCreateWithoutRelationsInput'
+    connect: 'UserWhereUniqueInput'
+    connect_or_create: 'UserConnectOrCreateWithoutRelationsInput'
+    disconnect: bool
+    delete: bool
+
+    # TODO
+    # update: 'UserUpdateInput'
+    # upsert: 'UserUpsertWithoutRelationsInput'
+
+
+class UserUpsertInput(TypedDict):
+    create: 'UserCreateInput'
+    update: 'UserUpdateInput'  # pyright: ignore[reportIncompatibleMethodOverride]
+
+
+_User_id_OrderByInput = TypedDict(
+    '_User_id_OrderByInput',
+    {
+        'id': 'SortOrder',
+    },
+    total=True
+)
+
+_User_clerkId_OrderByInput = TypedDict(
+    '_User_clerkId_OrderByInput',
+    {
+        'clerkId': 'SortOrder',
+    },
+    total=True
+)
+
+_User_email_OrderByInput = TypedDict(
+    '_User_email_OrderByInput',
+    {
+        'email': 'SortOrder',
+    },
+    total=True
+)
+
+_User_firstName_OrderByInput = TypedDict(
+    '_User_firstName_OrderByInput',
+    {
+        'firstName': 'SortOrder',
+    },
+    total=True
+)
+
+_User_lastName_OrderByInput = TypedDict(
+    '_User_lastName_OrderByInput',
+    {
+        'lastName': 'SortOrder',
+    },
+    total=True
+)
+
+_User_avatarUrl_OrderByInput = TypedDict(
+    '_User_avatarUrl_OrderByInput',
+    {
+        'avatarUrl': 'SortOrder',
+    },
+    total=True
+)
+
+_User_createdAt_OrderByInput = TypedDict(
+    '_User_createdAt_OrderByInput',
+    {
+        'createdAt': 'SortOrder',
+    },
+    total=True
+)
+
+_User_updatedAt_OrderByInput = TypedDict(
+    '_User_updatedAt_OrderByInput',
+    {
+        'updatedAt': 'SortOrder',
+    },
+    total=True
+)
+
+_User_RelevanceInner = TypedDict(
+    '_User_RelevanceInner',
+    {
+        'fields': 'List[UserScalarFieldKeys]',
+        'search': 'str',
+        'sort': 'SortOrder',
+    },
+    total=True
+)
+
+_User_RelevanceOrderByInput = TypedDict(
+    '_User_RelevanceOrderByInput',
+    {
+        '_relevance': '_User_RelevanceInner',
+    },
+    total=True
+)
+
+UserOrderByInput = Union[
+    '_User_id_OrderByInput',
+    '_User_clerkId_OrderByInput',
+    '_User_email_OrderByInput',
+    '_User_firstName_OrderByInput',
+    '_User_lastName_OrderByInput',
+    '_User_avatarUrl_OrderByInput',
+    '_User_createdAt_OrderByInput',
+    '_User_updatedAt_OrderByInput',
+    '_User_RelevanceOrderByInput',
+]
+
+
+
+# recursive User types
+# TODO: cleanup these types
+
+
+# Dict[str, Any] is a mypy limitation
+# see https://github.com/RobertCraigie/prisma-client-py/issues/45
+# switch to pyright for improved types, see https://prisma-client-py.readthedocs.io/en/stable/reference/limitations/
+
+UserRelationFilter = TypedDict(
+    'UserRelationFilter',
+    {
+        'is': 'Dict[str, Any]',
+        'is_not': 'Dict[str, Any]',
+    },
+    total=False,
+)
+
+
+class UserListRelationFilter(TypedDict, total=False):
+    some: 'Dict[str, Any]'
+    none: 'Dict[str, Any]'
+    every: 'Dict[str, Any]'
+
+
+class UserInclude(TypedDict, total=False):
+    """User relational arguments"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromUser']
+    invitations: Union[bool, 'FindManyInvitationArgsFromUser']
+
+
+    
+
+class NoteIncludeFromUser(TypedDict, total=False):
+    """Relational arguments for User"""
+
+
+class NoteIncludeFromUserRecursive1(TypedDict, total=False):
+    """Relational arguments for User"""
+
+
+class NoteIncludeFromUserRecursive2(TypedDict, total=False):
+    """Relational arguments for User"""
+
+
+class NoteIncludeFromUserRecursive3(TypedDict, total=False):
+    """Relational arguments for User"""
+
+
+class NoteIncludeFromUserRecursive4(TypedDict, total=False):
+    """Relational arguments for User"""
+
+    
+
+class NoteArgsFromUser(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'NoteIncludeFromNoteRecursive1'
+
+
+class NoteArgsFromUserRecursive1(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'NoteIncludeFromNoteRecursive2'
+
+
+class NoteArgsFromUserRecursive2(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'NoteIncludeFromNoteRecursive3'
+
+
+class NoteArgsFromUserRecursive3(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'NoteIncludeFromNoteRecursive4'
+
+
+class NoteArgsFromUserRecursive4(TypedDict, total=False):
+    """Arguments for User"""
+    
+    
+
+class FindManyNoteArgsFromUser(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive1'
+
+
+class FindManyNoteArgsFromUserRecursive1(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive2'
+
+
+class FindManyNoteArgsFromUserRecursive2(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive3'
+
+
+class FindManyNoteArgsFromUserRecursive3(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive4'
+
+
+class FindManyNoteArgsFromUserRecursive4(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    
+    
+
+class UserIncludeFromUser(TypedDict, total=False):
+    """Relational arguments for User"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromUserRecursive1']
+    invitations: Union[bool, 'FindManyInvitationArgsFromUserRecursive1']
+
+
+class UserIncludeFromUserRecursive1(TypedDict, total=False):
+    """Relational arguments for User"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromUserRecursive2']
+    invitations: Union[bool, 'FindManyInvitationArgsFromUserRecursive2']
+
+
+class UserIncludeFromUserRecursive2(TypedDict, total=False):
+    """Relational arguments for User"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromUserRecursive3']
+    invitations: Union[bool, 'FindManyInvitationArgsFromUserRecursive3']
+
+
+class UserIncludeFromUserRecursive3(TypedDict, total=False):
+    """Relational arguments for User"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromUserRecursive4']
+    invitations: Union[bool, 'FindManyInvitationArgsFromUserRecursive4']
+
+
+class UserIncludeFromUserRecursive4(TypedDict, total=False):
+    """Relational arguments for User"""
+
+    
+
+class UserArgsFromUser(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'UserIncludeFromUserRecursive1'
+
+
+class UserArgsFromUserRecursive1(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'UserIncludeFromUserRecursive2'
+
+
+class UserArgsFromUserRecursive2(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'UserIncludeFromUserRecursive3'
+
+
+class UserArgsFromUserRecursive3(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'UserIncludeFromUserRecursive4'
+
+
+class UserArgsFromUserRecursive4(TypedDict, total=False):
+    """Arguments for User"""
+    
+    
+
+class FindManyUserArgsFromUser(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive1'
+
+
+class FindManyUserArgsFromUserRecursive1(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive2'
+
+
+class FindManyUserArgsFromUserRecursive2(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive3'
+
+
+class FindManyUserArgsFromUserRecursive3(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive4'
+
+
+class FindManyUserArgsFromUserRecursive4(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    
+    
+
+class OrganizationIncludeFromUser(TypedDict, total=False):
+    """Relational arguments for User"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromUserRecursive1']
+    invitations: Union[bool, 'FindManyInvitationArgsFromUserRecursive1']
+
+
+class OrganizationIncludeFromUserRecursive1(TypedDict, total=False):
+    """Relational arguments for User"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromUserRecursive2']
+    invitations: Union[bool, 'FindManyInvitationArgsFromUserRecursive2']
+
+
+class OrganizationIncludeFromUserRecursive2(TypedDict, total=False):
+    """Relational arguments for User"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromUserRecursive3']
+    invitations: Union[bool, 'FindManyInvitationArgsFromUserRecursive3']
+
+
+class OrganizationIncludeFromUserRecursive3(TypedDict, total=False):
+    """Relational arguments for User"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromUserRecursive4']
+    invitations: Union[bool, 'FindManyInvitationArgsFromUserRecursive4']
+
+
+class OrganizationIncludeFromUserRecursive4(TypedDict, total=False):
+    """Relational arguments for User"""
+
+    
+
+class OrganizationArgsFromUser(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'OrganizationIncludeFromOrganizationRecursive1'
+
+
+class OrganizationArgsFromUserRecursive1(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'OrganizationIncludeFromOrganizationRecursive2'
+
+
+class OrganizationArgsFromUserRecursive2(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'OrganizationIncludeFromOrganizationRecursive3'
+
+
+class OrganizationArgsFromUserRecursive3(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'OrganizationIncludeFromOrganizationRecursive4'
+
+
+class OrganizationArgsFromUserRecursive4(TypedDict, total=False):
+    """Arguments for User"""
+    
+    
+
+class FindManyOrganizationArgsFromUser(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive1'
+
+
+class FindManyOrganizationArgsFromUserRecursive1(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive2'
+
+
+class FindManyOrganizationArgsFromUserRecursive2(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive3'
+
+
+class FindManyOrganizationArgsFromUserRecursive3(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive4'
+
+
+class FindManyOrganizationArgsFromUserRecursive4(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    
+    
+
+class OrganizationMemberIncludeFromUser(TypedDict, total=False):
+    """Relational arguments for User"""
+    user: Union[bool, 'UserArgsFromUserRecursive1']
+    organization: Union[bool, 'OrganizationArgsFromUserRecursive1']
+
+
+class OrganizationMemberIncludeFromUserRecursive1(TypedDict, total=False):
+    """Relational arguments for User"""
+    user: Union[bool, 'UserArgsFromUserRecursive2']
+    organization: Union[bool, 'OrganizationArgsFromUserRecursive2']
+
+
+class OrganizationMemberIncludeFromUserRecursive2(TypedDict, total=False):
+    """Relational arguments for User"""
+    user: Union[bool, 'UserArgsFromUserRecursive3']
+    organization: Union[bool, 'OrganizationArgsFromUserRecursive3']
+
+
+class OrganizationMemberIncludeFromUserRecursive3(TypedDict, total=False):
+    """Relational arguments for User"""
+    user: Union[bool, 'UserArgsFromUserRecursive4']
+    organization: Union[bool, 'OrganizationArgsFromUserRecursive4']
+
+
+class OrganizationMemberIncludeFromUserRecursive4(TypedDict, total=False):
+    """Relational arguments for User"""
+
+    
+
+class OrganizationMemberArgsFromUser(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive1'
+
+
+class OrganizationMemberArgsFromUserRecursive1(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive2'
+
+
+class OrganizationMemberArgsFromUserRecursive2(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive3'
+
+
+class OrganizationMemberArgsFromUserRecursive3(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive4'
+
+
+class OrganizationMemberArgsFromUserRecursive4(TypedDict, total=False):
+    """Arguments for User"""
+    
+    
+
+class FindManyOrganizationMemberArgsFromUser(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive1'
+
+
+class FindManyOrganizationMemberArgsFromUserRecursive1(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive2'
+
+
+class FindManyOrganizationMemberArgsFromUserRecursive2(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive3'
+
+
+class FindManyOrganizationMemberArgsFromUserRecursive3(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive4'
+
+
+class FindManyOrganizationMemberArgsFromUserRecursive4(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    
+    
+
+class InvitationIncludeFromUser(TypedDict, total=False):
+    """Relational arguments for User"""
+    organization: Union[bool, 'OrganizationArgsFromUserRecursive1']
+    inviter: Union[bool, 'UserArgsFromUserRecursive1']
+
+
+class InvitationIncludeFromUserRecursive1(TypedDict, total=False):
+    """Relational arguments for User"""
+    organization: Union[bool, 'OrganizationArgsFromUserRecursive2']
+    inviter: Union[bool, 'UserArgsFromUserRecursive2']
+
+
+class InvitationIncludeFromUserRecursive2(TypedDict, total=False):
+    """Relational arguments for User"""
+    organization: Union[bool, 'OrganizationArgsFromUserRecursive3']
+    inviter: Union[bool, 'UserArgsFromUserRecursive3']
+
+
+class InvitationIncludeFromUserRecursive3(TypedDict, total=False):
+    """Relational arguments for User"""
+    organization: Union[bool, 'OrganizationArgsFromUserRecursive4']
+    inviter: Union[bool, 'UserArgsFromUserRecursive4']
+
+
+class InvitationIncludeFromUserRecursive4(TypedDict, total=False):
+    """Relational arguments for User"""
+
+    
+
+class InvitationArgsFromUser(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'InvitationIncludeFromInvitationRecursive1'
+
+
+class InvitationArgsFromUserRecursive1(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'InvitationIncludeFromInvitationRecursive2'
+
+
+class InvitationArgsFromUserRecursive2(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'InvitationIncludeFromInvitationRecursive3'
+
+
+class InvitationArgsFromUserRecursive3(TypedDict, total=False):
+    """Arguments for User"""
+    include: 'InvitationIncludeFromInvitationRecursive4'
+
+
+class InvitationArgsFromUserRecursive4(TypedDict, total=False):
+    """Arguments for User"""
+    
+    
+
+class FindManyInvitationArgsFromUser(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive1'
+
+
+class FindManyInvitationArgsFromUserRecursive1(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive2'
+
+
+class FindManyInvitationArgsFromUserRecursive2(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive3'
+
+
+class FindManyInvitationArgsFromUserRecursive3(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive4'
+
+
+class FindManyInvitationArgsFromUserRecursive4(TypedDict, total=False):
+    """Arguments for User"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    
+
+
+FindManyUserArgs = FindManyUserArgsFromUser
+FindFirstUserArgs = FindManyUserArgsFromUser
+
+
+    
+
+class UserWhereInput(TypedDict, total=False):
+    """User arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    clerkId: Union[_str, 'types.StringFilter']
+    email: Union[_str, 'types.StringFilter']
+    firstName: Union[None, _str, 'types.StringFilter']
+    lastName: Union[None, _str, 'types.StringFilter']
+    avatarUrl: Union[None, _str, 'types.StringFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    memberships: 'OrganizationMemberListRelationFilter'
+    invitations: 'InvitationListRelationFilter'
+
+    # should be noted that AND and NOT should be Union['UserWhereInputRecursive1', List['UserWhereInputRecursive1']]
+    # but this causes mypy to hang :/
+    AND: List['UserWhereInputRecursive1']
+    OR: List['UserWhereInputRecursive1']
+    NOT: List['UserWhereInputRecursive1']
+
+
+class UserWhereInputRecursive1(TypedDict, total=False):
+    """User arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    clerkId: Union[_str, 'types.StringFilter']
+    email: Union[_str, 'types.StringFilter']
+    firstName: Union[None, _str, 'types.StringFilter']
+    lastName: Union[None, _str, 'types.StringFilter']
+    avatarUrl: Union[None, _str, 'types.StringFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    memberships: 'OrganizationMemberListRelationFilter'
+    invitations: 'InvitationListRelationFilter'
+
+    # should be noted that AND and NOT should be Union['UserWhereInputRecursive2', List['UserWhereInputRecursive2']]
+    # but this causes mypy to hang :/
+    AND: List['UserWhereInputRecursive2']
+    OR: List['UserWhereInputRecursive2']
+    NOT: List['UserWhereInputRecursive2']
+
+
+class UserWhereInputRecursive2(TypedDict, total=False):
+    """User arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    clerkId: Union[_str, 'types.StringFilter']
+    email: Union[_str, 'types.StringFilter']
+    firstName: Union[None, _str, 'types.StringFilter']
+    lastName: Union[None, _str, 'types.StringFilter']
+    avatarUrl: Union[None, _str, 'types.StringFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    memberships: 'OrganizationMemberListRelationFilter'
+    invitations: 'InvitationListRelationFilter'
+
+    # should be noted that AND and NOT should be Union['UserWhereInputRecursive3', List['UserWhereInputRecursive3']]
+    # but this causes mypy to hang :/
+    AND: List['UserWhereInputRecursive3']
+    OR: List['UserWhereInputRecursive3']
+    NOT: List['UserWhereInputRecursive3']
+
+
+class UserWhereInputRecursive3(TypedDict, total=False):
+    """User arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    clerkId: Union[_str, 'types.StringFilter']
+    email: Union[_str, 'types.StringFilter']
+    firstName: Union[None, _str, 'types.StringFilter']
+    lastName: Union[None, _str, 'types.StringFilter']
+    avatarUrl: Union[None, _str, 'types.StringFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    memberships: 'OrganizationMemberListRelationFilter'
+    invitations: 'InvitationListRelationFilter'
+
+    # should be noted that AND and NOT should be Union['UserWhereInputRecursive4', List['UserWhereInputRecursive4']]
+    # but this causes mypy to hang :/
+    AND: List['UserWhereInputRecursive4']
+    OR: List['UserWhereInputRecursive4']
+    NOT: List['UserWhereInputRecursive4']
+
+
+class UserWhereInputRecursive4(TypedDict, total=False):
+    """User arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    clerkId: Union[_str, 'types.StringFilter']
+    email: Union[_str, 'types.StringFilter']
+    firstName: Union[None, _str, 'types.StringFilter']
+    lastName: Union[None, _str, 'types.StringFilter']
+    avatarUrl: Union[None, _str, 'types.StringFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    memberships: 'OrganizationMemberListRelationFilter'
+    invitations: 'InvitationListRelationFilter'
+
+
+
+# aggregate User types
+
+
+    
+
+class UserScalarWhereWithAggregatesInput(TypedDict, total=False):
+    """User arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    clerkId: Union[_str, 'types.StringWithAggregatesFilter']
+    email: Union[_str, 'types.StringWithAggregatesFilter']
+    firstName: Union[_str, 'types.StringWithAggregatesFilter']
+    lastName: Union[_str, 'types.StringWithAggregatesFilter']
+    avatarUrl: Union[_str, 'types.StringWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['UserScalarWhereWithAggregatesInputRecursive1']
+    OR: List['UserScalarWhereWithAggregatesInputRecursive1']
+    NOT: List['UserScalarWhereWithAggregatesInputRecursive1']
+
+
+class UserScalarWhereWithAggregatesInputRecursive1(TypedDict, total=False):
+    """User arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    clerkId: Union[_str, 'types.StringWithAggregatesFilter']
+    email: Union[_str, 'types.StringWithAggregatesFilter']
+    firstName: Union[_str, 'types.StringWithAggregatesFilter']
+    lastName: Union[_str, 'types.StringWithAggregatesFilter']
+    avatarUrl: Union[_str, 'types.StringWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['UserScalarWhereWithAggregatesInputRecursive2']
+    OR: List['UserScalarWhereWithAggregatesInputRecursive2']
+    NOT: List['UserScalarWhereWithAggregatesInputRecursive2']
+
+
+class UserScalarWhereWithAggregatesInputRecursive2(TypedDict, total=False):
+    """User arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    clerkId: Union[_str, 'types.StringWithAggregatesFilter']
+    email: Union[_str, 'types.StringWithAggregatesFilter']
+    firstName: Union[_str, 'types.StringWithAggregatesFilter']
+    lastName: Union[_str, 'types.StringWithAggregatesFilter']
+    avatarUrl: Union[_str, 'types.StringWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['UserScalarWhereWithAggregatesInputRecursive3']
+    OR: List['UserScalarWhereWithAggregatesInputRecursive3']
+    NOT: List['UserScalarWhereWithAggregatesInputRecursive3']
+
+
+class UserScalarWhereWithAggregatesInputRecursive3(TypedDict, total=False):
+    """User arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    clerkId: Union[_str, 'types.StringWithAggregatesFilter']
+    email: Union[_str, 'types.StringWithAggregatesFilter']
+    firstName: Union[_str, 'types.StringWithAggregatesFilter']
+    lastName: Union[_str, 'types.StringWithAggregatesFilter']
+    avatarUrl: Union[_str, 'types.StringWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['UserScalarWhereWithAggregatesInputRecursive4']
+    OR: List['UserScalarWhereWithAggregatesInputRecursive4']
+    NOT: List['UserScalarWhereWithAggregatesInputRecursive4']
+
+
+class UserScalarWhereWithAggregatesInputRecursive4(TypedDict, total=False):
+    """User arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    clerkId: Union[_str, 'types.StringWithAggregatesFilter']
+    email: Union[_str, 'types.StringWithAggregatesFilter']
+    firstName: Union[_str, 'types.StringWithAggregatesFilter']
+    lastName: Union[_str, 'types.StringWithAggregatesFilter']
+    avatarUrl: Union[_str, 'types.StringWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+
+
+class UserGroupByOutput(TypedDict, total=False):
+    id: _str
+    clerkId: _str
+    email: _str
+    firstName: _str
+    lastName: _str
+    avatarUrl: _str
+    createdAt: datetime.datetime
+    updatedAt: datetime.datetime
+    _sum: 'UserSumAggregateOutput'
+    _avg: 'UserAvgAggregateOutput'
+    _min: 'UserMinAggregateOutput'
+    _max: 'UserMaxAggregateOutput'
+    _count: 'UserCountAggregateOutput'
+
+
+class UserAvgAggregateOutput(TypedDict, total=False):
+    """User output for aggregating averages"""
+
+
+class UserSumAggregateOutput(TypedDict, total=False):
+    """User output for aggregating sums"""
+
+
+class UserScalarAggregateOutput(TypedDict, total=False):
+    """User output including scalar fields"""
+    id: _str
+    clerkId: _str
+    email: _str
+    firstName: _str
+    lastName: _str
+    avatarUrl: _str
+    createdAt: datetime.datetime
+    updatedAt: datetime.datetime
+
+
+UserMinAggregateOutput = UserScalarAggregateOutput
+UserMaxAggregateOutput = UserScalarAggregateOutput
+
+
+class UserMaxAggregateInput(TypedDict, total=False):
+    """User input for aggregating by max"""
+    id: bool
+    clerkId: bool
+    email: bool
+    firstName: bool
+    lastName: bool
+    avatarUrl: bool
+    createdAt: bool
+    updatedAt: bool
+
+
+class UserMinAggregateInput(TypedDict, total=False):
+    """User input for aggregating by min"""
+    id: bool
+    clerkId: bool
+    email: bool
+    firstName: bool
+    lastName: bool
+    avatarUrl: bool
+    createdAt: bool
+    updatedAt: bool
+
+
+class UserNumberAggregateInput(TypedDict, total=False):
+    """User input for aggregating numbers"""
+
+
+UserAvgAggregateInput = UserNumberAggregateInput
+UserSumAggregateInput = UserNumberAggregateInput
+
+
+UserCountAggregateInput = TypedDict(
+    'UserCountAggregateInput',
+    {
+        'id': bool,
+        'clerkId': bool,
+        'email': bool,
+        'firstName': bool,
+        'lastName': bool,
+        'avatarUrl': bool,
+        'createdAt': bool,
+        'updatedAt': bool,
+        '_all': bool,
+    },
+    total=False,
+)
+
+UserCountAggregateOutput = TypedDict(
+    'UserCountAggregateOutput',
+    {
+        'id': int,
+        'clerkId': int,
+        'email': int,
+        'firstName': int,
+        'lastName': int,
+        'avatarUrl': int,
+        'createdAt': int,
+        'updatedAt': int,
+        '_all': int,
+    },
+    total=False,
+)
+
+
+UserKeys = Literal[
+    'id',
+    'clerkId',
+    'email',
+    'firstName',
+    'lastName',
+    'avatarUrl',
+    'createdAt',
+    'updatedAt',
+    'memberships',
+    'invitations',
+]
+UserScalarFieldKeys = Literal[
+    'id',
+    'clerkId',
+    'email',
+    'firstName',
+    'lastName',
+    'avatarUrl',
+    'createdAt',
+    'updatedAt',
+]
+UserScalarFieldKeysT = TypeVar('UserScalarFieldKeysT', bound=UserScalarFieldKeys)
+
+UserRelationalFieldKeys = Literal[
+        'memberships',
+        'invitations',
+    ]
+
+# Organization types
+
+class OrganizationOptionalCreateInput(TypedDict, total=False):
+    """Optional arguments to the Organization create method"""
+    id: _str
+    createdAt: datetime.datetime
+    updatedAt: datetime.datetime
+    members: 'OrganizationMemberCreateManyNestedWithoutRelationsInput'
+    invitations: 'InvitationCreateManyNestedWithoutRelationsInput'
+
+
+class OrganizationCreateInput(OrganizationOptionalCreateInput):
+    """Required arguments to the Organization create method"""
+    name: _str
+    slug: _str
+
+
+# TODO: remove this in favour of without explicit relations
+# e.g. PostCreateWithoutAuthorInput
+
+class OrganizationOptionalCreateWithoutRelationsInput(TypedDict, total=False):
+    """Optional arguments to the Organization create method, without relations"""
+    id: _str
+    createdAt: datetime.datetime
+    updatedAt: datetime.datetime
+
+
+class OrganizationCreateWithoutRelationsInput(OrganizationOptionalCreateWithoutRelationsInput):
+    """Required arguments to the Organization create method, without relations"""
+    name: _str
+    slug: _str
+
+class OrganizationConnectOrCreateWithoutRelationsInput(TypedDict):
+    create: 'OrganizationCreateWithoutRelationsInput'
+    where: 'OrganizationWhereUniqueInput'
+
+class OrganizationCreateNestedWithoutRelationsInput(TypedDict, total=False):
+    create: 'OrganizationCreateWithoutRelationsInput'
+    connect: 'OrganizationWhereUniqueInput'
+    connect_or_create: 'OrganizationConnectOrCreateWithoutRelationsInput'
+
+
+class OrganizationCreateManyNestedWithoutRelationsInput(TypedDict, total=False):
+    create: Union['OrganizationCreateWithoutRelationsInput', List['OrganizationCreateWithoutRelationsInput']]
+    connect: Union['OrganizationWhereUniqueInput', List['OrganizationWhereUniqueInput']]
+    connect_or_create: Union['OrganizationConnectOrCreateWithoutRelationsInput', List['OrganizationConnectOrCreateWithoutRelationsInput']]
+
+_OrganizationWhereUnique_id_Input = TypedDict(
+    '_OrganizationWhereUnique_id_Input',
+    {
+        'id': '_str',
+    },
+    total=True
+)
+
+_OrganizationWhereUnique_slug_Input = TypedDict(
+    '_OrganizationWhereUnique_slug_Input',
+    {
+        'slug': '_str',
+    },
+    total=True
+)
+
+OrganizationWhereUniqueInput = Union[
+    '_OrganizationWhereUnique_id_Input',
+    '_OrganizationWhereUnique_slug_Input',
+]
+
+
+class OrganizationUpdateInput(TypedDict, total=False):
+    """Optional arguments for updating a record"""
+    id: _str
+    name: _str
+    slug: _str
+    createdAt: datetime.datetime
+    updatedAt: datetime.datetime
+    members: 'OrganizationMemberUpdateManyWithoutRelationsInput'
+    invitations: 'InvitationUpdateManyWithoutRelationsInput'
+
+
+class OrganizationUpdateManyMutationInput(TypedDict, total=False):
+    """Arguments for updating many records"""
+    id: _str
+    name: _str
+    slug: _str
+    createdAt: datetime.datetime
+    updatedAt: datetime.datetime
+
+
+class OrganizationUpdateManyWithoutRelationsInput(TypedDict, total=False):
+    create: List['OrganizationCreateWithoutRelationsInput']
+    connect: List['OrganizationWhereUniqueInput']
+    connect_or_create: List['OrganizationConnectOrCreateWithoutRelationsInput']
+    set: List['OrganizationWhereUniqueInput']
+    disconnect: List['OrganizationWhereUniqueInput']
+    delete: List['OrganizationWhereUniqueInput']
+
+    # TODO
+    # update: List['OrganizationUpdateWithWhereUniqueWithoutRelationsInput']
+    # updateMany: List['OrganizationUpdateManyWithWhereUniqueWithoutRelationsInput']
+    # deleteMany: List['OrganizationScalarWhereInput']
+    # upsert: List['OrganizationUpserteWithWhereUniqueWithoutRelationsInput']
+
+
+class OrganizationUpdateOneWithoutRelationsInput(TypedDict, total=False):
+    create: 'OrganizationCreateWithoutRelationsInput'
+    connect: 'OrganizationWhereUniqueInput'
+    connect_or_create: 'OrganizationConnectOrCreateWithoutRelationsInput'
+    disconnect: bool
+    delete: bool
+
+    # TODO
+    # update: 'OrganizationUpdateInput'
+    # upsert: 'OrganizationUpsertWithoutRelationsInput'
+
+
+class OrganizationUpsertInput(TypedDict):
+    create: 'OrganizationCreateInput'
+    update: 'OrganizationUpdateInput'  # pyright: ignore[reportIncompatibleMethodOverride]
+
+
+_Organization_id_OrderByInput = TypedDict(
+    '_Organization_id_OrderByInput',
+    {
+        'id': 'SortOrder',
+    },
+    total=True
+)
+
+_Organization_name_OrderByInput = TypedDict(
+    '_Organization_name_OrderByInput',
+    {
+        'name': 'SortOrder',
+    },
+    total=True
+)
+
+_Organization_slug_OrderByInput = TypedDict(
+    '_Organization_slug_OrderByInput',
+    {
+        'slug': 'SortOrder',
+    },
+    total=True
+)
+
+_Organization_createdAt_OrderByInput = TypedDict(
+    '_Organization_createdAt_OrderByInput',
+    {
+        'createdAt': 'SortOrder',
+    },
+    total=True
+)
+
+_Organization_updatedAt_OrderByInput = TypedDict(
+    '_Organization_updatedAt_OrderByInput',
+    {
+        'updatedAt': 'SortOrder',
+    },
+    total=True
+)
+
+_Organization_RelevanceInner = TypedDict(
+    '_Organization_RelevanceInner',
+    {
+        'fields': 'List[OrganizationScalarFieldKeys]',
+        'search': 'str',
+        'sort': 'SortOrder',
+    },
+    total=True
+)
+
+_Organization_RelevanceOrderByInput = TypedDict(
+    '_Organization_RelevanceOrderByInput',
+    {
+        '_relevance': '_Organization_RelevanceInner',
+    },
+    total=True
+)
+
+OrganizationOrderByInput = Union[
+    '_Organization_id_OrderByInput',
+    '_Organization_name_OrderByInput',
+    '_Organization_slug_OrderByInput',
+    '_Organization_createdAt_OrderByInput',
+    '_Organization_updatedAt_OrderByInput',
+    '_Organization_RelevanceOrderByInput',
+]
+
+
+
+# recursive Organization types
+# TODO: cleanup these types
+
+
+# Dict[str, Any] is a mypy limitation
+# see https://github.com/RobertCraigie/prisma-client-py/issues/45
+# switch to pyright for improved types, see https://prisma-client-py.readthedocs.io/en/stable/reference/limitations/
+
+OrganizationRelationFilter = TypedDict(
+    'OrganizationRelationFilter',
+    {
+        'is': 'Dict[str, Any]',
+        'is_not': 'Dict[str, Any]',
+    },
+    total=False,
+)
+
+
+class OrganizationListRelationFilter(TypedDict, total=False):
+    some: 'Dict[str, Any]'
+    none: 'Dict[str, Any]'
+    every: 'Dict[str, Any]'
+
+
+class OrganizationInclude(TypedDict, total=False):
+    """Organization relational arguments"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromOrganization']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganization']
+
+
+    
+
+class NoteIncludeFromOrganization(TypedDict, total=False):
+    """Relational arguments for Organization"""
+
+
+class NoteIncludeFromOrganizationRecursive1(TypedDict, total=False):
+    """Relational arguments for Organization"""
+
+
+class NoteIncludeFromOrganizationRecursive2(TypedDict, total=False):
+    """Relational arguments for Organization"""
+
+
+class NoteIncludeFromOrganizationRecursive3(TypedDict, total=False):
+    """Relational arguments for Organization"""
+
+
+class NoteIncludeFromOrganizationRecursive4(TypedDict, total=False):
+    """Relational arguments for Organization"""
+
+    
+
+class NoteArgsFromOrganization(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'NoteIncludeFromNoteRecursive1'
+
+
+class NoteArgsFromOrganizationRecursive1(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'NoteIncludeFromNoteRecursive2'
+
+
+class NoteArgsFromOrganizationRecursive2(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'NoteIncludeFromNoteRecursive3'
+
+
+class NoteArgsFromOrganizationRecursive3(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'NoteIncludeFromNoteRecursive4'
+
+
+class NoteArgsFromOrganizationRecursive4(TypedDict, total=False):
+    """Arguments for Organization"""
+    
+    
+
+class FindManyNoteArgsFromOrganization(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive1'
+
+
+class FindManyNoteArgsFromOrganizationRecursive1(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive2'
+
+
+class FindManyNoteArgsFromOrganizationRecursive2(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive3'
+
+
+class FindManyNoteArgsFromOrganizationRecursive3(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive4'
+
+
+class FindManyNoteArgsFromOrganizationRecursive4(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    
+    
+
+class UserIncludeFromOrganization(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationRecursive1']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationRecursive1']
+
+
+class UserIncludeFromOrganizationRecursive1(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationRecursive2']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationRecursive2']
+
+
+class UserIncludeFromOrganizationRecursive2(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationRecursive3']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationRecursive3']
+
+
+class UserIncludeFromOrganizationRecursive3(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationRecursive4']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationRecursive4']
+
+
+class UserIncludeFromOrganizationRecursive4(TypedDict, total=False):
+    """Relational arguments for Organization"""
+
+    
+
+class UserArgsFromOrganization(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'UserIncludeFromUserRecursive1'
+
+
+class UserArgsFromOrganizationRecursive1(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'UserIncludeFromUserRecursive2'
+
+
+class UserArgsFromOrganizationRecursive2(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'UserIncludeFromUserRecursive3'
+
+
+class UserArgsFromOrganizationRecursive3(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'UserIncludeFromUserRecursive4'
+
+
+class UserArgsFromOrganizationRecursive4(TypedDict, total=False):
+    """Arguments for Organization"""
+    
+    
+
+class FindManyUserArgsFromOrganization(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive1'
+
+
+class FindManyUserArgsFromOrganizationRecursive1(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive2'
+
+
+class FindManyUserArgsFromOrganizationRecursive2(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive3'
+
+
+class FindManyUserArgsFromOrganizationRecursive3(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive4'
+
+
+class FindManyUserArgsFromOrganizationRecursive4(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    
+    
+
+class OrganizationIncludeFromOrganization(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationRecursive1']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationRecursive1']
+
+
+class OrganizationIncludeFromOrganizationRecursive1(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationRecursive2']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationRecursive2']
+
+
+class OrganizationIncludeFromOrganizationRecursive2(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationRecursive3']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationRecursive3']
+
+
+class OrganizationIncludeFromOrganizationRecursive3(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationRecursive4']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationRecursive4']
+
+
+class OrganizationIncludeFromOrganizationRecursive4(TypedDict, total=False):
+    """Relational arguments for Organization"""
+
+    
+
+class OrganizationArgsFromOrganization(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'OrganizationIncludeFromOrganizationRecursive1'
+
+
+class OrganizationArgsFromOrganizationRecursive1(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'OrganizationIncludeFromOrganizationRecursive2'
+
+
+class OrganizationArgsFromOrganizationRecursive2(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'OrganizationIncludeFromOrganizationRecursive3'
+
+
+class OrganizationArgsFromOrganizationRecursive3(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'OrganizationIncludeFromOrganizationRecursive4'
+
+
+class OrganizationArgsFromOrganizationRecursive4(TypedDict, total=False):
+    """Arguments for Organization"""
+    
+    
+
+class FindManyOrganizationArgsFromOrganization(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive1'
+
+
+class FindManyOrganizationArgsFromOrganizationRecursive1(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive2'
+
+
+class FindManyOrganizationArgsFromOrganizationRecursive2(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive3'
+
+
+class FindManyOrganizationArgsFromOrganizationRecursive3(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive4'
+
+
+class FindManyOrganizationArgsFromOrganizationRecursive4(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    
+    
+
+class OrganizationMemberIncludeFromOrganization(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    user: Union[bool, 'UserArgsFromOrganizationRecursive1']
+    organization: Union[bool, 'OrganizationArgsFromOrganizationRecursive1']
+
+
+class OrganizationMemberIncludeFromOrganizationRecursive1(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    user: Union[bool, 'UserArgsFromOrganizationRecursive2']
+    organization: Union[bool, 'OrganizationArgsFromOrganizationRecursive2']
+
+
+class OrganizationMemberIncludeFromOrganizationRecursive2(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    user: Union[bool, 'UserArgsFromOrganizationRecursive3']
+    organization: Union[bool, 'OrganizationArgsFromOrganizationRecursive3']
+
+
+class OrganizationMemberIncludeFromOrganizationRecursive3(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    user: Union[bool, 'UserArgsFromOrganizationRecursive4']
+    organization: Union[bool, 'OrganizationArgsFromOrganizationRecursive4']
+
+
+class OrganizationMemberIncludeFromOrganizationRecursive4(TypedDict, total=False):
+    """Relational arguments for Organization"""
+
+    
+
+class OrganizationMemberArgsFromOrganization(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive1'
+
+
+class OrganizationMemberArgsFromOrganizationRecursive1(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive2'
+
+
+class OrganizationMemberArgsFromOrganizationRecursive2(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive3'
+
+
+class OrganizationMemberArgsFromOrganizationRecursive3(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive4'
+
+
+class OrganizationMemberArgsFromOrganizationRecursive4(TypedDict, total=False):
+    """Arguments for Organization"""
+    
+    
+
+class FindManyOrganizationMemberArgsFromOrganization(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive1'
+
+
+class FindManyOrganizationMemberArgsFromOrganizationRecursive1(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive2'
+
+
+class FindManyOrganizationMemberArgsFromOrganizationRecursive2(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive3'
+
+
+class FindManyOrganizationMemberArgsFromOrganizationRecursive3(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive4'
+
+
+class FindManyOrganizationMemberArgsFromOrganizationRecursive4(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    
+    
+
+class InvitationIncludeFromOrganization(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    organization: Union[bool, 'OrganizationArgsFromOrganizationRecursive1']
+    inviter: Union[bool, 'UserArgsFromOrganizationRecursive1']
+
+
+class InvitationIncludeFromOrganizationRecursive1(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    organization: Union[bool, 'OrganizationArgsFromOrganizationRecursive2']
+    inviter: Union[bool, 'UserArgsFromOrganizationRecursive2']
+
+
+class InvitationIncludeFromOrganizationRecursive2(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    organization: Union[bool, 'OrganizationArgsFromOrganizationRecursive3']
+    inviter: Union[bool, 'UserArgsFromOrganizationRecursive3']
+
+
+class InvitationIncludeFromOrganizationRecursive3(TypedDict, total=False):
+    """Relational arguments for Organization"""
+    organization: Union[bool, 'OrganizationArgsFromOrganizationRecursive4']
+    inviter: Union[bool, 'UserArgsFromOrganizationRecursive4']
+
+
+class InvitationIncludeFromOrganizationRecursive4(TypedDict, total=False):
+    """Relational arguments for Organization"""
+
+    
+
+class InvitationArgsFromOrganization(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'InvitationIncludeFromInvitationRecursive1'
+
+
+class InvitationArgsFromOrganizationRecursive1(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'InvitationIncludeFromInvitationRecursive2'
+
+
+class InvitationArgsFromOrganizationRecursive2(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'InvitationIncludeFromInvitationRecursive3'
+
+
+class InvitationArgsFromOrganizationRecursive3(TypedDict, total=False):
+    """Arguments for Organization"""
+    include: 'InvitationIncludeFromInvitationRecursive4'
+
+
+class InvitationArgsFromOrganizationRecursive4(TypedDict, total=False):
+    """Arguments for Organization"""
+    
+    
+
+class FindManyInvitationArgsFromOrganization(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive1'
+
+
+class FindManyInvitationArgsFromOrganizationRecursive1(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive2'
+
+
+class FindManyInvitationArgsFromOrganizationRecursive2(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive3'
+
+
+class FindManyInvitationArgsFromOrganizationRecursive3(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive4'
+
+
+class FindManyInvitationArgsFromOrganizationRecursive4(TypedDict, total=False):
+    """Arguments for Organization"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    
+
+
+FindManyOrganizationArgs = FindManyOrganizationArgsFromOrganization
+FindFirstOrganizationArgs = FindManyOrganizationArgsFromOrganization
+
+
+    
+
+class OrganizationWhereInput(TypedDict, total=False):
+    """Organization arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    name: Union[_str, 'types.StringFilter']
+    slug: Union[_str, 'types.StringFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    members: 'OrganizationMemberListRelationFilter'
+    invitations: 'InvitationListRelationFilter'
+
+    # should be noted that AND and NOT should be Union['OrganizationWhereInputRecursive1', List['OrganizationWhereInputRecursive1']]
+    # but this causes mypy to hang :/
+    AND: List['OrganizationWhereInputRecursive1']
+    OR: List['OrganizationWhereInputRecursive1']
+    NOT: List['OrganizationWhereInputRecursive1']
+
+
+class OrganizationWhereInputRecursive1(TypedDict, total=False):
+    """Organization arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    name: Union[_str, 'types.StringFilter']
+    slug: Union[_str, 'types.StringFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    members: 'OrganizationMemberListRelationFilter'
+    invitations: 'InvitationListRelationFilter'
+
+    # should be noted that AND and NOT should be Union['OrganizationWhereInputRecursive2', List['OrganizationWhereInputRecursive2']]
+    # but this causes mypy to hang :/
+    AND: List['OrganizationWhereInputRecursive2']
+    OR: List['OrganizationWhereInputRecursive2']
+    NOT: List['OrganizationWhereInputRecursive2']
+
+
+class OrganizationWhereInputRecursive2(TypedDict, total=False):
+    """Organization arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    name: Union[_str, 'types.StringFilter']
+    slug: Union[_str, 'types.StringFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    members: 'OrganizationMemberListRelationFilter'
+    invitations: 'InvitationListRelationFilter'
+
+    # should be noted that AND and NOT should be Union['OrganizationWhereInputRecursive3', List['OrganizationWhereInputRecursive3']]
+    # but this causes mypy to hang :/
+    AND: List['OrganizationWhereInputRecursive3']
+    OR: List['OrganizationWhereInputRecursive3']
+    NOT: List['OrganizationWhereInputRecursive3']
+
+
+class OrganizationWhereInputRecursive3(TypedDict, total=False):
+    """Organization arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    name: Union[_str, 'types.StringFilter']
+    slug: Union[_str, 'types.StringFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    members: 'OrganizationMemberListRelationFilter'
+    invitations: 'InvitationListRelationFilter'
+
+    # should be noted that AND and NOT should be Union['OrganizationWhereInputRecursive4', List['OrganizationWhereInputRecursive4']]
+    # but this causes mypy to hang :/
+    AND: List['OrganizationWhereInputRecursive4']
+    OR: List['OrganizationWhereInputRecursive4']
+    NOT: List['OrganizationWhereInputRecursive4']
+
+
+class OrganizationWhereInputRecursive4(TypedDict, total=False):
+    """Organization arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    name: Union[_str, 'types.StringFilter']
+    slug: Union[_str, 'types.StringFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    members: 'OrganizationMemberListRelationFilter'
+    invitations: 'InvitationListRelationFilter'
+
+
+
+# aggregate Organization types
+
+
+    
+
+class OrganizationScalarWhereWithAggregatesInput(TypedDict, total=False):
+    """Organization arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    name: Union[_str, 'types.StringWithAggregatesFilter']
+    slug: Union[_str, 'types.StringWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['OrganizationScalarWhereWithAggregatesInputRecursive1']
+    OR: List['OrganizationScalarWhereWithAggregatesInputRecursive1']
+    NOT: List['OrganizationScalarWhereWithAggregatesInputRecursive1']
+
+
+class OrganizationScalarWhereWithAggregatesInputRecursive1(TypedDict, total=False):
+    """Organization arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    name: Union[_str, 'types.StringWithAggregatesFilter']
+    slug: Union[_str, 'types.StringWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['OrganizationScalarWhereWithAggregatesInputRecursive2']
+    OR: List['OrganizationScalarWhereWithAggregatesInputRecursive2']
+    NOT: List['OrganizationScalarWhereWithAggregatesInputRecursive2']
+
+
+class OrganizationScalarWhereWithAggregatesInputRecursive2(TypedDict, total=False):
+    """Organization arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    name: Union[_str, 'types.StringWithAggregatesFilter']
+    slug: Union[_str, 'types.StringWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['OrganizationScalarWhereWithAggregatesInputRecursive3']
+    OR: List['OrganizationScalarWhereWithAggregatesInputRecursive3']
+    NOT: List['OrganizationScalarWhereWithAggregatesInputRecursive3']
+
+
+class OrganizationScalarWhereWithAggregatesInputRecursive3(TypedDict, total=False):
+    """Organization arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    name: Union[_str, 'types.StringWithAggregatesFilter']
+    slug: Union[_str, 'types.StringWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['OrganizationScalarWhereWithAggregatesInputRecursive4']
+    OR: List['OrganizationScalarWhereWithAggregatesInputRecursive4']
+    NOT: List['OrganizationScalarWhereWithAggregatesInputRecursive4']
+
+
+class OrganizationScalarWhereWithAggregatesInputRecursive4(TypedDict, total=False):
+    """Organization arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    name: Union[_str, 'types.StringWithAggregatesFilter']
+    slug: Union[_str, 'types.StringWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    updatedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+
+
+class OrganizationGroupByOutput(TypedDict, total=False):
+    id: _str
+    name: _str
+    slug: _str
+    createdAt: datetime.datetime
+    updatedAt: datetime.datetime
+    _sum: 'OrganizationSumAggregateOutput'
+    _avg: 'OrganizationAvgAggregateOutput'
+    _min: 'OrganizationMinAggregateOutput'
+    _max: 'OrganizationMaxAggregateOutput'
+    _count: 'OrganizationCountAggregateOutput'
+
+
+class OrganizationAvgAggregateOutput(TypedDict, total=False):
+    """Organization output for aggregating averages"""
+
+
+class OrganizationSumAggregateOutput(TypedDict, total=False):
+    """Organization output for aggregating sums"""
+
+
+class OrganizationScalarAggregateOutput(TypedDict, total=False):
+    """Organization output including scalar fields"""
+    id: _str
+    name: _str
+    slug: _str
+    createdAt: datetime.datetime
+    updatedAt: datetime.datetime
+
+
+OrganizationMinAggregateOutput = OrganizationScalarAggregateOutput
+OrganizationMaxAggregateOutput = OrganizationScalarAggregateOutput
+
+
+class OrganizationMaxAggregateInput(TypedDict, total=False):
+    """Organization input for aggregating by max"""
+    id: bool
+    name: bool
+    slug: bool
+    createdAt: bool
+    updatedAt: bool
+
+
+class OrganizationMinAggregateInput(TypedDict, total=False):
+    """Organization input for aggregating by min"""
+    id: bool
+    name: bool
+    slug: bool
+    createdAt: bool
+    updatedAt: bool
+
+
+class OrganizationNumberAggregateInput(TypedDict, total=False):
+    """Organization input for aggregating numbers"""
+
+
+OrganizationAvgAggregateInput = OrganizationNumberAggregateInput
+OrganizationSumAggregateInput = OrganizationNumberAggregateInput
+
+
+OrganizationCountAggregateInput = TypedDict(
+    'OrganizationCountAggregateInput',
+    {
+        'id': bool,
+        'name': bool,
+        'slug': bool,
+        'createdAt': bool,
+        'updatedAt': bool,
+        '_all': bool,
+    },
+    total=False,
+)
+
+OrganizationCountAggregateOutput = TypedDict(
+    'OrganizationCountAggregateOutput',
+    {
+        'id': int,
+        'name': int,
+        'slug': int,
+        'createdAt': int,
+        'updatedAt': int,
+        '_all': int,
+    },
+    total=False,
+)
+
+
+OrganizationKeys = Literal[
+    'id',
+    'name',
+    'slug',
+    'createdAt',
+    'updatedAt',
+    'members',
+    'invitations',
+]
+OrganizationScalarFieldKeys = Literal[
+    'id',
+    'name',
+    'slug',
+    'createdAt',
+    'updatedAt',
+]
+OrganizationScalarFieldKeysT = TypeVar('OrganizationScalarFieldKeysT', bound=OrganizationScalarFieldKeys)
+
+OrganizationRelationalFieldKeys = Literal[
+        'members',
+        'invitations',
+    ]
+
+# OrganizationMember types
+
+class OrganizationMemberOptionalCreateInput(TypedDict, total=False):
+    """Optional arguments to the OrganizationMember create method"""
+    id: _str
+    userId: _str
+    organizationId: _str
+    role: 'enums.Role'
+    createdAt: datetime.datetime
+    user: 'UserCreateNestedWithoutRelationsInput'
+    organization: 'OrganizationCreateNestedWithoutRelationsInput'
+
+
+class OrganizationMemberCreateInput(OrganizationMemberOptionalCreateInput):
+    """Required arguments to the OrganizationMember create method"""
+
+
+# TODO: remove this in favour of without explicit relations
+# e.g. PostCreateWithoutAuthorInput
+
+class OrganizationMemberOptionalCreateWithoutRelationsInput(TypedDict, total=False):
+    """Optional arguments to the OrganizationMember create method, without relations"""
+    id: _str
+    userId: _str
+    organizationId: _str
+    role: 'enums.Role'
+    createdAt: datetime.datetime
+
+
+class OrganizationMemberCreateWithoutRelationsInput(OrganizationMemberOptionalCreateWithoutRelationsInput):
+    """Required arguments to the OrganizationMember create method, without relations"""
+
+class OrganizationMemberConnectOrCreateWithoutRelationsInput(TypedDict):
+    create: 'OrganizationMemberCreateWithoutRelationsInput'
+    where: 'OrganizationMemberWhereUniqueInput'
+
+class OrganizationMemberCreateNestedWithoutRelationsInput(TypedDict, total=False):
+    create: 'OrganizationMemberCreateWithoutRelationsInput'
+    connect: 'OrganizationMemberWhereUniqueInput'
+    connect_or_create: 'OrganizationMemberConnectOrCreateWithoutRelationsInput'
+
+
+class OrganizationMemberCreateManyNestedWithoutRelationsInput(TypedDict, total=False):
+    create: Union['OrganizationMemberCreateWithoutRelationsInput', List['OrganizationMemberCreateWithoutRelationsInput']]
+    connect: Union['OrganizationMemberWhereUniqueInput', List['OrganizationMemberWhereUniqueInput']]
+    connect_or_create: Union['OrganizationMemberConnectOrCreateWithoutRelationsInput', List['OrganizationMemberConnectOrCreateWithoutRelationsInput']]
+
+_OrganizationMemberWhereUnique_id_Input = TypedDict(
+    '_OrganizationMemberWhereUnique_id_Input',
+    {
+        'id': '_str',
+    },
+    total=True
+)
+
+_OrganizationMemberCompounduserId_organizationIdKeyInner = TypedDict(
+    '_OrganizationMemberCompounduserId_organizationIdKeyInner',
+    {
+        'userId': '_str',
+        'organizationId': '_str',
+    },
+    total=True
+)
+
+_OrganizationMemberCompounduserId_organizationIdKey = TypedDict(
+    '_OrganizationMemberCompounduserId_organizationIdKey',
+    {
+        'userId_organizationId': '_OrganizationMemberCompounduserId_organizationIdKeyInner',
+    },
+    total=True
+)
+
+OrganizationMemberWhereUniqueInput = Union[
+    '_OrganizationMemberWhereUnique_id_Input',
+    '_OrganizationMemberCompounduserId_organizationIdKey',
+]
+
+
+class OrganizationMemberUpdateInput(TypedDict, total=False):
+    """Optional arguments for updating a record"""
+    id: _str
+    role: 'enums.Role'
+    createdAt: datetime.datetime
+    user: 'UserUpdateOneWithoutRelationsInput'
+    organization: 'OrganizationUpdateOneWithoutRelationsInput'
+
+
+class OrganizationMemberUpdateManyMutationInput(TypedDict, total=False):
+    """Arguments for updating many records"""
+    id: _str
+    role: 'enums.Role'
+    createdAt: datetime.datetime
+
+
+class OrganizationMemberUpdateManyWithoutRelationsInput(TypedDict, total=False):
+    create: List['OrganizationMemberCreateWithoutRelationsInput']
+    connect: List['OrganizationMemberWhereUniqueInput']
+    connect_or_create: List['OrganizationMemberConnectOrCreateWithoutRelationsInput']
+    set: List['OrganizationMemberWhereUniqueInput']
+    disconnect: List['OrganizationMemberWhereUniqueInput']
+    delete: List['OrganizationMemberWhereUniqueInput']
+
+    # TODO
+    # update: List['OrganizationMemberUpdateWithWhereUniqueWithoutRelationsInput']
+    # updateMany: List['OrganizationMemberUpdateManyWithWhereUniqueWithoutRelationsInput']
+    # deleteMany: List['OrganizationMemberScalarWhereInput']
+    # upsert: List['OrganizationMemberUpserteWithWhereUniqueWithoutRelationsInput']
+
+
+class OrganizationMemberUpdateOneWithoutRelationsInput(TypedDict, total=False):
+    create: 'OrganizationMemberCreateWithoutRelationsInput'
+    connect: 'OrganizationMemberWhereUniqueInput'
+    connect_or_create: 'OrganizationMemberConnectOrCreateWithoutRelationsInput'
+    disconnect: bool
+    delete: bool
+
+    # TODO
+    # update: 'OrganizationMemberUpdateInput'
+    # upsert: 'OrganizationMemberUpsertWithoutRelationsInput'
+
+
+class OrganizationMemberUpsertInput(TypedDict):
+    create: 'OrganizationMemberCreateInput'
+    update: 'OrganizationMemberUpdateInput'  # pyright: ignore[reportIncompatibleMethodOverride]
+
+
+_OrganizationMember_id_OrderByInput = TypedDict(
+    '_OrganizationMember_id_OrderByInput',
+    {
+        'id': 'SortOrder',
+    },
+    total=True
+)
+
+_OrganizationMember_userId_OrderByInput = TypedDict(
+    '_OrganizationMember_userId_OrderByInput',
+    {
+        'userId': 'SortOrder',
+    },
+    total=True
+)
+
+_OrganizationMember_organizationId_OrderByInput = TypedDict(
+    '_OrganizationMember_organizationId_OrderByInput',
+    {
+        'organizationId': 'SortOrder',
+    },
+    total=True
+)
+
+_OrganizationMember_role_OrderByInput = TypedDict(
+    '_OrganizationMember_role_OrderByInput',
+    {
+        'role': 'SortOrder',
+    },
+    total=True
+)
+
+_OrganizationMember_createdAt_OrderByInput = TypedDict(
+    '_OrganizationMember_createdAt_OrderByInput',
+    {
+        'createdAt': 'SortOrder',
+    },
+    total=True
+)
+
+_OrganizationMember_RelevanceInner = TypedDict(
+    '_OrganizationMember_RelevanceInner',
+    {
+        'fields': 'List[OrganizationMemberScalarFieldKeys]',
+        'search': 'str',
+        'sort': 'SortOrder',
+    },
+    total=True
+)
+
+_OrganizationMember_RelevanceOrderByInput = TypedDict(
+    '_OrganizationMember_RelevanceOrderByInput',
+    {
+        '_relevance': '_OrganizationMember_RelevanceInner',
+    },
+    total=True
+)
+
+OrganizationMemberOrderByInput = Union[
+    '_OrganizationMember_id_OrderByInput',
+    '_OrganizationMember_userId_OrderByInput',
+    '_OrganizationMember_organizationId_OrderByInput',
+    '_OrganizationMember_role_OrderByInput',
+    '_OrganizationMember_createdAt_OrderByInput',
+    '_OrganizationMember_RelevanceOrderByInput',
+]
+
+
+
+# recursive OrganizationMember types
+# TODO: cleanup these types
+
+
+# Dict[str, Any] is a mypy limitation
+# see https://github.com/RobertCraigie/prisma-client-py/issues/45
+# switch to pyright for improved types, see https://prisma-client-py.readthedocs.io/en/stable/reference/limitations/
+
+OrganizationMemberRelationFilter = TypedDict(
+    'OrganizationMemberRelationFilter',
+    {
+        'is': 'Dict[str, Any]',
+        'is_not': 'Dict[str, Any]',
+    },
+    total=False,
+)
+
+
+class OrganizationMemberListRelationFilter(TypedDict, total=False):
+    some: 'Dict[str, Any]'
+    none: 'Dict[str, Any]'
+    every: 'Dict[str, Any]'
+
+
+class OrganizationMemberInclude(TypedDict, total=False):
+    """OrganizationMember relational arguments"""
+    user: Union[bool, 'UserArgsFromOrganizationMember']
+    organization: Union[bool, 'OrganizationArgsFromOrganizationMember']
+
+
+    
+
+class NoteIncludeFromOrganizationMember(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+
+
+class NoteIncludeFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+
+
+class NoteIncludeFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+
+
+class NoteIncludeFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+
+
+class NoteIncludeFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+
+    
+
+class NoteArgsFromOrganizationMember(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'NoteIncludeFromNoteRecursive1'
+
+
+class NoteArgsFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'NoteIncludeFromNoteRecursive2'
+
+
+class NoteArgsFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'NoteIncludeFromNoteRecursive3'
+
+
+class NoteArgsFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'NoteIncludeFromNoteRecursive4'
+
+
+class NoteArgsFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    
+    
+
+class FindManyNoteArgsFromOrganizationMember(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive1'
+
+
+class FindManyNoteArgsFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive2'
+
+
+class FindManyNoteArgsFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive3'
+
+
+class FindManyNoteArgsFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive4'
+
+
+class FindManyNoteArgsFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    
+    
+
+class UserIncludeFromOrganizationMember(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationMemberRecursive1']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationMemberRecursive1']
+
+
+class UserIncludeFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationMemberRecursive2']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationMemberRecursive2']
+
+
+class UserIncludeFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationMemberRecursive3']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationMemberRecursive3']
+
+
+class UserIncludeFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationMemberRecursive4']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationMemberRecursive4']
+
+
+class UserIncludeFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+
+    
+
+class UserArgsFromOrganizationMember(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'UserIncludeFromUserRecursive1'
+
+
+class UserArgsFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'UserIncludeFromUserRecursive2'
+
+
+class UserArgsFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'UserIncludeFromUserRecursive3'
+
+
+class UserArgsFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'UserIncludeFromUserRecursive4'
+
+
+class UserArgsFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    
+    
+
+class FindManyUserArgsFromOrganizationMember(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive1'
+
+
+class FindManyUserArgsFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive2'
+
+
+class FindManyUserArgsFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive3'
+
+
+class FindManyUserArgsFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive4'
+
+
+class FindManyUserArgsFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    
+    
+
+class OrganizationIncludeFromOrganizationMember(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationMemberRecursive1']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationMemberRecursive1']
+
+
+class OrganizationIncludeFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationMemberRecursive2']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationMemberRecursive2']
+
+
+class OrganizationIncludeFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationMemberRecursive3']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationMemberRecursive3']
+
+
+class OrganizationIncludeFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromOrganizationMemberRecursive4']
+    invitations: Union[bool, 'FindManyInvitationArgsFromOrganizationMemberRecursive4']
+
+
+class OrganizationIncludeFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+
+    
+
+class OrganizationArgsFromOrganizationMember(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'OrganizationIncludeFromOrganizationRecursive1'
+
+
+class OrganizationArgsFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'OrganizationIncludeFromOrganizationRecursive2'
+
+
+class OrganizationArgsFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'OrganizationIncludeFromOrganizationRecursive3'
+
+
+class OrganizationArgsFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'OrganizationIncludeFromOrganizationRecursive4'
+
+
+class OrganizationArgsFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    
+    
+
+class FindManyOrganizationArgsFromOrganizationMember(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive1'
+
+
+class FindManyOrganizationArgsFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive2'
+
+
+class FindManyOrganizationArgsFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive3'
+
+
+class FindManyOrganizationArgsFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive4'
+
+
+class FindManyOrganizationArgsFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    
+    
+
+class OrganizationMemberIncludeFromOrganizationMember(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    user: Union[bool, 'UserArgsFromOrganizationMemberRecursive1']
+    organization: Union[bool, 'OrganizationArgsFromOrganizationMemberRecursive1']
+
+
+class OrganizationMemberIncludeFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    user: Union[bool, 'UserArgsFromOrganizationMemberRecursive2']
+    organization: Union[bool, 'OrganizationArgsFromOrganizationMemberRecursive2']
+
+
+class OrganizationMemberIncludeFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    user: Union[bool, 'UserArgsFromOrganizationMemberRecursive3']
+    organization: Union[bool, 'OrganizationArgsFromOrganizationMemberRecursive3']
+
+
+class OrganizationMemberIncludeFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    user: Union[bool, 'UserArgsFromOrganizationMemberRecursive4']
+    organization: Union[bool, 'OrganizationArgsFromOrganizationMemberRecursive4']
+
+
+class OrganizationMemberIncludeFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+
+    
+
+class OrganizationMemberArgsFromOrganizationMember(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive1'
+
+
+class OrganizationMemberArgsFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive2'
+
+
+class OrganizationMemberArgsFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive3'
+
+
+class OrganizationMemberArgsFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive4'
+
+
+class OrganizationMemberArgsFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    
+    
+
+class FindManyOrganizationMemberArgsFromOrganizationMember(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive1'
+
+
+class FindManyOrganizationMemberArgsFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive2'
+
+
+class FindManyOrganizationMemberArgsFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive3'
+
+
+class FindManyOrganizationMemberArgsFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive4'
+
+
+class FindManyOrganizationMemberArgsFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    
+    
+
+class InvitationIncludeFromOrganizationMember(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    organization: Union[bool, 'OrganizationArgsFromOrganizationMemberRecursive1']
+    inviter: Union[bool, 'UserArgsFromOrganizationMemberRecursive1']
+
+
+class InvitationIncludeFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    organization: Union[bool, 'OrganizationArgsFromOrganizationMemberRecursive2']
+    inviter: Union[bool, 'UserArgsFromOrganizationMemberRecursive2']
+
+
+class InvitationIncludeFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    organization: Union[bool, 'OrganizationArgsFromOrganizationMemberRecursive3']
+    inviter: Union[bool, 'UserArgsFromOrganizationMemberRecursive3']
+
+
+class InvitationIncludeFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+    organization: Union[bool, 'OrganizationArgsFromOrganizationMemberRecursive4']
+    inviter: Union[bool, 'UserArgsFromOrganizationMemberRecursive4']
+
+
+class InvitationIncludeFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Relational arguments for OrganizationMember"""
+
+    
+
+class InvitationArgsFromOrganizationMember(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'InvitationIncludeFromInvitationRecursive1'
+
+
+class InvitationArgsFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'InvitationIncludeFromInvitationRecursive2'
+
+
+class InvitationArgsFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'InvitationIncludeFromInvitationRecursive3'
+
+
+class InvitationArgsFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    include: 'InvitationIncludeFromInvitationRecursive4'
+
+
+class InvitationArgsFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    
+    
+
+class FindManyInvitationArgsFromOrganizationMember(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive1'
+
+
+class FindManyInvitationArgsFromOrganizationMemberRecursive1(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive2'
+
+
+class FindManyInvitationArgsFromOrganizationMemberRecursive2(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive3'
+
+
+class FindManyInvitationArgsFromOrganizationMemberRecursive3(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive4'
+
+
+class FindManyInvitationArgsFromOrganizationMemberRecursive4(TypedDict, total=False):
+    """Arguments for OrganizationMember"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    
+
+
+FindManyOrganizationMemberArgs = FindManyOrganizationMemberArgsFromOrganizationMember
+FindFirstOrganizationMemberArgs = FindManyOrganizationMemberArgsFromOrganizationMember
+
+
+    
+
+class OrganizationMemberWhereInput(TypedDict, total=False):
+    """OrganizationMember arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    userId: Union[_str, 'types.StringFilter']
+    organizationId: Union[_str, 'types.StringFilter']
+    role: 'enums.Role'
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    user: 'UserRelationFilter'
+    organization: 'OrganizationRelationFilter'
+
+    # should be noted that AND and NOT should be Union['OrganizationMemberWhereInputRecursive1', List['OrganizationMemberWhereInputRecursive1']]
+    # but this causes mypy to hang :/
+    AND: List['OrganizationMemberWhereInputRecursive1']
+    OR: List['OrganizationMemberWhereInputRecursive1']
+    NOT: List['OrganizationMemberWhereInputRecursive1']
+
+
+class OrganizationMemberWhereInputRecursive1(TypedDict, total=False):
+    """OrganizationMember arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    userId: Union[_str, 'types.StringFilter']
+    organizationId: Union[_str, 'types.StringFilter']
+    role: 'enums.Role'
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    user: 'UserRelationFilter'
+    organization: 'OrganizationRelationFilter'
+
+    # should be noted that AND and NOT should be Union['OrganizationMemberWhereInputRecursive2', List['OrganizationMemberWhereInputRecursive2']]
+    # but this causes mypy to hang :/
+    AND: List['OrganizationMemberWhereInputRecursive2']
+    OR: List['OrganizationMemberWhereInputRecursive2']
+    NOT: List['OrganizationMemberWhereInputRecursive2']
+
+
+class OrganizationMemberWhereInputRecursive2(TypedDict, total=False):
+    """OrganizationMember arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    userId: Union[_str, 'types.StringFilter']
+    organizationId: Union[_str, 'types.StringFilter']
+    role: 'enums.Role'
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    user: 'UserRelationFilter'
+    organization: 'OrganizationRelationFilter'
+
+    # should be noted that AND and NOT should be Union['OrganizationMemberWhereInputRecursive3', List['OrganizationMemberWhereInputRecursive3']]
+    # but this causes mypy to hang :/
+    AND: List['OrganizationMemberWhereInputRecursive3']
+    OR: List['OrganizationMemberWhereInputRecursive3']
+    NOT: List['OrganizationMemberWhereInputRecursive3']
+
+
+class OrganizationMemberWhereInputRecursive3(TypedDict, total=False):
+    """OrganizationMember arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    userId: Union[_str, 'types.StringFilter']
+    organizationId: Union[_str, 'types.StringFilter']
+    role: 'enums.Role'
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    user: 'UserRelationFilter'
+    organization: 'OrganizationRelationFilter'
+
+    # should be noted that AND and NOT should be Union['OrganizationMemberWhereInputRecursive4', List['OrganizationMemberWhereInputRecursive4']]
+    # but this causes mypy to hang :/
+    AND: List['OrganizationMemberWhereInputRecursive4']
+    OR: List['OrganizationMemberWhereInputRecursive4']
+    NOT: List['OrganizationMemberWhereInputRecursive4']
+
+
+class OrganizationMemberWhereInputRecursive4(TypedDict, total=False):
+    """OrganizationMember arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    userId: Union[_str, 'types.StringFilter']
+    organizationId: Union[_str, 'types.StringFilter']
+    role: 'enums.Role'
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    user: 'UserRelationFilter'
+    organization: 'OrganizationRelationFilter'
+
+
+
+# aggregate OrganizationMember types
+
+
+    
+
+class OrganizationMemberScalarWhereWithAggregatesInput(TypedDict, total=False):
+    """OrganizationMember arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    userId: Union[_str, 'types.StringWithAggregatesFilter']
+    organizationId: Union[_str, 'types.StringWithAggregatesFilter']
+    role: 'enums.Role'
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['OrganizationMemberScalarWhereWithAggregatesInputRecursive1']
+    OR: List['OrganizationMemberScalarWhereWithAggregatesInputRecursive1']
+    NOT: List['OrganizationMemberScalarWhereWithAggregatesInputRecursive1']
+
+
+class OrganizationMemberScalarWhereWithAggregatesInputRecursive1(TypedDict, total=False):
+    """OrganizationMember arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    userId: Union[_str, 'types.StringWithAggregatesFilter']
+    organizationId: Union[_str, 'types.StringWithAggregatesFilter']
+    role: 'enums.Role'
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['OrganizationMemberScalarWhereWithAggregatesInputRecursive2']
+    OR: List['OrganizationMemberScalarWhereWithAggregatesInputRecursive2']
+    NOT: List['OrganizationMemberScalarWhereWithAggregatesInputRecursive2']
+
+
+class OrganizationMemberScalarWhereWithAggregatesInputRecursive2(TypedDict, total=False):
+    """OrganizationMember arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    userId: Union[_str, 'types.StringWithAggregatesFilter']
+    organizationId: Union[_str, 'types.StringWithAggregatesFilter']
+    role: 'enums.Role'
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['OrganizationMemberScalarWhereWithAggregatesInputRecursive3']
+    OR: List['OrganizationMemberScalarWhereWithAggregatesInputRecursive3']
+    NOT: List['OrganizationMemberScalarWhereWithAggregatesInputRecursive3']
+
+
+class OrganizationMemberScalarWhereWithAggregatesInputRecursive3(TypedDict, total=False):
+    """OrganizationMember arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    userId: Union[_str, 'types.StringWithAggregatesFilter']
+    organizationId: Union[_str, 'types.StringWithAggregatesFilter']
+    role: 'enums.Role'
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['OrganizationMemberScalarWhereWithAggregatesInputRecursive4']
+    OR: List['OrganizationMemberScalarWhereWithAggregatesInputRecursive4']
+    NOT: List['OrganizationMemberScalarWhereWithAggregatesInputRecursive4']
+
+
+class OrganizationMemberScalarWhereWithAggregatesInputRecursive4(TypedDict, total=False):
+    """OrganizationMember arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    userId: Union[_str, 'types.StringWithAggregatesFilter']
+    organizationId: Union[_str, 'types.StringWithAggregatesFilter']
+    role: 'enums.Role'
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+
+
+class OrganizationMemberGroupByOutput(TypedDict, total=False):
+    id: _str
+    userId: _str
+    organizationId: _str
+    role: 'enums.Role'
+    createdAt: datetime.datetime
+    _sum: 'OrganizationMemberSumAggregateOutput'
+    _avg: 'OrganizationMemberAvgAggregateOutput'
+    _min: 'OrganizationMemberMinAggregateOutput'
+    _max: 'OrganizationMemberMaxAggregateOutput'
+    _count: 'OrganizationMemberCountAggregateOutput'
+
+
+class OrganizationMemberAvgAggregateOutput(TypedDict, total=False):
+    """OrganizationMember output for aggregating averages"""
+
+
+class OrganizationMemberSumAggregateOutput(TypedDict, total=False):
+    """OrganizationMember output for aggregating sums"""
+
+
+class OrganizationMemberScalarAggregateOutput(TypedDict, total=False):
+    """OrganizationMember output including scalar fields"""
+    id: _str
+    userId: _str
+    organizationId: _str
+    role: 'enums.Role'
+    createdAt: datetime.datetime
+
+
+OrganizationMemberMinAggregateOutput = OrganizationMemberScalarAggregateOutput
+OrganizationMemberMaxAggregateOutput = OrganizationMemberScalarAggregateOutput
+
+
+class OrganizationMemberMaxAggregateInput(TypedDict, total=False):
+    """OrganizationMember input for aggregating by max"""
+    id: bool
+    userId: bool
+    organizationId: bool
+    role: bool
+    createdAt: bool
+
+
+class OrganizationMemberMinAggregateInput(TypedDict, total=False):
+    """OrganizationMember input for aggregating by min"""
+    id: bool
+    userId: bool
+    organizationId: bool
+    role: bool
+    createdAt: bool
+
+
+class OrganizationMemberNumberAggregateInput(TypedDict, total=False):
+    """OrganizationMember input for aggregating numbers"""
+
+
+OrganizationMemberAvgAggregateInput = OrganizationMemberNumberAggregateInput
+OrganizationMemberSumAggregateInput = OrganizationMemberNumberAggregateInput
+
+
+OrganizationMemberCountAggregateInput = TypedDict(
+    'OrganizationMemberCountAggregateInput',
+    {
+        'id': bool,
+        'userId': bool,
+        'organizationId': bool,
+        'role': bool,
+        'createdAt': bool,
+        '_all': bool,
+    },
+    total=False,
+)
+
+OrganizationMemberCountAggregateOutput = TypedDict(
+    'OrganizationMemberCountAggregateOutput',
+    {
+        'id': int,
+        'userId': int,
+        'organizationId': int,
+        'role': int,
+        'createdAt': int,
+        '_all': int,
+    },
+    total=False,
+)
+
+
+OrganizationMemberKeys = Literal[
+    'id',
+    'userId',
+    'organizationId',
+    'role',
+    'createdAt',
+    'user',
+    'organization',
+]
+OrganizationMemberScalarFieldKeys = Literal[
+    'id',
+    'userId',
+    'organizationId',
+    'role',
+    'createdAt',
+]
+OrganizationMemberScalarFieldKeysT = TypeVar('OrganizationMemberScalarFieldKeysT', bound=OrganizationMemberScalarFieldKeys)
+
+OrganizationMemberRelationalFieldKeys = Literal[
+        'user',
+        'organization',
+    ]
+
+# Invitation types
+
+class InvitationOptionalCreateInput(TypedDict, total=False):
+    """Optional arguments to the Invitation create method"""
+    id: _str
+    organizationId: _str
+    inviterId: _str
+    role: 'enums.Role'
+    createdAt: datetime.datetime
+    acceptedAt: Optional[datetime.datetime]
+    organization: 'OrganizationCreateNestedWithoutRelationsInput'
+    inviter: 'UserCreateNestedWithoutRelationsInput'
+
+
+class InvitationCreateInput(InvitationOptionalCreateInput):
+    """Required arguments to the Invitation create method"""
+    email: _str
+    token: _str
+    expiresAt: datetime.datetime
+
+
+# TODO: remove this in favour of without explicit relations
+# e.g. PostCreateWithoutAuthorInput
+
+class InvitationOptionalCreateWithoutRelationsInput(TypedDict, total=False):
+    """Optional arguments to the Invitation create method, without relations"""
+    id: _str
+    organizationId: _str
+    inviterId: _str
+    role: 'enums.Role'
+    createdAt: datetime.datetime
+    acceptedAt: Optional[datetime.datetime]
+
+
+class InvitationCreateWithoutRelationsInput(InvitationOptionalCreateWithoutRelationsInput):
+    """Required arguments to the Invitation create method, without relations"""
+    email: _str
+    token: _str
+    expiresAt: datetime.datetime
+
+class InvitationConnectOrCreateWithoutRelationsInput(TypedDict):
+    create: 'InvitationCreateWithoutRelationsInput'
+    where: 'InvitationWhereUniqueInput'
+
+class InvitationCreateNestedWithoutRelationsInput(TypedDict, total=False):
+    create: 'InvitationCreateWithoutRelationsInput'
+    connect: 'InvitationWhereUniqueInput'
+    connect_or_create: 'InvitationConnectOrCreateWithoutRelationsInput'
+
+
+class InvitationCreateManyNestedWithoutRelationsInput(TypedDict, total=False):
+    create: Union['InvitationCreateWithoutRelationsInput', List['InvitationCreateWithoutRelationsInput']]
+    connect: Union['InvitationWhereUniqueInput', List['InvitationWhereUniqueInput']]
+    connect_or_create: Union['InvitationConnectOrCreateWithoutRelationsInput', List['InvitationConnectOrCreateWithoutRelationsInput']]
+
+_InvitationWhereUnique_id_Input = TypedDict(
+    '_InvitationWhereUnique_id_Input',
+    {
+        'id': '_str',
+    },
+    total=True
+)
+
+_InvitationWhereUnique_token_Input = TypedDict(
+    '_InvitationWhereUnique_token_Input',
+    {
+        'token': '_str',
+    },
+    total=True
+)
+
+InvitationWhereUniqueInput = Union[
+    '_InvitationWhereUnique_id_Input',
+    '_InvitationWhereUnique_token_Input',
+]
+
+
+class InvitationUpdateInput(TypedDict, total=False):
+    """Optional arguments for updating a record"""
+    id: _str
+    email: _str
+    token: _str
+    role: 'enums.Role'
+    expiresAt: datetime.datetime
+    createdAt: datetime.datetime
+    acceptedAt: Optional[datetime.datetime]
+    organization: 'OrganizationUpdateOneWithoutRelationsInput'
+    inviter: 'UserUpdateOneWithoutRelationsInput'
+
+
+class InvitationUpdateManyMutationInput(TypedDict, total=False):
+    """Arguments for updating many records"""
+    id: _str
+    email: _str
+    token: _str
+    role: 'enums.Role'
+    expiresAt: datetime.datetime
+    createdAt: datetime.datetime
+    acceptedAt: Optional[datetime.datetime]
+
+
+class InvitationUpdateManyWithoutRelationsInput(TypedDict, total=False):
+    create: List['InvitationCreateWithoutRelationsInput']
+    connect: List['InvitationWhereUniqueInput']
+    connect_or_create: List['InvitationConnectOrCreateWithoutRelationsInput']
+    set: List['InvitationWhereUniqueInput']
+    disconnect: List['InvitationWhereUniqueInput']
+    delete: List['InvitationWhereUniqueInput']
+
+    # TODO
+    # update: List['InvitationUpdateWithWhereUniqueWithoutRelationsInput']
+    # updateMany: List['InvitationUpdateManyWithWhereUniqueWithoutRelationsInput']
+    # deleteMany: List['InvitationScalarWhereInput']
+    # upsert: List['InvitationUpserteWithWhereUniqueWithoutRelationsInput']
+
+
+class InvitationUpdateOneWithoutRelationsInput(TypedDict, total=False):
+    create: 'InvitationCreateWithoutRelationsInput'
+    connect: 'InvitationWhereUniqueInput'
+    connect_or_create: 'InvitationConnectOrCreateWithoutRelationsInput'
+    disconnect: bool
+    delete: bool
+
+    # TODO
+    # update: 'InvitationUpdateInput'
+    # upsert: 'InvitationUpsertWithoutRelationsInput'
+
+
+class InvitationUpsertInput(TypedDict):
+    create: 'InvitationCreateInput'
+    update: 'InvitationUpdateInput'  # pyright: ignore[reportIncompatibleMethodOverride]
+
+
+_Invitation_id_OrderByInput = TypedDict(
+    '_Invitation_id_OrderByInput',
+    {
+        'id': 'SortOrder',
+    },
+    total=True
+)
+
+_Invitation_email_OrderByInput = TypedDict(
+    '_Invitation_email_OrderByInput',
+    {
+        'email': 'SortOrder',
+    },
+    total=True
+)
+
+_Invitation_token_OrderByInput = TypedDict(
+    '_Invitation_token_OrderByInput',
+    {
+        'token': 'SortOrder',
+    },
+    total=True
+)
+
+_Invitation_organizationId_OrderByInput = TypedDict(
+    '_Invitation_organizationId_OrderByInput',
+    {
+        'organizationId': 'SortOrder',
+    },
+    total=True
+)
+
+_Invitation_inviterId_OrderByInput = TypedDict(
+    '_Invitation_inviterId_OrderByInput',
+    {
+        'inviterId': 'SortOrder',
+    },
+    total=True
+)
+
+_Invitation_role_OrderByInput = TypedDict(
+    '_Invitation_role_OrderByInput',
+    {
+        'role': 'SortOrder',
+    },
+    total=True
+)
+
+_Invitation_expiresAt_OrderByInput = TypedDict(
+    '_Invitation_expiresAt_OrderByInput',
+    {
+        'expiresAt': 'SortOrder',
+    },
+    total=True
+)
+
+_Invitation_createdAt_OrderByInput = TypedDict(
+    '_Invitation_createdAt_OrderByInput',
+    {
+        'createdAt': 'SortOrder',
+    },
+    total=True
+)
+
+_Invitation_acceptedAt_OrderByInput = TypedDict(
+    '_Invitation_acceptedAt_OrderByInput',
+    {
+        'acceptedAt': 'SortOrder',
+    },
+    total=True
+)
+
+_Invitation_RelevanceInner = TypedDict(
+    '_Invitation_RelevanceInner',
+    {
+        'fields': 'List[InvitationScalarFieldKeys]',
+        'search': 'str',
+        'sort': 'SortOrder',
+    },
+    total=True
+)
+
+_Invitation_RelevanceOrderByInput = TypedDict(
+    '_Invitation_RelevanceOrderByInput',
+    {
+        '_relevance': '_Invitation_RelevanceInner',
+    },
+    total=True
+)
+
+InvitationOrderByInput = Union[
+    '_Invitation_id_OrderByInput',
+    '_Invitation_email_OrderByInput',
+    '_Invitation_token_OrderByInput',
+    '_Invitation_organizationId_OrderByInput',
+    '_Invitation_inviterId_OrderByInput',
+    '_Invitation_role_OrderByInput',
+    '_Invitation_expiresAt_OrderByInput',
+    '_Invitation_createdAt_OrderByInput',
+    '_Invitation_acceptedAt_OrderByInput',
+    '_Invitation_RelevanceOrderByInput',
+]
+
+
+
+# recursive Invitation types
+# TODO: cleanup these types
+
+
+# Dict[str, Any] is a mypy limitation
+# see https://github.com/RobertCraigie/prisma-client-py/issues/45
+# switch to pyright for improved types, see https://prisma-client-py.readthedocs.io/en/stable/reference/limitations/
+
+InvitationRelationFilter = TypedDict(
+    'InvitationRelationFilter',
+    {
+        'is': 'Dict[str, Any]',
+        'is_not': 'Dict[str, Any]',
+    },
+    total=False,
+)
+
+
+class InvitationListRelationFilter(TypedDict, total=False):
+    some: 'Dict[str, Any]'
+    none: 'Dict[str, Any]'
+    every: 'Dict[str, Any]'
+
+
+class InvitationInclude(TypedDict, total=False):
+    """Invitation relational arguments"""
+    organization: Union[bool, 'OrganizationArgsFromInvitation']
+    inviter: Union[bool, 'UserArgsFromInvitation']
+
+
+    
+
+class NoteIncludeFromInvitation(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+
+
+class NoteIncludeFromInvitationRecursive1(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+
+
+class NoteIncludeFromInvitationRecursive2(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+
+
+class NoteIncludeFromInvitationRecursive3(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+
+
+class NoteIncludeFromInvitationRecursive4(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+
+    
+
+class NoteArgsFromInvitation(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'NoteIncludeFromNoteRecursive1'
+
+
+class NoteArgsFromInvitationRecursive1(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'NoteIncludeFromNoteRecursive2'
+
+
+class NoteArgsFromInvitationRecursive2(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'NoteIncludeFromNoteRecursive3'
+
+
+class NoteArgsFromInvitationRecursive3(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'NoteIncludeFromNoteRecursive4'
+
+
+class NoteArgsFromInvitationRecursive4(TypedDict, total=False):
+    """Arguments for Invitation"""
+    
+    
+
+class FindManyNoteArgsFromInvitation(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive1'
+
+
+class FindManyNoteArgsFromInvitationRecursive1(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive2'
+
+
+class FindManyNoteArgsFromInvitationRecursive2(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive3'
+
+
+class FindManyNoteArgsFromInvitationRecursive3(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    include: 'NoteIncludeFromNoteRecursive4'
+
+
+class FindManyNoteArgsFromInvitationRecursive4(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['NoteOrderByInput', List['NoteOrderByInput']]
+    where: 'NoteWhereInput'
+    cursor: 'NoteWhereUniqueInput'
+    distinct: List['NoteScalarFieldKeys']
+    
+    
+
+class UserIncludeFromInvitation(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromInvitationRecursive1']
+    invitations: Union[bool, 'FindManyInvitationArgsFromInvitationRecursive1']
+
+
+class UserIncludeFromInvitationRecursive1(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromInvitationRecursive2']
+    invitations: Union[bool, 'FindManyInvitationArgsFromInvitationRecursive2']
+
+
+class UserIncludeFromInvitationRecursive2(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromInvitationRecursive3']
+    invitations: Union[bool, 'FindManyInvitationArgsFromInvitationRecursive3']
+
+
+class UserIncludeFromInvitationRecursive3(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    memberships: Union[bool, 'FindManyOrganizationMemberArgsFromInvitationRecursive4']
+    invitations: Union[bool, 'FindManyInvitationArgsFromInvitationRecursive4']
+
+
+class UserIncludeFromInvitationRecursive4(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+
+    
+
+class UserArgsFromInvitation(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'UserIncludeFromUserRecursive1'
+
+
+class UserArgsFromInvitationRecursive1(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'UserIncludeFromUserRecursive2'
+
+
+class UserArgsFromInvitationRecursive2(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'UserIncludeFromUserRecursive3'
+
+
+class UserArgsFromInvitationRecursive3(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'UserIncludeFromUserRecursive4'
+
+
+class UserArgsFromInvitationRecursive4(TypedDict, total=False):
+    """Arguments for Invitation"""
+    
+    
+
+class FindManyUserArgsFromInvitation(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive1'
+
+
+class FindManyUserArgsFromInvitationRecursive1(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive2'
+
+
+class FindManyUserArgsFromInvitationRecursive2(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive3'
+
+
+class FindManyUserArgsFromInvitationRecursive3(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    include: 'UserIncludeFromUserRecursive4'
+
+
+class FindManyUserArgsFromInvitationRecursive4(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['UserOrderByInput', List['UserOrderByInput']]
+    where: 'UserWhereInput'
+    cursor: 'UserWhereUniqueInput'
+    distinct: List['UserScalarFieldKeys']
+    
+    
+
+class OrganizationIncludeFromInvitation(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromInvitationRecursive1']
+    invitations: Union[bool, 'FindManyInvitationArgsFromInvitationRecursive1']
+
+
+class OrganizationIncludeFromInvitationRecursive1(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromInvitationRecursive2']
+    invitations: Union[bool, 'FindManyInvitationArgsFromInvitationRecursive2']
+
+
+class OrganizationIncludeFromInvitationRecursive2(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromInvitationRecursive3']
+    invitations: Union[bool, 'FindManyInvitationArgsFromInvitationRecursive3']
+
+
+class OrganizationIncludeFromInvitationRecursive3(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    members: Union[bool, 'FindManyOrganizationMemberArgsFromInvitationRecursive4']
+    invitations: Union[bool, 'FindManyInvitationArgsFromInvitationRecursive4']
+
+
+class OrganizationIncludeFromInvitationRecursive4(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+
+    
+
+class OrganizationArgsFromInvitation(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'OrganizationIncludeFromOrganizationRecursive1'
+
+
+class OrganizationArgsFromInvitationRecursive1(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'OrganizationIncludeFromOrganizationRecursive2'
+
+
+class OrganizationArgsFromInvitationRecursive2(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'OrganizationIncludeFromOrganizationRecursive3'
+
+
+class OrganizationArgsFromInvitationRecursive3(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'OrganizationIncludeFromOrganizationRecursive4'
+
+
+class OrganizationArgsFromInvitationRecursive4(TypedDict, total=False):
+    """Arguments for Invitation"""
+    
+    
+
+class FindManyOrganizationArgsFromInvitation(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive1'
+
+
+class FindManyOrganizationArgsFromInvitationRecursive1(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive2'
+
+
+class FindManyOrganizationArgsFromInvitationRecursive2(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive3'
+
+
+class FindManyOrganizationArgsFromInvitationRecursive3(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    include: 'OrganizationIncludeFromOrganizationRecursive4'
+
+
+class FindManyOrganizationArgsFromInvitationRecursive4(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationOrderByInput', List['OrganizationOrderByInput']]
+    where: 'OrganizationWhereInput'
+    cursor: 'OrganizationWhereUniqueInput'
+    distinct: List['OrganizationScalarFieldKeys']
+    
+    
+
+class OrganizationMemberIncludeFromInvitation(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    user: Union[bool, 'UserArgsFromInvitationRecursive1']
+    organization: Union[bool, 'OrganizationArgsFromInvitationRecursive1']
+
+
+class OrganizationMemberIncludeFromInvitationRecursive1(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    user: Union[bool, 'UserArgsFromInvitationRecursive2']
+    organization: Union[bool, 'OrganizationArgsFromInvitationRecursive2']
+
+
+class OrganizationMemberIncludeFromInvitationRecursive2(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    user: Union[bool, 'UserArgsFromInvitationRecursive3']
+    organization: Union[bool, 'OrganizationArgsFromInvitationRecursive3']
+
+
+class OrganizationMemberIncludeFromInvitationRecursive3(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    user: Union[bool, 'UserArgsFromInvitationRecursive4']
+    organization: Union[bool, 'OrganizationArgsFromInvitationRecursive4']
+
+
+class OrganizationMemberIncludeFromInvitationRecursive4(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+
+    
+
+class OrganizationMemberArgsFromInvitation(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive1'
+
+
+class OrganizationMemberArgsFromInvitationRecursive1(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive2'
+
+
+class OrganizationMemberArgsFromInvitationRecursive2(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive3'
+
+
+class OrganizationMemberArgsFromInvitationRecursive3(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive4'
+
+
+class OrganizationMemberArgsFromInvitationRecursive4(TypedDict, total=False):
+    """Arguments for Invitation"""
+    
+    
+
+class FindManyOrganizationMemberArgsFromInvitation(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive1'
+
+
+class FindManyOrganizationMemberArgsFromInvitationRecursive1(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive2'
+
+
+class FindManyOrganizationMemberArgsFromInvitationRecursive2(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive3'
+
+
+class FindManyOrganizationMemberArgsFromInvitationRecursive3(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    include: 'OrganizationMemberIncludeFromOrganizationMemberRecursive4'
+
+
+class FindManyOrganizationMemberArgsFromInvitationRecursive4(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['OrganizationMemberOrderByInput', List['OrganizationMemberOrderByInput']]
+    where: 'OrganizationMemberWhereInput'
+    cursor: 'OrganizationMemberWhereUniqueInput'
+    distinct: List['OrganizationMemberScalarFieldKeys']
+    
+    
+
+class InvitationIncludeFromInvitation(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    organization: Union[bool, 'OrganizationArgsFromInvitationRecursive1']
+    inviter: Union[bool, 'UserArgsFromInvitationRecursive1']
+
+
+class InvitationIncludeFromInvitationRecursive1(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    organization: Union[bool, 'OrganizationArgsFromInvitationRecursive2']
+    inviter: Union[bool, 'UserArgsFromInvitationRecursive2']
+
+
+class InvitationIncludeFromInvitationRecursive2(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    organization: Union[bool, 'OrganizationArgsFromInvitationRecursive3']
+    inviter: Union[bool, 'UserArgsFromInvitationRecursive3']
+
+
+class InvitationIncludeFromInvitationRecursive3(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+    organization: Union[bool, 'OrganizationArgsFromInvitationRecursive4']
+    inviter: Union[bool, 'UserArgsFromInvitationRecursive4']
+
+
+class InvitationIncludeFromInvitationRecursive4(TypedDict, total=False):
+    """Relational arguments for Invitation"""
+
+    
+
+class InvitationArgsFromInvitation(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'InvitationIncludeFromInvitationRecursive1'
+
+
+class InvitationArgsFromInvitationRecursive1(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'InvitationIncludeFromInvitationRecursive2'
+
+
+class InvitationArgsFromInvitationRecursive2(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'InvitationIncludeFromInvitationRecursive3'
+
+
+class InvitationArgsFromInvitationRecursive3(TypedDict, total=False):
+    """Arguments for Invitation"""
+    include: 'InvitationIncludeFromInvitationRecursive4'
+
+
+class InvitationArgsFromInvitationRecursive4(TypedDict, total=False):
+    """Arguments for Invitation"""
+    
+    
+
+class FindManyInvitationArgsFromInvitation(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive1'
+
+
+class FindManyInvitationArgsFromInvitationRecursive1(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive2'
+
+
+class FindManyInvitationArgsFromInvitationRecursive2(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive3'
+
+
+class FindManyInvitationArgsFromInvitationRecursive3(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    include: 'InvitationIncludeFromInvitationRecursive4'
+
+
+class FindManyInvitationArgsFromInvitationRecursive4(TypedDict, total=False):
+    """Arguments for Invitation"""
+    take: int
+    skip: int
+    order_by: Union['InvitationOrderByInput', List['InvitationOrderByInput']]
+    where: 'InvitationWhereInput'
+    cursor: 'InvitationWhereUniqueInput'
+    distinct: List['InvitationScalarFieldKeys']
+    
+
+
+FindManyInvitationArgs = FindManyInvitationArgsFromInvitation
+FindFirstInvitationArgs = FindManyInvitationArgsFromInvitation
+
+
+    
+
+class InvitationWhereInput(TypedDict, total=False):
+    """Invitation arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    email: Union[_str, 'types.StringFilter']
+    token: Union[_str, 'types.StringFilter']
+    organizationId: Union[_str, 'types.StringFilter']
+    inviterId: Union[_str, 'types.StringFilter']
+    role: 'enums.Role'
+    expiresAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    acceptedAt: Union[None, datetime.datetime, 'types.DateTimeFilter']
+    organization: 'OrganizationRelationFilter'
+    inviter: 'UserRelationFilter'
+
+    # should be noted that AND and NOT should be Union['InvitationWhereInputRecursive1', List['InvitationWhereInputRecursive1']]
+    # but this causes mypy to hang :/
+    AND: List['InvitationWhereInputRecursive1']
+    OR: List['InvitationWhereInputRecursive1']
+    NOT: List['InvitationWhereInputRecursive1']
+
+
+class InvitationWhereInputRecursive1(TypedDict, total=False):
+    """Invitation arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    email: Union[_str, 'types.StringFilter']
+    token: Union[_str, 'types.StringFilter']
+    organizationId: Union[_str, 'types.StringFilter']
+    inviterId: Union[_str, 'types.StringFilter']
+    role: 'enums.Role'
+    expiresAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    acceptedAt: Union[None, datetime.datetime, 'types.DateTimeFilter']
+    organization: 'OrganizationRelationFilter'
+    inviter: 'UserRelationFilter'
+
+    # should be noted that AND and NOT should be Union['InvitationWhereInputRecursive2', List['InvitationWhereInputRecursive2']]
+    # but this causes mypy to hang :/
+    AND: List['InvitationWhereInputRecursive2']
+    OR: List['InvitationWhereInputRecursive2']
+    NOT: List['InvitationWhereInputRecursive2']
+
+
+class InvitationWhereInputRecursive2(TypedDict, total=False):
+    """Invitation arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    email: Union[_str, 'types.StringFilter']
+    token: Union[_str, 'types.StringFilter']
+    organizationId: Union[_str, 'types.StringFilter']
+    inviterId: Union[_str, 'types.StringFilter']
+    role: 'enums.Role'
+    expiresAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    acceptedAt: Union[None, datetime.datetime, 'types.DateTimeFilter']
+    organization: 'OrganizationRelationFilter'
+    inviter: 'UserRelationFilter'
+
+    # should be noted that AND and NOT should be Union['InvitationWhereInputRecursive3', List['InvitationWhereInputRecursive3']]
+    # but this causes mypy to hang :/
+    AND: List['InvitationWhereInputRecursive3']
+    OR: List['InvitationWhereInputRecursive3']
+    NOT: List['InvitationWhereInputRecursive3']
+
+
+class InvitationWhereInputRecursive3(TypedDict, total=False):
+    """Invitation arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    email: Union[_str, 'types.StringFilter']
+    token: Union[_str, 'types.StringFilter']
+    organizationId: Union[_str, 'types.StringFilter']
+    inviterId: Union[_str, 'types.StringFilter']
+    role: 'enums.Role'
+    expiresAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    acceptedAt: Union[None, datetime.datetime, 'types.DateTimeFilter']
+    organization: 'OrganizationRelationFilter'
+    inviter: 'UserRelationFilter'
+
+    # should be noted that AND and NOT should be Union['InvitationWhereInputRecursive4', List['InvitationWhereInputRecursive4']]
+    # but this causes mypy to hang :/
+    AND: List['InvitationWhereInputRecursive4']
+    OR: List['InvitationWhereInputRecursive4']
+    NOT: List['InvitationWhereInputRecursive4']
+
+
+class InvitationWhereInputRecursive4(TypedDict, total=False):
+    """Invitation arguments for searching"""
+    id: Union[_str, 'types.StringFilter']
+    email: Union[_str, 'types.StringFilter']
+    token: Union[_str, 'types.StringFilter']
+    organizationId: Union[_str, 'types.StringFilter']
+    inviterId: Union[_str, 'types.StringFilter']
+    role: 'enums.Role'
+    expiresAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeFilter']
+    acceptedAt: Union[None, datetime.datetime, 'types.DateTimeFilter']
+    organization: 'OrganizationRelationFilter'
+    inviter: 'UserRelationFilter'
+
+
+
+# aggregate Invitation types
+
+
+    
+
+class InvitationScalarWhereWithAggregatesInput(TypedDict, total=False):
+    """Invitation arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    email: Union[_str, 'types.StringWithAggregatesFilter']
+    token: Union[_str, 'types.StringWithAggregatesFilter']
+    organizationId: Union[_str, 'types.StringWithAggregatesFilter']
+    inviterId: Union[_str, 'types.StringWithAggregatesFilter']
+    role: 'enums.Role'
+    expiresAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    acceptedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['InvitationScalarWhereWithAggregatesInputRecursive1']
+    OR: List['InvitationScalarWhereWithAggregatesInputRecursive1']
+    NOT: List['InvitationScalarWhereWithAggregatesInputRecursive1']
+
+
+class InvitationScalarWhereWithAggregatesInputRecursive1(TypedDict, total=False):
+    """Invitation arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    email: Union[_str, 'types.StringWithAggregatesFilter']
+    token: Union[_str, 'types.StringWithAggregatesFilter']
+    organizationId: Union[_str, 'types.StringWithAggregatesFilter']
+    inviterId: Union[_str, 'types.StringWithAggregatesFilter']
+    role: 'enums.Role'
+    expiresAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    acceptedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['InvitationScalarWhereWithAggregatesInputRecursive2']
+    OR: List['InvitationScalarWhereWithAggregatesInputRecursive2']
+    NOT: List['InvitationScalarWhereWithAggregatesInputRecursive2']
+
+
+class InvitationScalarWhereWithAggregatesInputRecursive2(TypedDict, total=False):
+    """Invitation arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    email: Union[_str, 'types.StringWithAggregatesFilter']
+    token: Union[_str, 'types.StringWithAggregatesFilter']
+    organizationId: Union[_str, 'types.StringWithAggregatesFilter']
+    inviterId: Union[_str, 'types.StringWithAggregatesFilter']
+    role: 'enums.Role'
+    expiresAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    acceptedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['InvitationScalarWhereWithAggregatesInputRecursive3']
+    OR: List['InvitationScalarWhereWithAggregatesInputRecursive3']
+    NOT: List['InvitationScalarWhereWithAggregatesInputRecursive3']
+
+
+class InvitationScalarWhereWithAggregatesInputRecursive3(TypedDict, total=False):
+    """Invitation arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    email: Union[_str, 'types.StringWithAggregatesFilter']
+    token: Union[_str, 'types.StringWithAggregatesFilter']
+    organizationId: Union[_str, 'types.StringWithAggregatesFilter']
+    inviterId: Union[_str, 'types.StringWithAggregatesFilter']
+    role: 'enums.Role'
+    expiresAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    acceptedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+    AND: List['InvitationScalarWhereWithAggregatesInputRecursive4']
+    OR: List['InvitationScalarWhereWithAggregatesInputRecursive4']
+    NOT: List['InvitationScalarWhereWithAggregatesInputRecursive4']
+
+
+class InvitationScalarWhereWithAggregatesInputRecursive4(TypedDict, total=False):
+    """Invitation arguments for searching"""
+    id: Union[_str, 'types.StringWithAggregatesFilter']
+    email: Union[_str, 'types.StringWithAggregatesFilter']
+    token: Union[_str, 'types.StringWithAggregatesFilter']
+    organizationId: Union[_str, 'types.StringWithAggregatesFilter']
+    inviterId: Union[_str, 'types.StringWithAggregatesFilter']
+    role: 'enums.Role'
+    expiresAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    createdAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+    acceptedAt: Union[datetime.datetime, 'types.DateTimeWithAggregatesFilter']
+
+
+
+class InvitationGroupByOutput(TypedDict, total=False):
+    id: _str
+    email: _str
+    token: _str
+    organizationId: _str
+    inviterId: _str
+    role: 'enums.Role'
+    expiresAt: datetime.datetime
+    createdAt: datetime.datetime
+    acceptedAt: datetime.datetime
+    _sum: 'InvitationSumAggregateOutput'
+    _avg: 'InvitationAvgAggregateOutput'
+    _min: 'InvitationMinAggregateOutput'
+    _max: 'InvitationMaxAggregateOutput'
+    _count: 'InvitationCountAggregateOutput'
+
+
+class InvitationAvgAggregateOutput(TypedDict, total=False):
+    """Invitation output for aggregating averages"""
+
+
+class InvitationSumAggregateOutput(TypedDict, total=False):
+    """Invitation output for aggregating sums"""
+
+
+class InvitationScalarAggregateOutput(TypedDict, total=False):
+    """Invitation output including scalar fields"""
+    id: _str
+    email: _str
+    token: _str
+    organizationId: _str
+    inviterId: _str
+    role: 'enums.Role'
+    expiresAt: datetime.datetime
+    createdAt: datetime.datetime
+    acceptedAt: datetime.datetime
+
+
+InvitationMinAggregateOutput = InvitationScalarAggregateOutput
+InvitationMaxAggregateOutput = InvitationScalarAggregateOutput
+
+
+class InvitationMaxAggregateInput(TypedDict, total=False):
+    """Invitation input for aggregating by max"""
+    id: bool
+    email: bool
+    token: bool
+    organizationId: bool
+    inviterId: bool
+    role: bool
+    expiresAt: bool
+    createdAt: bool
+    acceptedAt: bool
+
+
+class InvitationMinAggregateInput(TypedDict, total=False):
+    """Invitation input for aggregating by min"""
+    id: bool
+    email: bool
+    token: bool
+    organizationId: bool
+    inviterId: bool
+    role: bool
+    expiresAt: bool
+    createdAt: bool
+    acceptedAt: bool
+
+
+class InvitationNumberAggregateInput(TypedDict, total=False):
+    """Invitation input for aggregating numbers"""
+
+
+InvitationAvgAggregateInput = InvitationNumberAggregateInput
+InvitationSumAggregateInput = InvitationNumberAggregateInput
+
+
+InvitationCountAggregateInput = TypedDict(
+    'InvitationCountAggregateInput',
+    {
+        'id': bool,
+        'email': bool,
+        'token': bool,
+        'organizationId': bool,
+        'inviterId': bool,
+        'role': bool,
+        'expiresAt': bool,
+        'createdAt': bool,
+        'acceptedAt': bool,
+        '_all': bool,
+    },
+    total=False,
+)
+
+InvitationCountAggregateOutput = TypedDict(
+    'InvitationCountAggregateOutput',
+    {
+        'id': int,
+        'email': int,
+        'token': int,
+        'organizationId': int,
+        'inviterId': int,
+        'role': int,
+        'expiresAt': int,
+        'createdAt': int,
+        'acceptedAt': int,
+        '_all': int,
+    },
+    total=False,
+)
+
+
+InvitationKeys = Literal[
+    'id',
+    'email',
+    'token',
+    'organizationId',
+    'inviterId',
+    'role',
+    'expiresAt',
+    'createdAt',
+    'acceptedAt',
+    'organization',
+    'inviter',
+]
+InvitationScalarFieldKeys = Literal[
+    'id',
+    'email',
+    'token',
+    'organizationId',
+    'inviterId',
+    'role',
+    'expiresAt',
+    'createdAt',
+    'acceptedAt',
+]
+InvitationScalarFieldKeysT = TypeVar('InvitationScalarFieldKeysT', bound=InvitationScalarFieldKeys)
+
+InvitationRelationalFieldKeys = Literal[
+        'organization',
+        'inviter',
+    ]
 
 
 

@@ -2,6 +2,7 @@ import strawberry
 
 from .schemas.health import HealthQueries
 from .schemas.note import NoteMutations, NoteQueries
+from .schemas.auth import AuthMutations
 
 
 @strawberry.type
@@ -10,7 +11,7 @@ class Query(NoteQueries, HealthQueries):
 
 
 @strawberry.type
-class Mutation(NoteMutations):
+class Mutation(NoteMutations, AuthMutations):
     pass
 
 
