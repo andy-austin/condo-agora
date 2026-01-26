@@ -7,6 +7,10 @@ pydantic>=2.0.0
 # Database & ORM
 prisma>=0.15.0
 
+# Auth (Clerk integration)
+svix>=1.0.0
+PyJWT[crypto]>=2.8.0
+
 # Development dependencies
 black>=24.0.0
 isort>=5.13.0

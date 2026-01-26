@@ -82,3 +82,43 @@ class BaseNote(_PrismaModel):
         from .client import get_client
 
         return actions.NoteActions[_PrismaModelT](client or get_client(), cls)
+
+
+class BaseUser(_PrismaModel):
+    __prisma_model__: ClassVar[Literal['User']] = 'User'  # pyright: ignore[reportIncompatibleVariableOverride]
+
+    @classmethod
+    def prisma(cls: Type[_PrismaModelT], client: Optional['Prisma'] = None) -> 'actions.UserActions[_PrismaModelT]':
+        from .client import get_client
+
+        return actions.UserActions[_PrismaModelT](client or get_client(), cls)
+
+
+class BaseOrganization(_PrismaModel):
+    __prisma_model__: ClassVar[Literal['Organization']] = 'Organization'  # pyright: ignore[reportIncompatibleVariableOverride]
+
+    @classmethod
+    def prisma(cls: Type[_PrismaModelT], client: Optional['Prisma'] = None) -> 'actions.OrganizationActions[_PrismaModelT]':
+        from .client import get_client
+
+        return actions.OrganizationActions[_PrismaModelT](client or get_client(), cls)
+
+
+class BaseOrganizationMember(_PrismaModel):
+    __prisma_model__: ClassVar[Literal['OrganizationMember']] = 'OrganizationMember'  # pyright: ignore[reportIncompatibleVariableOverride]
+
+    @classmethod
+    def prisma(cls: Type[_PrismaModelT], client: Optional['Prisma'] = None) -> 'actions.OrganizationMemberActions[_PrismaModelT]':
+        from .client import get_client
+
+        return actions.OrganizationMemberActions[_PrismaModelT](client or get_client(), cls)
+
+
+class BaseInvitation(_PrismaModel):
+    __prisma_model__: ClassVar[Literal['Invitation']] = 'Invitation'  # pyright: ignore[reportIncompatibleVariableOverride]
+
+    @classmethod
+    def prisma(cls: Type[_PrismaModelT], client: Optional['Prisma'] = None) -> 'actions.InvitationActions[_PrismaModelT]':
+        from .client import get_client
+
+        return actions.InvitationActions[_PrismaModelT](client or get_client(), cls)

@@ -95,9 +95,17 @@ class Prisma(AsyncBasePrisma):
     # Note: these property names can be customised using `/// @Python(instance_name: '...')`
     # https://prisma-client-py.readthedocs.io/en/stable/reference/schema-extensions/#instance_name
     note: 'actions.NoteActions[models.Note]'
+    user: 'actions.UserActions[models.User]'
+    organization: 'actions.OrganizationActions[models.Organization]'
+    organizationmember: 'actions.OrganizationMemberActions[models.OrganizationMember]'
+    invitation: 'actions.InvitationActions[models.Invitation]'
 
     __slots__ = (
         'note',
+        'user',
+        'organization',
+        'organizationmember',
+        'invitation',
     )
 
     def __init__(
@@ -129,6 +137,10 @@ class Prisma(AsyncBasePrisma):
         )
 
         self.note = actions.NoteActions[models.Note](self, models.Note)
+        self.user = actions.UserActions[models.User](self, models.User)
+        self.organization = actions.OrganizationActions[models.Organization](self, models.Organization)
+        self.organizationmember = actions.OrganizationMemberActions[models.OrganizationMember](self, models.OrganizationMember)
+        self.invitation = actions.InvitationActions[models.Invitation](self, models.Invitation)
 
         if auto_register:
             register(self)
@@ -280,12 +292,20 @@ TransactionManager = AsyncTransactionManager[Prisma]
 # TODO: don't require copy-pasting arguments between actions and batch actions
 class Batch:
     note: 'NoteBatchActions'
+    user: 'UserBatchActions'
+    organization: 'OrganizationBatchActions'
+    organizationmember: 'OrganizationMemberBatchActions'
+    invitation: 'InvitationBatchActions'
 
     def __init__(self, client: Prisma) -> None:
         self.__client = client
         self.__queries: List[str] = []
         self._active_provider = client._active_provider
         self.note = NoteBatchActions(self)
+        self.user = UserBatchActions(self)
+        self.organization = OrganizationBatchActions(self)
+        self.organizationmember = OrganizationMemberBatchActions(self)
+        self.invitation = InvitationBatchActions(self)
 
     def _add(self, **kwargs: Any) -> None:
         builder = QueryBuilder(
@@ -443,6 +463,450 @@ class NoteBatchActions:
         self._batcher._add(
             method='delete_many',
             model=models.Note,
+            arguments={'where': where},
+            root_selection=['count'],
+        )
+
+
+
+# NOTE: some arguments are meaningless in this context but are included
+# for completeness sake
+class UserBatchActions:
+    def __init__(self, batcher: Batch) -> None:
+        self._batcher = batcher
+
+    def create(
+        self,
+        data: types.UserCreateInput,
+        include: Optional[types.UserInclude] = None
+    ) -> None:
+        self._batcher._add(
+            method='create',
+            model=models.User,
+            arguments={
+                'data': data,
+                'include': include,
+            },
+        )
+
+    def create_many(
+        self,
+        data: List[types.UserCreateWithoutRelationsInput],
+        *,
+        skip_duplicates: Optional[bool] = None,
+    ) -> None:
+        if skip_duplicates and self._batcher._active_provider in CREATE_MANY_SKIP_DUPLICATES_UNSUPPORTED:
+            raise errors.UnsupportedDatabaseError(self._batcher._active_provider, 'create_many_skip_duplicates')
+
+        self._batcher._add(
+            method='create_many',
+            model=models.User,
+            arguments={
+                'data': data,
+                'skipDuplicates': skip_duplicates,
+            },
+            root_selection=['count'],
+        )
+
+    def delete(
+        self,
+        where: types.UserWhereUniqueInput,
+        include: Optional[types.UserInclude] = None,
+    ) -> None:
+        self._batcher._add(
+            method='delete',
+            model=models.User,
+            arguments={
+                'where': where,
+                'include': include,
+            },
+        )
+
+    def update(
+        self,
+        data: types.UserUpdateInput,
+        where: types.UserWhereUniqueInput,
+        include: Optional[types.UserInclude] = None
+    ) -> None:
+        self._batcher._add(
+            method='update',
+            model=models.User,
+            arguments={
+                'data': data,
+                'where': where,
+                'include': include,
+            },
+        )
+
+    def upsert(
+        self,
+        where: types.UserWhereUniqueInput,
+        data: types.UserUpsertInput,
+        include: Optional[types.UserInclude] = None,
+    ) -> None:
+        self._batcher._add(
+            method='upsert',
+            model=models.User,
+            arguments={
+                'where': where,
+                'include': include,
+                'create': data.get('create'),
+                'update': data.get('update'),
+            },
+        )
+
+    def update_many(
+        self,
+        data: types.UserUpdateManyMutationInput,
+        where: types.UserWhereInput,
+    ) -> None:
+        self._batcher._add(
+            method='update_many',
+            model=models.User,
+            arguments={'data': data, 'where': where,},
+            root_selection=['count'],
+        )
+
+    def delete_many(
+        self,
+        where: Optional[types.UserWhereInput] = None,
+    ) -> None:
+        self._batcher._add(
+            method='delete_many',
+            model=models.User,
+            arguments={'where': where},
+            root_selection=['count'],
+        )
+
+
+
+# NOTE: some arguments are meaningless in this context but are included
+# for completeness sake
+class OrganizationBatchActions:
+    def __init__(self, batcher: Batch) -> None:
+        self._batcher = batcher
+
+    def create(
+        self,
+        data: types.OrganizationCreateInput,
+        include: Optional[types.OrganizationInclude] = None
+    ) -> None:
+        self._batcher._add(
+            method='create',
+            model=models.Organization,
+            arguments={
+                'data': data,
+                'include': include,
+            },
+        )
+
+    def create_many(
+        self,
+        data: List[types.OrganizationCreateWithoutRelationsInput],
+        *,
+        skip_duplicates: Optional[bool] = None,
+    ) -> None:
+        if skip_duplicates and self._batcher._active_provider in CREATE_MANY_SKIP_DUPLICATES_UNSUPPORTED:
+            raise errors.UnsupportedDatabaseError(self._batcher._active_provider, 'create_many_skip_duplicates')
+
+        self._batcher._add(
+            method='create_many',
+            model=models.Organization,
+            arguments={
+                'data': data,
+                'skipDuplicates': skip_duplicates,
+            },
+            root_selection=['count'],
+        )
+
+    def delete(
+        self,
+        where: types.OrganizationWhereUniqueInput,
+        include: Optional[types.OrganizationInclude] = None,
+    ) -> None:
+        self._batcher._add(
+            method='delete',
+            model=models.Organization,
+            arguments={
+                'where': where,
+                'include': include,
+            },
+        )
+
+    def update(
+        self,
+        data: types.OrganizationUpdateInput,
+        where: types.OrganizationWhereUniqueInput,
+        include: Optional[types.OrganizationInclude] = None
+    ) -> None:
+        self._batcher._add(
+            method='update',
+            model=models.Organization,
+            arguments={
+                'data': data,
+                'where': where,
+                'include': include,
+            },
+        )
+
+    def upsert(
+        self,
+        where: types.OrganizationWhereUniqueInput,
+        data: types.OrganizationUpsertInput,
+        include: Optional[types.OrganizationInclude] = None,
+    ) -> None:
+        self._batcher._add(
+            method='upsert',
+            model=models.Organization,
+            arguments={
+                'where': where,
+                'include': include,
+                'create': data.get('create'),
+                'update': data.get('update'),
+            },
+        )
+
+    def update_many(
+        self,
+        data: types.OrganizationUpdateManyMutationInput,
+        where: types.OrganizationWhereInput,
+    ) -> None:
+        self._batcher._add(
+            method='update_many',
+            model=models.Organization,
+            arguments={'data': data, 'where': where,},
+            root_selection=['count'],
+        )
+
+    def delete_many(
+        self,
+        where: Optional[types.OrganizationWhereInput] = None,
+    ) -> None:
+        self._batcher._add(
+            method='delete_many',
+            model=models.Organization,
+            arguments={'where': where},
+            root_selection=['count'],
+        )
+
+
+
+# NOTE: some arguments are meaningless in this context but are included
+# for completeness sake
+class OrganizationMemberBatchActions:
+    def __init__(self, batcher: Batch) -> None:
+        self._batcher = batcher
+
+    def create(
+        self,
+        data: types.OrganizationMemberCreateInput,
+        include: Optional[types.OrganizationMemberInclude] = None
+    ) -> None:
+        self._batcher._add(
+            method='create',
+            model=models.OrganizationMember,
+            arguments={
+                'data': data,
+                'include': include,
+            },
+        )
+
+    def create_many(
+        self,
+        data: List[types.OrganizationMemberCreateWithoutRelationsInput],
+        *,
+        skip_duplicates: Optional[bool] = None,
+    ) -> None:
+        if skip_duplicates and self._batcher._active_provider in CREATE_MANY_SKIP_DUPLICATES_UNSUPPORTED:
+            raise errors.UnsupportedDatabaseError(self._batcher._active_provider, 'create_many_skip_duplicates')
+
+        self._batcher._add(
+            method='create_many',
+            model=models.OrganizationMember,
+            arguments={
+                'data': data,
+                'skipDuplicates': skip_duplicates,
+            },
+            root_selection=['count'],
+        )
+
+    def delete(
+        self,
+        where: types.OrganizationMemberWhereUniqueInput,
+        include: Optional[types.OrganizationMemberInclude] = None,
+    ) -> None:
+        self._batcher._add(
+            method='delete',
+            model=models.OrganizationMember,
+            arguments={
+                'where': where,
+                'include': include,
+            },
+        )
+
+    def update(
+        self,
+        data: types.OrganizationMemberUpdateInput,
+        where: types.OrganizationMemberWhereUniqueInput,
+        include: Optional[types.OrganizationMemberInclude] = None
+    ) -> None:
+        self._batcher._add(
+            method='update',
+            model=models.OrganizationMember,
+            arguments={
+                'data': data,
+                'where': where,
+                'include': include,
+            },
+        )
+
+    def upsert(
+        self,
+        where: types.OrganizationMemberWhereUniqueInput,
+        data: types.OrganizationMemberUpsertInput,
+        include: Optional[types.OrganizationMemberInclude] = None,
+    ) -> None:
+        self._batcher._add(
+            method='upsert',
+            model=models.OrganizationMember,
+            arguments={
+                'where': where,
+                'include': include,
+                'create': data.get('create'),
+                'update': data.get('update'),
+            },
+        )
+
+    def update_many(
+        self,
+        data: types.OrganizationMemberUpdateManyMutationInput,
+        where: types.OrganizationMemberWhereInput,
+    ) -> None:
+        self._batcher._add(
+            method='update_many',
+            model=models.OrganizationMember,
+            arguments={'data': data, 'where': where,},
+            root_selection=['count'],
+        )
+
+    def delete_many(
+        self,
+        where: Optional[types.OrganizationMemberWhereInput] = None,
+    ) -> None:
+        self._batcher._add(
+            method='delete_many',
+            model=models.OrganizationMember,
+            arguments={'where': where},
+            root_selection=['count'],
+        )
+
+
+
+# NOTE: some arguments are meaningless in this context but are included
+# for completeness sake
+class InvitationBatchActions:
+    def __init__(self, batcher: Batch) -> None:
+        self._batcher = batcher
+
+    def create(
+        self,
+        data: types.InvitationCreateInput,
+        include: Optional[types.InvitationInclude] = None
+    ) -> None:
+        self._batcher._add(
+            method='create',
+            model=models.Invitation,
+            arguments={
+                'data': data,
+                'include': include,
+            },
+        )
+
+    def create_many(
+        self,
+        data: List[types.InvitationCreateWithoutRelationsInput],
+        *,
+        skip_duplicates: Optional[bool] = None,
+    ) -> None:
+        if skip_duplicates and self._batcher._active_provider in CREATE_MANY_SKIP_DUPLICATES_UNSUPPORTED:
+            raise errors.UnsupportedDatabaseError(self._batcher._active_provider, 'create_many_skip_duplicates')
+
+        self._batcher._add(
+            method='create_many',
+            model=models.Invitation,
+            arguments={
+                'data': data,
+                'skipDuplicates': skip_duplicates,
+            },
+            root_selection=['count'],
+        )
+
+    def delete(
+        self,
+        where: types.InvitationWhereUniqueInput,
+        include: Optional[types.InvitationInclude] = None,
+    ) -> None:
+        self._batcher._add(
+            method='delete',
+            model=models.Invitation,
+            arguments={
+                'where': where,
+                'include': include,
+            },
+        )
+
+    def update(
+        self,
+        data: types.InvitationUpdateInput,
+        where: types.InvitationWhereUniqueInput,
+        include: Optional[types.InvitationInclude] = None
+    ) -> None:
+        self._batcher._add(
+            method='update',
+            model=models.Invitation,
+            arguments={
+                'data': data,
+                'where': where,
+                'include': include,
+            },
+        )
+
+    def upsert(
+        self,
+        where: types.InvitationWhereUniqueInput,
+        data: types.InvitationUpsertInput,
+        include: Optional[types.InvitationInclude] = None,
+    ) -> None:
+        self._batcher._add(
+            method='upsert',
+            model=models.Invitation,
+            arguments={
+                'where': where,
+                'include': include,
+                'create': data.get('create'),
+                'update': data.get('update'),
+            },
+        )
+
+    def update_many(
+        self,
+        data: types.InvitationUpdateManyMutationInput,
+        where: types.InvitationWhereInput,
+    ) -> None:
+        self._batcher._add(
+            method='update_many',
+            model=models.Invitation,
+            arguments={'data': data, 'where': where,},
+            root_selection=['count'],
+        )
+
+    def delete_many(
+        self,
+        where: Optional[types.InvitationWhereInput] = None,
+    ) -> None:
+        self._batcher._add(
+            method='delete_many',
+            model=models.Invitation,
             arguments={'where': where},
             root_selection=['count'],
         )
