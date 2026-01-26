@@ -1,6 +1,8 @@
 from typing import Optional
-from fastapi import Depends, HTTPException, Security
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+from fastapi import HTTPException, Security
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
 from ...database import db
 from .utils import verify_clerk_token
 

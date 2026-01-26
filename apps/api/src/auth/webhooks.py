@@ -1,7 +1,9 @@
 import os
 from datetime import datetime
-from fastapi import Request, HTTPException
+
+from fastapi import HTTPException, Request
 from svix.webhooks import Webhook, WebhookVerificationError
+
 from ...database import db
 
 CLERK_WEBHOOK_SECRET = os.getenv("CLERK_WEBHOOK_SECRET")

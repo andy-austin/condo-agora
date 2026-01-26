@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Request, BackgroundTasks
-from .webhooks import verify_clerk_webhook, handle_user_created, handle_user_updated
+from fastapi import APIRouter, BackgroundTasks, Request
+
+from .webhooks import handle_user_created, handle_user_updated, verify_clerk_webhook
 
 router = APIRouter(prefix="/webhooks")
 

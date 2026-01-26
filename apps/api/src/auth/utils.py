@@ -1,7 +1,8 @@
 import os
+
 import jwt
-from jwt import PyJWKClient
 from fastapi import HTTPException
+from jwt import PyJWKClient
 
 CLERK_ISSUER_URL = os.getenv("CLERK_ISSUER_URL")
 JWKS_URL = f"{CLERK_ISSUER_URL}/.well-known/jwks.json" if CLERK_ISSUER_URL else None

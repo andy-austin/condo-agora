@@ -1,7 +1,7 @@
-import strawberry
 from typing import Any
-from ..src.auth.service import create_invitation as service_create_invitation
+
 from ..graphql_types.auth import Invitation, Role
+from ..src.auth.service import create_invitation as service_create_invitation
 
 
 async def resolve_create_invitation(

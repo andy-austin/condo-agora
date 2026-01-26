@@ -1,6 +1,7 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from fastapi import HTTPException
+
+import pytest
+
 from apps.api.src.auth.webhooks import handle_user_created, handle_user_updated
 
 

@@ -1,11 +1,11 @@
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from strawberry.fastapi import GraphQLRouter
 
 from .database import db
 from .schema import schema
-from .src.auth.router import router as auth_router
 from .src.auth.dependencies import get_current_user_optional
+from .src.auth.router import router as auth_router
 
 app = FastAPI(root_path="/api")
 

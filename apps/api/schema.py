@@ -1,8 +1,8 @@
 import strawberry
 
+from .schemas.auth import AuthMutations
 from .schemas.health import HealthQueries
 from .schemas.note import NoteMutations, NoteQueries
-from .schemas.auth import AuthMutations
 
 
 @strawberry.type

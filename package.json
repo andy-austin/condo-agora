@@ -13,16 +13,16 @@
     "migrate": "pnpm --filter api run prisma:migrate"
   },
   "devDependencies": {
-    "turbo": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",
     "eslint-plugin-react": "^7.33.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^9.0.0",
-    "lint-staged": "^15.0.0"
+    "lint-staged": "^15.0.0",
+    "turbo": "^2.0.0"
   },
-  "packageManager": "pnpm@8.15.6",
+  "packageManager": "pnpm@10.28.1",
   "engines": {
     "node": ">=18"
   },

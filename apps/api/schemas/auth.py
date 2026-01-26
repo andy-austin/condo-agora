@@ -1,6 +1,7 @@
 import strawberry
-from ..resolvers.auth import resolve_create_invitation
+
 from ..graphql_types.auth import Invitation
+from ..resolvers.auth import resolve_create_invitation
 
 
 @strawberry.type

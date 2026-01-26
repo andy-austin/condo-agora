@@ -34,9 +34,9 @@ function getLocaleFromHeaders(acceptLanguage: string | null): string {
   return defaultLocale;
 }
 
-export default clerkMiddleware((auth, request) => {
+export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
-    auth().protect();
+    await auth.protect();
   }
 
   // 2. Locale Management
