@@ -54,18 +54,23 @@ jobs:
       - name: Pull Vercel environment
         run: vercel pull --yes --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Build with Vercel
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          PRISMA_SKIP_FETCH_ENGINE: 1
+
       - name: Deploy to Vercel (Production)
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         id: deploy-prod
         run: |
-          URL=$(vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }})
+          URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Vercel (Preview)
         if: github.event_name == 'pull_request'
         id: deploy-preview
         run: |
-          URL=$(vercel deploy --token=${{ secrets.VERCEL_TOKEN }})
+          URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Comment preview URL on PR
