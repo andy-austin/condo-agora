@@ -4,15 +4,60 @@
 #   - apps/api/bin/
 # so that the pre-generated Prisma client and query engine binaries get uploaded.
 
-# Byte-compiled / optimized / DLL files
+# === Files NOT needed at runtime ===
+
+# Documentation
+docs/
+*.md
+LICENSE
+
+# Tests
+apps/api/tests/
+apps/web/tests/
+
+# CI/CD and git config
+.github/
+.git/
+.pre-commit-config.yaml
+setup.sh
+
+# IDE and editor configs
+.idea/
+.vscode/
+.cursorignore
+.cursorindexingignore
+
+# AI agent configs
+.gemini/
+.claude/
+.specify/
+.mcp.json
+GEMINI.md
+
+# Husky and git hooks (not needed in deploy)
+.husky/
+
+# TurboRepo cache
+.turbo/
+turbo.json
+
+# Lock files (dependencies resolved at build time)
+pnpm-lock.yaml
+
+# Root config files not needed at runtime
+pyproject.toml
+tsconfig.json
+.env.example
+
+# === Standard ignores ===
+
+# Python bytecode
 __pycache__/
 *.py[codz]
 *$py.class
-
-# C extensions
 *.so
 
-# Distribution / packaging
+# Python packaging
 .Python
 build/
 develop-eggs/
@@ -21,7 +66,6 @@ downloads/
 eggs/
 .eggs/
 **/lib/python*
-**/__pycache__/lib/
 lib64/
 parts/
 sdist/
@@ -32,16 +76,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-
-# PyInstaller
 *.manifest
 *.spec
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
+# Python test/coverage
 htmlcov/
 .tox/
 .nox/
@@ -56,55 +94,7 @@ coverage.xml
 .pytest_cache/
 cover/
 
-# Translations
-*.mo
-*.pot
-
-# Django stuff
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff
-instance/
-.webassets-cache
-
-# Scrapy stuff
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-.pybuilder/
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pdm
-.pdm-python
-.pdm-build/
-
-# pixi
-.pixi
-
-# PEP 582
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
+# Python environments
 .env
 .envrc
 .venv
@@ -114,93 +104,50 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
+# Python tools
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
-# Pyre type checker
 .pyre/
-
-# pytype static type analyzer
 .pytype/
-
-# Cython debug symbols
 cython_debug/
-
-# PyCharm
-.idea/
-
-# Abstra
+.ruff_cache/
+.pypirc
+.pdm-python
+.pdm-build/
+.pixi
+__pypackages__/
 .abstra/
 
-# Ruff stuff
-.ruff_cache/
-
-# PyPI configuration file
-.pypirc
-
-# Cursor
-.cursorignore
-.cursorindexingignore
-
-# Marimo
-marimo/_static/
-marimo/_lsp/
-__marimo__/
-
-# Node modules
+# Node
 node_modules/
 .npm/
 .eslintcache
 .pnpmrc
+*.tsbuildinfo
 
-# Environment variables file
-.env
+# Env files
 .env.local
 .env.*
 !.env.example
-!.env.*.example
 
-# TurboRepo
-.turbo/
-.cache/
+# Frameworks
 .next/
 .out/
 .nuxt/
+.cache/
+.swc/
 
-# TypeScript build cache
-*.tsbuildinfo
-
-# Pre commit hooks and husky
-.pre-commit/
-.husky
-.husky/_/
+# Vercel local
 .vercel
+
+# Clerk local
 apps/web/.clerk/
 
-# Local SQLite database files
+# OS files
+.DS_Store
 *.sqlite3
 *.db
-.mcp.json
-.DS_Store
-
-# AI Agents local config files
-.gemini/
-.claude/
-/.specify/
-/apps/web/.clerk/.tmp/keyless.json
-/apps/web/.clerk/.tmp/README.md
-/apps/web/.clerk/.tmp/telemetry.json
-/apps/web/.env.local
-/apps/web/.gitignore
+*.log
+*.mo
+*.pot

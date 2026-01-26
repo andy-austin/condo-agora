@@ -1,5 +1,5 @@
+# Runtime dependencies only (dev deps in pyproject.toml)
 fastapi>=0.104.0
-uvicorn[standard]>=0.24.0
 strawberry-graphql[fastapi]>=0.213.0
 python-dotenv>=1.0.0
 pydantic>=2.0.0
@@ -10,12 +10,3 @@ prisma>=0.15.0
 # Auth (Clerk integration)
 svix>=1.0.0
 PyJWT[crypto]>=2.8.0
-
-# Development dependencies
-black>=24.0.0
-isort>=5.13.0
-flake8>=7.0.0
-pytest>=7.4.0
-pytest-asyncio>=0.21.0
-pytest-cov>=4.1.0
-httpx>=0.25.0
