@@ -37,8 +37,15 @@ jobs:
       - name: Copy query engine binary
         run: |
           mkdir -p apps/api/bin
-          cp ~/.cache/prisma-python/binaries/*/node_modules/prisma/query-engine-rhel-* apps/api/bin/ 2>/dev/null || \
-          cp ~/.cache/prisma-python/binaries/*/node_modules/@prisma/engines/query-engine-rhel-* apps/api/bin/ 2>/dev/null || true
+          # Find the rhel query engine binary wherever prisma cached it
+          ENGINE=$(find ~/.cache -name "query-engine-rhel-openssl-3.0.x" -type f 2>/dev/null | head -1)
+          if [ -n "$ENGINE" ]; then
+            cp "$ENGINE" apps/api/bin/
+            echo "Copied engine from: $ENGINE"
+          else
+            echo "Warning: rhel query engine not found, searching all engines..."
+            find ~/.cache -name "query-engine-*" -type f 2>/dev/null || echo "No engines found"
+          fi
           ls -la apps/api/bin/
 
       - name: Setup Node.js
@@ -68,7 +75,7 @@ jobs:
           echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Vercel (Preview)
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
         id: deploy-preview
         run: |
           URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
