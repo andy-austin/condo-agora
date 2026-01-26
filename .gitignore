@@ -253,3 +253,6 @@ apps/web/.clerk/
 /apps/web/.clerk/.tmp/README.md
 /apps/web/.clerk/.tmp/telemetry.json
 /apps/web/.env.local
+
+# Prisma generated client (regenerate with: pnpm --filter api run prisma:generate)
+apps/api/prisma_client/
