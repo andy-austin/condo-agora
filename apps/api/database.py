@@ -1,7 +1,19 @@
 import os
+import platform
+from pathlib import Path
 
 from dotenv import load_dotenv
-from prisma import Prisma
+
+# Set PRISMA_QUERY_ENGINE_BINARY for Linux (Vercel/serverless) before importing Prisma
+if platform.system() == "Linux":
+    _api_dir = Path(__file__).parent
+    _bin_dir = _api_dir / "bin"
+    for _f in _bin_dir.iterdir() if _bin_dir.exists() else []:
+        if _f.name.startswith("query-engine-") and _f.is_file():
+            os.environ["PRISMA_QUERY_ENGINE_BINARY"] = str(_f)
+            break
+
+from .prisma_client import Prisma  # noqa: E402
 
 # Load environment variables from the root directory
 env_path = os.path.join(

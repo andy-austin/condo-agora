@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timedelta
 
-from prisma.enums import Role
+from ...prisma_client.enums import Role
 
 from ...database import db
 

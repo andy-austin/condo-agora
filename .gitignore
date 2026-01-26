@@ -255,5 +255,6 @@ apps/web/.clerk/
 /apps/web/.env.local
 /apps/web/.gitignore
 
-# Prisma generated client (regenerate with: pnpm --filter api run prisma:generate)
+# Prisma generated (auto-generated at build time via prisma generate)
 apps/api/prisma_client/
+apps/api/bin/
