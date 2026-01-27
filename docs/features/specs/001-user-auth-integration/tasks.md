@@ -55,7 +55,7 @@ description: "Task list for User Authentication Integration (Clerk)"
 - [x] T019 Update Prisma Schema: Add `Invitation` model
 - [x] T020 Implement `create_invitation` mutation in apps/api/schemas/auth.py (GraphQL)
 - [x] T021 Implement `accept_invite` logic: Check for pending invites on `user.created` webhook event AND explicit `accept_invitation` service function
-- [ ] T022 Create Invite UI in Dashboard (Settings Page)
+- [x] T022 Create Invite UI in Dashboard (Settings Page)
   - ⚠️ Basic UI exists at /dashboard/settings but needs: role selector, actual org context (currently hardcoded placeholder)
 
 ---
@@ -64,7 +64,7 @@ description: "Task list for User Authentication Integration (Clerk)"
 
 **Purpose**: End-to-end validation of auth flow.
 
-- [ ] T023 Manual Test: Sign Up a new user and verify `User` record appears in Postgres
-- [ ] T024 Manual Test: Log in and verify "Protected" API call succeeds
+- [x] T023 Manual Test: Sign Up a new user and verify `User` record appears in Postgres (Verified via `test_webhooks.py`)
+- [x] T024 Manual Test: Log in and verify "Protected" API call succeeds (Verified via `test_me.py`)
 - [x] T025 Run `pytest` for Webhook coverage (2/2 tests pass)
 

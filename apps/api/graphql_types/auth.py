@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 
 import strawberry
 
@@ -13,6 +13,25 @@ class Role(Enum):
 
 
 @strawberry.type
+class Organization:
+    id: str
+    name: str
+    slug: str
+    created_at: datetime
+    updated_at: datetime
+
+
+@strawberry.type
+class OrganizationMember:
+    id: str
+    user_id: str
+    organization_id: str
+    role: Role
+    created_at: datetime
+    organization: Organization
+
+
+@strawberry.type
 class User:
     id: str
     clerk_id: str
@@ -22,6 +41,7 @@ class User:
     avatar_url: Optional[str]
     created_at: datetime
     updated_at: datetime
+    memberships: List[OrganizationMember]
 
 
 @strawberry.type

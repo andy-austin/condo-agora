@@ -71,3 +71,16 @@ async def accept_invitation(token: str, user_id: str):
     )
 
     return updated_invitation, None
+
+
+async def get_user_with_memberships(user_id: str):
+    """
+    Fetches a user by ID, including their organization memberships.
+    """
+    if not db.is_connected():
+        await db.connect()
+
+    return await db.user.find_unique(
+        where={"id": user_id},
+        include={"memberships": {"include": {"organization": True}}},
+    )

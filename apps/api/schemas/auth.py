@@ -1,7 +1,14 @@
+from typing import Optional
+
 import strawberry
 
-from ..graphql_types.auth import Invitation
-from ..resolvers.auth import resolve_create_invitation
+from ..graphql_types.auth import Invitation, User
+from ..resolvers.auth import resolve_create_invitation, resolve_me
+
+
+@strawberry.type
+class AuthQueries:
+    me: Optional[User] = strawberry.field(resolver=resolve_me)
 
 
 @strawberry.type

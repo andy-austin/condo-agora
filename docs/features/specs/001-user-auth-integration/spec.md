@@ -60,10 +60,19 @@ Backend services must validate requests authenticated via Clerk.
 - **FR-001**: System MUST utilize **Clerk** for all authentication flows (Login, Register, SSO, Password Reset).
 - **FR-002**: Frontend MUST use `@clerk/nextjs` middleware to protect private routes.
 - **FR-003**: Backend MUST expose a public Webhook endpoint to receive `user.created` and `user.updated` events from Clerk.
+  - **FR-003a**: The endpoint MUST handle duplicate events idempotently (e.g. by checking if the update has already been applied).
+  - **FR-003b**: The endpoint MUST return a 5xx error code for transient failures to trigger Clerk's automatic retry mechanism (exponential backoff).
 - **FR-004**: System MUST verify the cryptographic signature of incoming Webhooks using `svix` to ensure they originate from Clerk.
 - **FR-005**: Backend MUST verify Clerk-issued JWTs attached to API requests to authenticate users.
 - **FR-006**: System MUST maintain a local `User` table in Postgres that is synchronized with Clerk data.
+  - **FR-006a**: Handle `user.updated` events to sync email address changes.
+  - **FR-006b**: Handle `user.deleted` events by performing a soft-delete on the local User record (retaining data for audit).
 - **FR-007**: System MUST allow users to invite others via email; if the invitee does not exist, they are prompted to sign up via Clerk.
+  - **FR-007a**: Invitations MUST be sent via email (SMTP or service).
+  - **FR-007b**: Invitation links MUST expire after 7 days.
+  - **FR-007c**: If an existing user clicks an invitation link, they SHOULD be added to the Organization immediately upon login.
+- **FR-008**: System MUST log all failed webhook attempts and unauthorized access attempts for security auditing.
+- **FR-009**: The public webhook endpoint MUST be rate-limited to prevent abuse (e.g. 100 req/min/IP).
 
 ### Key Entities
 
