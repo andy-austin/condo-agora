@@ -10,6 +10,14 @@ apps/web/
 │   ├── layout.tsx                # Root layout (HTML structure)
 │   ├── page.tsx                  # Home/landing page
 │   ├── globals.css               # Global styles + Tailwind
+│   ├── dashboard/                # Protected Dashboard
+│   │   ├── layout.tsx            # Dashboard layout (Navbar with UserButton)
+│   │   ├── page.tsx              # Dashboard home
+│   │   └── settings/             # User settings & Invites
+│   ├── sign-in/[[...sign-in]]/   # Clerk Sign In
+│   │   └── page.tsx
+│   ├── sign-up/[[...sign-up]]/   # Clerk Sign Up
+│   │   └── page.tsx
 │   └── health/
 │       └── page.tsx              # Health status page
 │
@@ -32,6 +40,7 @@ apps/web/
 │       └── index.ts              # Exports
 │
 ├── hooks/
+│   ├── use-auth-token.ts         # Clerk token retrieval hook
 │   └── useGraphQLStatus.ts       # GraphQL health hook
 │
 ├── lib/

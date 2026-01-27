@@ -31,17 +31,27 @@ apps/api/
 ├── index.py              # FastAPI application entry
 ├── database.py           # Prisma client initialization
 ├── schema.py             # Root GraphQL schema
+├── src/                  # Core Business Logic
+│   └── auth/
+│       ├── dependencies.py # Auth dependencies (get_current_user)
+│       ├── router.py       # Webhook routes
+│       ├── service.py      # Auth services (invitations)
+│       ├── utils.py        # Token verification
+│       └── webhooks.py     # Clerk webhook handlers
 ├── graphql_types/        # Strawberry type definitions
 │   ├── __init__.py
+│   ├── auth.py           # User, Organization, Invitation
 │   ├── health.py         # HealthStatus, ServiceStatus, DatabaseStatus
 │   └── note.py           # Note, CreateNoteInput, UpdateNoteInput
 ├── schemas/              # GraphQL query/mutation generators
 │   ├── __init__.py
+│   ├── auth.py           # AuthMutations, AuthQueries
 │   ├── base.py           # BaseSchemaGenerator (generic pattern)
 │   ├── health.py         # HealthQueries
 │   └── note.py           # NoteQueries, NoteMutations
 ├── resolvers/            # Business logic / data access
 │   ├── __init__.py
+│   ├── auth.py           # AuthResolver (me, create_invitation)
 │   ├── base.py           # BaseResolver (generic CRUD)
 │   ├── health.py         # HealthResolver
 │   └── note.py           # NoteResolver
