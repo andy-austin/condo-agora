@@ -68,7 +68,12 @@ jobs:
           fi
 
       - name: Build with Vercel
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+          else
+            vercel build --token=${{ secrets.VERCEL_TOKEN }}
+          fi
         env:
           PRISMA_SKIP_FETCH_ENGINE: 1
 
