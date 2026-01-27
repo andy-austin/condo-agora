@@ -220,7 +220,10 @@ apps/api/prisma_client/
 
 # Environment variables file
 .env
+.env.local
+.env.*
 !.env.example
+!.env.*.example
 
 # TurboRepo
 .turbo/
@@ -237,6 +240,7 @@ apps/api/prisma_client/
 .husky
 .husky/_/
 .vercel
+apps/web/.clerk/
 
 # Local SQLite database files
 *.sqlite3
@@ -248,3 +252,12 @@ apps/api/prisma_client/
 .gemini/
 .claude/
 /.specify/
+/apps/web/.clerk/.tmp/keyless.json
+/apps/web/.clerk/.tmp/README.md
+/apps/web/.clerk/.tmp/telemetry.json
+/apps/web/.env.local
+/apps/web/.gitignore
+
+# Prisma generated (auto-generated at build time via prisma generate)
+apps/api/prisma_client/
+apps/api/bin/

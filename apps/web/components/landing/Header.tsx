@@ -5,6 +5,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Menu } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,12 +36,19 @@ export function Header() {
 
           <div className="hidden lg:flex items-center gap-4">
             <LanguageSwitcher />
-            <Button variant="ghost" className="text-sm font-medium">
-              {t('login')}
-            </Button>
-            <Button className="btn-primary text-sm py-2.5 px-6">
-              {t('requestDemo')}
-            </Button>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button variant="ghost" className="text-sm font-medium">
+                  {t('login')}
+                </Button>
+              </SignInButton>
+              <Button className="btn-primary text-sm py-2.5 px-6">
+                {t('requestDemo')}
+              </Button>
+            </SignedOut>
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
           </div>
 
           <button
@@ -65,12 +73,19 @@ export function Header() {
               </a>
               <div className="flex flex-col gap-2 pt-4">
                 <LanguageSwitcher />
-                <Button variant="ghost" className="justify-start">
-                  {t('login')}
-                </Button>
-                <Button className="btn-primary">
-                  {t('requestDemo')}
-                </Button>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <Button variant="ghost" className="justify-start">
+                      {t('login')}
+                    </Button>
+                  </SignInButton>
+                  <Button className="btn-primary">
+                    {t('requestDemo')}
+                  </Button>
+                </SignedOut>
+                <SignedIn>
+                  <UserButton afterSignOutUrl="/" />
+                </SignedIn>
               </div>
             </nav>
           </div>

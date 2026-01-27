@@ -1,6 +1,7 @@
 # Condo Agora
 
-**Production-ready full-stack template** combining React and Python, designed for high performance and scalability. Deployed on Vercel.
+**Production-ready full-stack template** combining React and Python, designed for high performance and scalability.
+Deployed on Vercel.
 
 ## Features
 
@@ -35,6 +36,7 @@ cd condo-agora
 ```
 
 This script will:
+
 - Install Node.js dependencies (pnpm)
 - Install Python dependencies (uv + virtual environment)
 - Start a PostgreSQL database in Docker
@@ -50,6 +52,7 @@ pnpm dev
 ```
 
 The application will be available at:
+
 - **Frontend**: [http://localhost:3000](http://localhost:3000)
 - **API (direct)**: [http://localhost:8000](http://localhost:8000)
 - **GraphQL Playground**: [http://localhost:8000/graphql](http://localhost:8000/graphql)
@@ -76,15 +79,15 @@ pnpm migrate
 
 ## Common Commands
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start development servers |
-| `pnpm build` | Build for production |
-| `pnpm lint` | Run all linters |
-| `pnpm lint:fix` | Fix linting issues |
-| `pnpm test` | Run tests |
-| `pnpm typecheck` | Check TypeScript types |
-| `pnpm migrate` | Run database migrations |
+| Command          | Description               |
+|------------------|---------------------------|
+| `pnpm dev`       | Start development servers |
+| `pnpm build`     | Build for production      |
+| `pnpm lint`      | Run all linters           |
+| `pnpm lint:fix`  | Fix linting issues        |
+| `pnpm test`      | Run tests                 |
+| `pnpm typecheck` | Check TypeScript types    |
+| `pnpm migrate`   | Run database migrations   |
 
 ## Project Structure
 
@@ -107,8 +110,8 @@ condo-agora/
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
+| Variable       | Description                  | Default                                                     |
+|----------------|------------------------------|-------------------------------------------------------------|
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://postgres:postgres@localhost:5432/condo_agora` |
 
 ## Deployment

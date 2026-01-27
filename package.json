@@ -23,7 +23,7 @@
     "prisma": "^5.22.0",
     "turbo": "^2.0.0"
   },
-  "packageManager": "pnpm@8.15.6",
+  "packageManager": "pnpm@10.28.1",
   "engines": {
     "node": ">=18"
   },

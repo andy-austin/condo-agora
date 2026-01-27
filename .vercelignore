@@ -1,0 +1,153 @@
+# When .vercelignore exists, Vercel uses it INSTEAD of .gitignore for upload
+# filtering. This mirrors .gitignore but intentionally OMITS:
+#   - apps/api/prisma_client/
+#   - apps/api/bin/
+# so that the pre-generated Prisma client and query engine binaries get uploaded.
+
+# === Files NOT needed at runtime ===
+
+# Documentation
+docs/
+*.md
+LICENSE
+
+# Tests
+apps/api/tests/
+apps/web/tests/
+
+# CI/CD and git config
+.github/
+.git/
+.pre-commit-config.yaml
+setup.sh
+
+# IDE and editor configs
+.idea/
+.vscode/
+.cursorignore
+.cursorindexingignore
+
+# AI agent configs
+.gemini/
+.claude/
+.specify/
+.mcp.json
+GEMINI.md
+
+# Husky and git hooks (not needed in deploy)
+.husky/
+
+# TurboRepo cache
+.turbo/
+turbo.json
+
+# Lock files (dependencies resolved at build time)
+pnpm-lock.yaml
+
+# Root config files not needed at runtime
+pyproject.toml
+tsconfig.json
+.env.example
+
+# === Standard ignores ===
+
+# Python bytecode
+__pycache__/
+*.py[codz]
+*$py.class
+*.so
+
+# Python packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+**/lib/python*
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.manifest
+*.spec
+
+# Python test/coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py.cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Python environments
+.env
+.envrc
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python tools
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+cython_debug/
+.ruff_cache/
+.pypirc
+.pdm-python
+.pdm-build/
+.pixi
+__pypackages__/
+.abstra/
+
+# Node
+node_modules/
+.npm/
+.eslintcache
+.pnpmrc
+*.tsbuildinfo
+
+# Env files
+.env.local
+.env.*
+!.env.example
+
+# Frameworks
+.next/
+.out/
+.nuxt/
+.cache/
+.swc/
+
+# Vercel local
+.vercel
+
+# Clerk local
+apps/web/.clerk/
+
+# OS files
+.DS_Store
+*.sqlite3
+*.db
+*.log
+*.mo
+*.pot

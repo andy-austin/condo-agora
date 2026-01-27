@@ -1,11 +1,17 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from strawberry.fastapi import GraphQLRouter
 
 from .database import db
 from .schema import schema
+from .src.auth.dependencies import get_current_user_optional
+from .src.auth.router import router as auth_router
 
 app = FastAPI(root_path="/api")
+
+
+async def get_context(user=Depends(get_current_user_optional)):
+    return {"user": user}
 
 
 @app.on_event("startup")
@@ -27,7 +33,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-router = GraphQLRouter(schema, path="/graphql")
+app.include_router(auth_router)
+router = GraphQLRouter(schema, path="/graphql", context_getter=get_context)
 app.include_router(router)
 
 
