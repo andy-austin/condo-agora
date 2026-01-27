@@ -71,7 +71,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         id: deploy-prod
         run: |
-          URL=$(vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }})
+          URL=$(vercel deploy --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Vercel (Preview)
