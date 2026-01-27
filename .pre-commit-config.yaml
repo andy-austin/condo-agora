@@ -11,15 +11,15 @@ repos:
     hooks:
       - id: isort
         files: ^apps/api/.*\.py$
-        args: ["--profile", "black"]
+        args: [ "--profile", "black" ]
 
   - repo: https://github.com/pycqa/flake8
     rev: 7.1.1
     hooks:
       - id: flake8
         files: ^apps/api/.*\.py$
-        args: ["--max-line-length=120"]
-        additional_dependencies: [flake8-black, flake8-isort]
+        args: [ "--max-line-length=120" ]
+        additional_dependencies: [ flake8-black, flake8-isort ]
 
   # General file formatting
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -34,9 +34,9 @@ repos:
       - id: check-toml
       - id: check-merge-conflict
       - id: check-added-large-files
-        args: ['--maxkb=1000']
+        args: [ '--maxkb=1000' ]
       - id: mixed-line-ending
-        args: ['--fix=lf']
+        args: [ '--fix=lf' ]
 
   # Markdown and documentation
   - repo: local
@@ -45,7 +45,7 @@ repos:
         name: markdownlint
         entry: npx markdownlint-cli --fix
         language: system
-        types: [markdown]
+        types: [ markdown ]
         exclude: node_modules/
 
 # Configuration
@@ -58,5 +58,5 @@ ci:
   autoupdate_branch: ''
   autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
   autoupdate_schedule: weekly
-  skip: []
+  skip: [ ]
   submodules: false

@@ -4,11 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Condo Agora is a full-stack monorepo combining Next.js (frontend) and FastAPI with Strawberry GraphQL (backend), deployed on Vercel. Uses TurboRepo for build orchestration.
+Condo Agora is a full-stack monorepo combining Next.js (frontend) and FastAPI with Strawberry GraphQL (backend),
+deployed on Vercel. Uses TurboRepo for build orchestration.
 
 ## Commands
 
 ### Development
+
 ```bash
 pnpm dev                    # Start both frontend (3000) and backend (8000)
 pnpm build                  # Build all packages
@@ -20,6 +22,7 @@ pnpm migrate                # Run Prisma database migrations
 ```
 
 ### Single App Commands
+
 ```bash
 pnpm --filter web dev       # Run frontend only
 pnpm --filter api dev       # Run backend only
@@ -28,6 +31,7 @@ pnpm --filter api test      # Run backend tests only
 ```
 
 ### Database
+
 ```bash
 pnpm --filter api run prisma:generate   # Generate Prisma client
 pnpm --filter api run prisma:migrate    # Run migrations
@@ -35,6 +39,7 @@ pnpm --filter api run prisma:studio     # Open Prisma Studio
 ```
 
 ### Running Single Tests
+
 ```bash
 # Frontend (Jest)
 cd apps/web && pnpm test -- --testPathPattern="<pattern>"
@@ -46,16 +51,19 @@ cd ../.. && .venv/bin/python -m pytest apps/api/tests/<test_file.py>::<test_func
 ## Architecture
 
 ### Frontend (`apps/web/`)
+
 - Next.js 14 with App Router, TypeScript, Tailwind CSS
 - GraphQL client using Apollo Client / graphql-request
 - Development: `/api/graphql` requests are rewritten to `localhost:8000/graphql` via `next.config.js`
 
 ### Backend (`apps/api/`)
+
 - FastAPI with Strawberry GraphQL at `/api/graphql`
 - Prisma Python Client for PostgreSQL (async)
 - Entry point: `apps/api/index.py` with `app` FastAPI instance
 
 ### GraphQL Layer Structure
+
 ```
 apps/api/
 ├── schema.py              # Strawberry schema combining all queries/mutations
@@ -67,6 +75,7 @@ apps/api/
 ```
 
 **Pattern for adding new entities:**
+
 1. Add model to `apps/api/prisma/schema.prisma`
 2. Create GraphQL types in `graphql_types/<entity>.py`
 3. Create resolver in `resolvers/<entity>.py` (extend `BaseResolver`)
@@ -74,11 +83,13 @@ apps/api/
 5. Register in `schema.py` Query/Mutation classes
 
 ### Production Routing
+
 Handled by `vercel.json`: `/api/*` routes to Python serverless function, everything else to Next.js.
 
 ## Coding Conventions
 
 ### Python (Backend)
+
 - Black formatter (line length 88)
 - isort for imports (black profile)
 - flake8 for linting (max line 120)
@@ -86,6 +97,7 @@ Handled by `vercel.json`: `/api/*` routes to Python serverless function, everyth
 - GraphQL uses snake_case, Prisma models use camelCase - conversion handled in `BaseSchemaGenerator.model_to_graphql()`
 
 ### TypeScript (Frontend)
+
 - Strict mode enabled
 - Tailwind CSS for styling
 - ESLint with Next.js config
@@ -99,13 +111,13 @@ Handled by `vercel.json`: `/api/*` routes to Python serverless function, everyth
 
 For comprehensive documentation, see the `docs/` folder:
 
-| Document | Purpose |
-|----------|---------|
-| [docs/OVERVIEW.md](docs/OVERVIEW.md) | System architecture and data flow |
-| [docs/BACKEND.md](docs/BACKEND.md) | FastAPI, GraphQL, resolver patterns |
-| [docs/FRONTEND.md](docs/FRONTEND.md) | Next.js, React components, hooks |
-| [docs/DATABASE.md](docs/DATABASE.md) | Prisma schema, migrations, queries |
-| [docs/GRAPHQL.md](docs/GRAPHQL.md) | GraphQL types, queries, mutations |
-| [docs/TESTING.md](docs/TESTING.md) | Jest and Pytest patterns |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel deployment configuration |
-| [docs/PATTERNS.md](docs/PATTERNS.md) | Code patterns for extending the codebase |
+| Document                                 | Purpose                                  |
+|------------------------------------------|------------------------------------------|
+| [docs/OVERVIEW.md](docs/OVERVIEW.md)     | System architecture and data flow        |
+| [docs/BACKEND.md](docs/BACKEND.md)       | FastAPI, GraphQL, resolver patterns      |
+| [docs/FRONTEND.md](docs/FRONTEND.md)     | Next.js, React components, hooks         |
+| [docs/DATABASE.md](docs/DATABASE.md)     | Prisma schema, migrations, queries       |
+| [docs/GRAPHQL.md](docs/GRAPHQL.md)       | GraphQL types, queries, mutations        |
+| [docs/TESTING.md](docs/TESTING.md)       | Jest and Pytest patterns                 |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel deployment configuration          |
+| [docs/PATTERNS.md](docs/PATTERNS.md)     | Code patterns for extending the codebase |
