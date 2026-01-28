@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 type CreateHouseDialogProps = {
-  onSubmit: (name: string) => Promise<void>;
+  // eslint-disable-next-line no-unused-vars
+  onSubmit: (_name: string) => Promise<void>;
 };
 
 export default function CreateHouseDialog({ onSubmit }: CreateHouseDialogProps) {

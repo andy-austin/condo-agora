@@ -8,7 +8,8 @@ import type { House } from '@/lib/queries/house';
 
 type HouseListProps = {
   houses: House[];
-  onDelete?: (id: string) => void;
+  // eslint-disable-next-line no-unused-vars
+  onDelete?: (_id: string) => void;
   deleting?: string | null;
 };
 
