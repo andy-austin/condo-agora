@@ -37,12 +37,12 @@ description: "Task list for House Account Management"
 
 **Purpose**: Admin interface for managing houses.
 
-- [ ] T013 [P] [US1] Create API Client queries for House management (`GET_HOUSES`, `CREATE_HOUSE`, `DELETE_HOUSE`) in apps/web/lib/api.ts
-- [ ] T014 [P] [US1] Create `HouseList` component in apps/web/components/properties/HouseList.tsx
-- [ ] T015 [US1] Create `CreateHouseDialog` component in apps/web/components/properties/CreateHouseDialog.tsx
-- [ ] T016 [US1] Implement Properties Page (`/dashboard/properties`) in apps/web/app/dashboard/properties/page.tsx
-- [ ] T017 [US1] Implement Single-House "Smart Default" redirection logic in `apps/web/app/dashboard/properties/page.tsx` (redirect to detail if count=1)
-- [ ] T018 [US1] Create House Detail Page (`/dashboard/properties/[id]`) in apps/web/app/dashboard/properties/[id]/page.tsx
+- [X] T013 [P] [US1] Create API Client queries for House management (`GET_HOUSES`, `CREATE_HOUSE`, `DELETE_HOUSE`) in apps/web/lib/queries/house.ts
+- [X] T014 [P] [US1] Create `HouseList` component in apps/web/components/properties/HouseList.tsx
+- [X] T015 [US1] Create `CreateHouseDialog` component in apps/web/components/properties/CreateHouseDialog.tsx
+- [X] T016 [US1] Implement Properties Page (`/dashboard/properties`) in apps/web/app/dashboard/properties/page.tsx
+- [X] T017 [US1] Implement Single-House "Smart Default" redirection logic in `apps/web/app/dashboard/properties/page.tsx` (redirect to detail if count=1)
+- [X] T018 [US1] Create House Detail Page (`/dashboard/properties/[id]`) in apps/web/app/dashboard/properties/[id]/page.tsx
 
 ---
 

@@ -14,6 +14,10 @@ export default function DashboardPage() {
       </p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Link href="/dashboard/properties" className="block p-6 border rounded-lg hover:border-primary transition-colors">
+          <h2 className="text-xl font-semibold mb-2">Properties</h2>
+          <p className="text-sm text-muted-foreground">Manage houses and units in your community.</p>
+        </Link>
         <Link href="/dashboard/settings" className="block p-6 border rounded-lg hover:border-primary transition-colors">
           <h2 className="text-xl font-semibold mb-2">Settings</h2>
           <p className="text-sm text-muted-foreground">Invite users and manage your profile.</p>
