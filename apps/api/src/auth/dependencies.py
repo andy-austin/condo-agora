@@ -62,5 +62,6 @@ async def get_current_user_optional(
 
         user = await db.user.find_unique(where={"clerkId": clerk_id})
         return user
-    except Exception:
+    except Exception as e:
+        print(f"Auth Error in optional dependency: {e}")
         return None

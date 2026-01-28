@@ -24,6 +24,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 Dashboard
               </Link>
               <Link
+                href="/dashboard/properties"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Properties
+              </Link>
+              <Link
                 href="/dashboard/settings"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
@@ -31,7 +37,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </Link>
             </div>
           </div>
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
         </div>
       </nav>
       <main>{children}</main>

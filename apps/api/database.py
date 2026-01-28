@@ -22,6 +22,13 @@ env_path = os.path.join(
 )
 load_dotenv(env_path)
 
+# Load environment variables from the api directory
+api_env_path = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    ".env",
+)
+load_dotenv(api_env_path)
+
 db = Prisma()
 
 
