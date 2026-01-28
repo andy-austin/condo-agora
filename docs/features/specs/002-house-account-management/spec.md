@@ -52,11 +52,12 @@ As a Resident, I want my profile to reflect my housing unit so that neighbors an
 
 - **FR-001 (House Management)**: System MUST allow Administrators to Create, Read, Update, and Delete `House` entities within their Organization.
   - A House MUST have a name/identifier (e.g., "Apt 1B").
+  - **Integrity**: System MUST prevent deleting a House if it has assigned Residents.
 - **FR-002 (Data Model)**: A `House` MUST belong to exactly one `Organization`.
 - **FR-003 (Residency)**: System MUST support linking an `OrganizationMember` (User) to a `House`.
   - Cardinality: A House CAN have multiple assigned Users (Residents).
   - Cardinality: A User SHOULD belong to at least one House if their role is "Resident".
-  - **Lifecycle**: System MUST prevent removing a Resident's last House assignment. To remove a resident who has moved out, the Administrator MUST revoke their entire Organization Membership.
+  - **Lifecycle**: System MUST prevent removing a Resident's last House assignment (leaving them with 0 houses). To remove a resident who has moved out completely, the Administrator MUST revoke their entire Organization Membership. If a resident has multiple houses, they CAN be removed from one as long as at least one remains.
   - **Cleanup**: Deleting an Organization Member MUST NOT delete the associated House entity.
 - **FR-004 (Invitation Flow)**: The existing Invitation system MUST be extended to optionally include a `House ID`.
   - When an invitation with a House ID is accepted, the user MUST be automatically assigned to that House.
