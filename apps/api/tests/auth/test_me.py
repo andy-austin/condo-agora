@@ -34,8 +34,7 @@ async def test_resolve_me_authenticated(db_mock):
     mock_membership.id = "mem-1"
     mock_membership.userId = user_id
     mock_membership.organizationId = "org-1"
-    mock_membership.role = MagicMock()
-    mock_membership.role.name = "ADMIN"
+    mock_membership.role = "ADMIN"
     mock_membership.createdAt = "2023-01-01"
     mock_membership.organization = mock_org
 
