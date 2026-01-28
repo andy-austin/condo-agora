@@ -47,6 +47,91 @@ model Note {
 
   @@map("note")
 }
+
+model User {
+  id        String   @id @default(uuid())
+  clerkId   String   @unique @map("clerk_id")
+  email     String   @unique
+  firstName String?  @map("first_name")
+  lastName  String?  @map("last_name")
+  avatarUrl String?  @map("avatar_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  memberships OrganizationMember[]
+  invitations Invitation[]         @relation("Inviter")
+
+  @@map("user")
+}
+
+enum Role {
+  ADMIN
+  RESIDENT
+  MEMBER
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  members     OrganizationMember[]
+  invitations Invitation[]
+  houses      House[]
+
+  @@map("organization")
+}
+
+model OrganizationMember {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  organizationId String   @map("organization_id")
+  houseId        String?  @map("house_id")
+  role           Role     @default(MEMBER)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user         User         @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  house        House?       @relation(fields: [houseId], references: [id])
+
+  @@unique([userId, organizationId])
+  @@map("organization_member")
+}
+
+model House {
+  id             String   @id @default(uuid())
+  name           String
+  organizationId String   @map("organization_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organization Organization       @relation(fields: [organizationId], references: [id])
+  residents    OrganizationMember[]
+  invitations  Invitation[]
+
+  @@map("house")
+}
+
+model Invitation {
+  id             String    @id @default(uuid())
+  email          String
+  token          String    @unique
+  organizationId String    @map("organization_id")
+  inviterId      String    @map("inviter_id")
+  houseId        String?   @map("house_id")
+  role           Role      @default(MEMBER)
+  expiresAt      DateTime  @map("expires_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  acceptedAt     DateTime? @map("accepted_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  inviter      User         @relation("Inviter", fields: [inviterId], references: [id])
+  house        House?       @relation(fields: [houseId], references: [id])
+
+  @@map("invitation")
+}
 ```
 
 **Field Mapping**:
