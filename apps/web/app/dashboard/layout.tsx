@@ -37,7 +37,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </Link>
             </div>
           </div>
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
         </div>
       </nav>
       <main>{children}</main>
