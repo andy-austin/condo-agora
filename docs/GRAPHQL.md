@@ -51,6 +51,58 @@ type HealthStatus {
 }
 ```
 
+### Auth & House Types (`graphql_types/auth.py`, `graphql_types/house.py`)
+
+```graphql
+enum Role {
+  ADMIN
+  RESIDENT
+  MEMBER
+}
+
+type User {
+  id: ID!
+  email: String!
+  firstName: String
+  lastName: String
+  avatarUrl: String
+  memberships: [OrganizationMember!]!
+}
+
+type Organization {
+  id: ID!
+  name: String!
+  slug: String!
+  houses: [House!]!
+  housesCount: Int!
+}
+
+type OrganizationMember {
+  id: ID!
+  role: Role!
+  organization: Organization!
+  house: House
+}
+
+type House {
+  id: ID!
+  name: String!
+  organizationId: ID!
+  residents: [OrganizationMember!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Invitation {
+  id: ID!
+  email: String!
+  role: Role!
+  organizationId: ID!
+  house: House
+  token: String!
+}
+```
+
 ### Note Types (`graphql_types/note.py`)
 
 ```graphql
@@ -115,6 +167,38 @@ query {
 }
 ```
 
+### Auth & House Queries
+
+```graphql
+query Me {
+  me {
+    id
+    email
+    memberships {
+      role
+      organization {
+        name
+      }
+      house {
+        name
+      }
+    }
+  }
+}
+
+query GetHouses($organizationId: String!) {
+  houses(organizationId: $organizationId) {
+    id
+    name
+    residents {
+      user {
+        email
+      }
+    }
+  }
+}
+```
+
 ### Notes Query
 
 ```graphql
@@ -144,6 +228,33 @@ query {
 ```
 
 ## Mutations
+
+### Auth & House Mutations
+
+```graphql
+mutation CreateInvitation($email: String!, $organizationId: String!, $role: Role!) {
+  createInvitation(email: $email, organizationId: $organizationId, role: $role) {
+    id
+    token
+  }
+}
+
+mutation CreateHouse($organizationId: ID!, $name: String!) {
+  createHouse(organizationId: $organizationId, name: $name) {
+    id
+    name
+  }
+}
+
+mutation AssignResident($userId: ID!, $houseId: ID!) {
+  assignResidentToHouse(userId: $userId, houseId: $houseId) {
+    id
+    house {
+      name
+    }
+  }
+}
+```
 
 ### Create Note
 
