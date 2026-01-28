@@ -21,15 +21,15 @@ description: "Task list for House Account Management"
 
 **Purpose**: Core logic for House management.
 
-- [ ] T004 [P] Create `House` GraphQL type in apps/api/graphql_types/house.py
-- [ ] T005 [P] Update `Organization` type to include `houses` and `housesCount` in apps/api/graphql_types/auth.py
-- [ ] T006 [P] Update `OrganizationMember` type to include `house` field in apps/api/graphql_types/auth.py
-- [ ] T007 Implement `House` CRUD service functions in apps/api/src/house/service.py
-- [ ] T008 [P] Implement `removeResidentFromHouse` service logic with "last house" validation in apps/api/src/house/service.py
-- [ ] T009 Create `House` resolvers (Query/Mutation) in apps/api/resolvers/house.py
-- [ ] T010 Create `House` schema definitions in apps/api/schemas/house.py
-- [ ] T011 Register `House` schema in root `apps/api/schema.py`
-- [ ] T012 Create unit tests for House CRUD service in apps/api/tests/house/test_service.py
+- [X] T004 [P] Create `House` GraphQL type in apps/api/graphql_types/house.py
+- [X] T005 [P] Update `Organization` type to include `houses` and `housesCount` in apps/api/graphql_types/auth.py
+- [X] T006 [P] Update `OrganizationMember` type to include `house` field in apps/api/graphql_types/auth.py
+- [X] T007 Implement `House` CRUD service functions in apps/api/src/house/service.py
+- [X] T008 [P] Implement `removeResidentFromHouse` service logic with "last house" validation in apps/api/src/house/service.py
+- [X] T009 Create `House` resolvers (Query/Mutation) in apps/api/resolvers/house.py
+- [X] T010 Create `House` schema definitions in apps/api/schemas/house.py
+- [X] T011 Register `House` schema in root `apps/api/schema.py`
+- [X] T012 Create unit tests for House CRUD service in apps/api/tests/house/test_service.py
 
 ---
 

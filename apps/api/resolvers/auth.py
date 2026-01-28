@@ -7,8 +7,20 @@ from ..graphql_types.auth import (
     Role,
     User,
 )
+from ..graphql_types.house import House
 from ..src.auth.service import create_invitation as service_create_invitation
 from ..src.auth.service import get_user_with_memberships
+
+
+def _prisma_house_to_graphql(h) -> House:
+    """Convert a Prisma House model to GraphQL House type."""
+    return House(
+        id=h.id,
+        name=h.name,
+        organization_id=h.organizationId,
+        created_at=h.createdAt,
+        updated_at=h.updatedAt,
+    )
 
 
 async def resolve_me(info: Any) -> Optional[User]:
@@ -26,12 +38,17 @@ async def resolve_me(info: Any) -> Optional[User]:
     memberships = []
     if user_data.memberships:
         for m in user_data.memberships:
+            house = None
+            if m.house:
+                house = _prisma_house_to_graphql(m.house)
+
             memberships.append(
                 OrganizationMember(
                     id=m.id,
                     user_id=m.userId,
                     organization_id=m.organizationId,
-                    role=Role(m.role.name),  # Convert Prisma Enum to Strawberry Enum
+                    house_id=m.houseId,
+                    role=Role(m.role.name),
                     created_at=m.createdAt,
                     organization=Organization(
                         id=m.organization.id,
@@ -40,6 +57,7 @@ async def resolve_me(info: Any) -> Optional[User]:
                         created_at=m.organization.createdAt,
                         updated_at=m.organization.updatedAt,
                     ),
+                    house=house,
                 )
             )
 
@@ -70,7 +88,7 @@ async def resolve_create_invitation(
         email=email,
         organization_id=organization_id,
         inviter_id=user.id,
-        role=role.value,  # Get string value for Prisma
+        role=role.value,
     )
 
     return Invitation(
