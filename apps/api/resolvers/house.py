@@ -34,7 +34,7 @@ def _prisma_member_to_graphql(m) -> OrganizationMember:
         user_id=m.userId,
         organization_id=m.organizationId,
         house_id=m.houseId,
-        role=Role(m.role.name),
+        role=Role(m.role),
         created_at=m.createdAt,
         organization=org,
     )
@@ -51,7 +51,7 @@ def _prisma_house_to_graphql(h) -> House:
                     user_id=m.userId,
                     organization_id=m.organizationId,
                     house_id=m.houseId,
-                    role=Role(m.role.name),
+                    role=Role(m.role),
                     created_at=m.createdAt,
                     organization=(
                         Organization(

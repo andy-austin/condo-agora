@@ -1,8 +1,11 @@
 import uuid
 from datetime import datetime, timedelta
 
+from fastapi import HTTPException
+
 from ...database import db
 from ...prisma_client.enums import Role
+from .clerk_utils import create_clerk_invitation
 
 
 async def create_invitation(
@@ -19,6 +22,7 @@ async def create_invitation(
     # 7 days expiration as per spec
     expires_at = datetime.now() + timedelta(days=7)
 
+    # 1. Create local invitation record
     invitation = await db.invitation.create(
         data={
             "email": email,
@@ -30,8 +34,35 @@ async def create_invitation(
         }
     )
 
-    # TODO: Integrate with an email service (e.g., Resend, SendGrid)
-    print(f"Invitation created for {email} to join org {organization_id}")
+    # 2. Trigger Clerk Invitation
+    # We pass the organization ID in metadata so we can track it later if needed
+    # The redirect URL should point to your sign-up page
+    # You might want to parameterize the base URL
+    try:
+        await create_clerk_invitation(
+            email=email,
+            public_metadata={
+                "organization_id": organization_id,
+                "role": role,
+                "invitation_token": token,
+            },
+            # Assuming standard Clerk redirect, or specific app page
+            # redirect_url="http://localhost:3000/sign-up"
+        )
+        print(f"Clerk invitation sent to {email}")
+    except HTTPException as e:
+        if e.status_code == 422 and "form_identifier_exists" in str(e.detail):
+            print(f"User {email} already exists in Clerk. Skipping Clerk invitation.")
+        else:
+            print(f"Failed to send Clerk invitation: {e}")
+            raise e
+    except Exception as e:
+        print(f"Failed to send Clerk invitation: {e}")
+        # We might want to rollback the DB creation here, but for now we'll just log it.
+        # raising exception will return error to frontend
+        raise e
+
+    print(f"Invitation created locally for {email} to join org {organization_id}")
 
     return invitation
 

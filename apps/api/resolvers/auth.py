@@ -48,7 +48,7 @@ async def resolve_me(info: Any) -> Optional[User]:
                     user_id=m.userId,
                     organization_id=m.organizationId,
                     house_id=m.houseId,
-                    role=Role(m.role.name),
+                    role=Role(m.role),
                     created_at=m.createdAt,
                     organization=Organization(
                         id=m.organization.id,
