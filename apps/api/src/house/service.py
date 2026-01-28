@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from ...database import db
 
@@ -128,6 +128,4 @@ async def remove_resident_from_house(user_id: str, organization_id: str):
 async def get_houses_count(organization_id: str) -> int:
     """Get the count of houses in an organization."""
     await _ensure_connected()
-    return await db.house.count(
-        where={"organizationId": organization_id}
-    )
+    return await db.house.count(where={"organizationId": organization_id})

@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -13,7 +13,8 @@ from apps.api.src.house.service import (
     remove_resident_from_house,
     update_house,
 )
-from ..conftest import mock_db, mock_house_delegate, mock_orgmember_delegate
+
+from ..conftest import mock_house_delegate, mock_orgmember_delegate
 
 
 def _make_mock_house(
@@ -127,16 +128,16 @@ class TestDeleteHouse:
         mock_house_delegate.delete.return_value = None
         result = await delete_house("house-1")
         assert result is True
-        mock_house_delegate.delete.assert_called_once_with(
-            where={"id": "house-1"}
-        )
+        mock_house_delegate.delete.assert_called_once_with(where={"id": "house-1"})
 
     @pytest.mark.asyncio
     async def test_raises_when_house_has_residents(self):
         member = _make_mock_member()
         house = _make_mock_house(residents=[member])
         mock_house_delegate.find_unique.return_value = house
-        with pytest.raises(Exception, match="Cannot delete a house with assigned residents"):
+        with pytest.raises(
+            Exception, match="Cannot delete a house with assigned residents"
+        ):
             await delete_house("house-1")
 
     @pytest.mark.asyncio

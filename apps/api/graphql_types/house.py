@@ -28,7 +28,5 @@ class House:
     created_at: datetime
     updated_at: datetime
     residents: List[
-        Annotated[
-            "OrganizationMember", strawberry.lazy("apps.api.graphql_types.auth")
-        ]
+        Annotated["OrganizationMember", strawberry.lazy("apps.api.graphql_types.auth")]
     ] = strawberry.field(default_factory=list)

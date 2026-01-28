@@ -6,26 +6,28 @@ from ..graphql_types.auth import (
     Role,
 )
 from ..graphql_types.house import House
-from ..src.house.service import (
-    assign_resident_to_house as service_assign_resident,
-    create_house as service_create_house,
-    delete_house as service_delete_house,
-    get_house as service_get_house,
-    get_houses as service_get_houses,
-    remove_resident_from_house as service_remove_resident,
-    update_house as service_update_house,
-)
+from ..src.house.service import assign_resident_to_house as service_assign_resident
+from ..src.house.service import create_house as service_create_house
+from ..src.house.service import delete_house as service_delete_house
+from ..src.house.service import get_house as service_get_house
+from ..src.house.service import get_houses as service_get_houses
+from ..src.house.service import remove_resident_from_house as service_remove_resident
+from ..src.house.service import update_house as service_update_house
 
 
 def _prisma_member_to_graphql(m) -> OrganizationMember:
     """Convert a Prisma OrganizationMember to GraphQL type."""
-    org = Organization(
-        id=m.organization.id,
-        name=m.organization.name,
-        slug=m.organization.slug,
-        created_at=m.organization.createdAt,
-        updated_at=m.organization.updatedAt,
-    ) if hasattr(m, "organization") and m.organization else None
+    org = (
+        Organization(
+            id=m.organization.id,
+            name=m.organization.name,
+            slug=m.organization.slug,
+            created_at=m.organization.createdAt,
+            updated_at=m.organization.updatedAt,
+        )
+        if hasattr(m, "organization") and m.organization
+        else None
+    )
 
     return OrganizationMember(
         id=m.id,
@@ -51,15 +53,22 @@ def _prisma_house_to_graphql(h) -> House:
                     house_id=m.houseId,
                     role=Role(m.role.name),
                     created_at=m.createdAt,
-                    organization=Organization(
-                        id="", name="", slug="",
-                        created_at=m.createdAt, updated_at=m.createdAt,
-                    ) if not (hasattr(m, "organization") and m.organization) else Organization(
-                        id=m.organization.id,
-                        name=m.organization.name,
-                        slug=m.organization.slug,
-                        created_at=m.organization.createdAt,
-                        updated_at=m.organization.updatedAt,
+                    organization=(
+                        Organization(
+                            id="",
+                            name="",
+                            slug="",
+                            created_at=m.createdAt,
+                            updated_at=m.createdAt,
+                        )
+                        if not (hasattr(m, "organization") and m.organization)
+                        else Organization(
+                            id=m.organization.id,
+                            name=m.organization.name,
+                            slug=m.organization.slug,
+                            created_at=m.organization.createdAt,
+                            updated_at=m.organization.updatedAt,
+                        )
                     ),
                 )
             )
@@ -88,9 +97,7 @@ async def resolve_house(info: Any, id: str) -> Optional[House]:
     return _prisma_house_to_graphql(house)
 
 
-async def resolve_create_house(
-    info: Any, organization_id: str, name: str
-) -> House:
+async def resolve_create_house(info: Any, organization_id: str, name: str) -> House:
     """Resolver for creating a new house."""
     user = info.context.get("user")
     if not user:

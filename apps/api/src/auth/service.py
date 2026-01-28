@@ -82,7 +82,5 @@ async def get_user_with_memberships(user_id: str):
 
     return await db.user.find_unique(
         where={"id": user_id},
-        include={
-            "memberships": {"include": {"organization": True, "house": True}}
-        },
+        include={"memberships": {"include": {"organization": True, "house": True}}},
     )
