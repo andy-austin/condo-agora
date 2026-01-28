@@ -11,9 +11,9 @@ description: "Task list for House Account Management"
 
 **Purpose**: Update database schema and generate clients.
 
-- [ ] T001 Update Prisma Schema: Add `House` model and update `OrganizationMember` and `Invitation` relations in apps/api/prisma/schema.prisma
-- [ ] T002 Run Prisma Migration to apply changes (migration name: `add_house_model`)
-- [ ] T003 Generate Prisma Client for API (`pnpm --filter api prisma:generate`)
+- [X] T001 Update Prisma Schema: Add `House` model and update `OrganizationMember` and `Invitation` relations in apps/api/prisma/schema.prisma
+- [X] T002 Run Prisma Migration to apply changes (migration name: `add_house_model`)
+- [X] T003 Generate Prisma Client for API (`pnpm --filter api prisma:generate`)
 
 ---
 
