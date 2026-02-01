@@ -1,6 +1,7 @@
 'use client';
 
 import { Mail } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 export function Footer() {
@@ -8,21 +9,17 @@ export function Footer() {
 
   const links = {
     product: [
-      { labelKey: 'features', href: "#features" },
-      { labelKey: 'pricing', href: "#pricing" },
-      { labelKey: 'demo', href: "#demo" },
-      { labelKey: 'updates', href: "#updates" }
+      { labelKey: 'features', href: "/#features" },
+      { labelKey: 'pricing', href: "/#pricing" },
+      { labelKey: 'demo', href: "/#demo" },
     ],
     company: [
-      { labelKey: 'about', href: "#about" },
-      { labelKey: 'blog', href: "#blog" },
-      { labelKey: 'careers', href: "#careers" },
-      { labelKey: 'contact', href: "#contact" }
+      { labelKey: 'about', href: "/about" },
     ],
     legal: [
-      { labelKey: 'privacy', href: "#privacy" },
-      { labelKey: 'terms', href: "#terms" },
-      { labelKey: 'cookies', href: "#cookies" }
+      { labelKey: 'privacy', href: "/privacy" },
+      { labelKey: 'terms', href: "/terms" },
+      { labelKey: 'cookies', href: "/cookies" }
     ]
   };
 
@@ -53,12 +50,12 @@ export function Footer() {
             <ul className="space-y-3">
               {links.product.map((link) => (
                 <li key={link.labelKey}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {t(`links.${link.labelKey}`)}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -69,12 +66,12 @@ export function Footer() {
             <ul className="space-y-3">
               {links.company.map((link) => (
                 <li key={link.labelKey}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {t(`links.${link.labelKey}`)}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -85,12 +82,12 @@ export function Footer() {
             <ul className="space-y-3">
               {links.legal.map((link) => (
                 <li key={link.labelKey}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {t(`links.${link.labelKey}`)}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

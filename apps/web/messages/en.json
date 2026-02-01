@@ -21,7 +21,12 @@
     "ctaPrimary": "Request Free Demo",
     "ctaSecondary": "Watch Video",
     "mockupUrl": "app.condoagora.com.uy",
-    "mockupAlt": "Condo Ágora Dashboard"
+    "mockupAlt": "Condo Ágora Dashboard",
+    "stats": {
+      "buildings": "Buildings",
+      "residents": "Residents",
+      "votes": "Votes cast"
+    }
   },
   "logoCloud": {
     "title": "Trusted by over 200 buildings across Uruguay"
@@ -130,6 +135,43 @@
     "description": "Join the communities that are already making smarter and more transparent decisions.",
     "ctaPrimary": "Request Free Demo",
     "ctaSecondary": "Talk to Sales"
+  },
+  "pricing": {
+    "label": "Pricing",
+    "title": "Simple, transparent pricing",
+    "description": "Choose the plan that best fits your community. All plans include unlimited proposals and votes.",
+    "popular": "Most Popular",
+    "tiers": {
+      "free": {
+        "name": "Free",
+        "description": "Perfect for small buildings getting started",
+        "price": "$0",
+        "period": "/month",
+        "cta": "Get Started",
+        "features": [
+          "Up to 10 units",
+          "Unlimited proposals",
+          "Basic voting system",
+          "Email notifications",
+          "Community support"
+        ]
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "For growing communities that need more",
+        "price": "$3",
+        "period": "/month",
+        "cta": "Start Free Trial",
+        "features": [
+          "Unlimited units",
+          "Priority voting system",
+          "Advanced analytics",
+          "Vote delegation",
+          "Priority support",
+          "Exportable reports"
+        ]
+      }
+    }
   },
   "footer": {
     "brand": "Condo Ágora",

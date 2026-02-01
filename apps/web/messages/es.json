@@ -21,7 +21,12 @@
     "ctaPrimary": "Solicitar Demo Gratuita",
     "ctaSecondary": "Ver Video",
     "mockupUrl": "app.condoagora.com.uy",
-    "mockupAlt": "Condo Ágora Dashboard"
+    "mockupAlt": "Condo Ágora Dashboard",
+    "stats": {
+      "buildings": "Edificios",
+      "residents": "Residentes",
+      "votes": "Votos realizados"
+    }
   },
   "logoCloud": {
     "title": "Con la confianza de más de 200 edificios en todo Uruguay"
@@ -130,6 +135,43 @@
     "description": "Unite a las comunidades que ya están tomando decisiones de forma más inteligente y transparente.",
     "ctaPrimary": "Solicitar Demo Gratuita",
     "ctaSecondary": "Hablar con Ventas"
+  },
+  "pricing": {
+    "label": "Precios",
+    "title": "Precios simples y transparentes",
+    "description": "Elegí el plan que mejor se adapte a tu comunidad. Todos los planes incluyen propuestas y votos ilimitados.",
+    "popular": "Más Popular",
+    "tiers": {
+      "free": {
+        "name": "Gratis",
+        "description": "Perfecto para edificios pequeños que empiezan",
+        "price": "$0",
+        "period": "/mes",
+        "cta": "Comenzar",
+        "features": [
+          "Hasta 10 unidades",
+          "Propuestas ilimitadas",
+          "Sistema de votación básico",
+          "Notificaciones por email",
+          "Soporte comunitario"
+        ]
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Para comunidades en crecimiento que necesitan más",
+        "price": "$3",
+        "period": "/mes",
+        "cta": "Prueba Gratuita",
+        "features": [
+          "Unidades ilimitadas",
+          "Sistema de votación por prioridad",
+          "Analíticas avanzadas",
+          "Delegación de voto",
+          "Soporte prioritario",
+          "Reportes exportables"
+        ]
+      }
+    }
   },
   "footer": {
     "brand": "Condo Ágora",
