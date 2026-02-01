@@ -5,6 +5,15 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['shared', 'db'],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+        pathname: '/7.x/**',
+      },
+    ],
+  },
   async rewrites() {
     const isDev = process.env.NODE_ENV === 'development'
 

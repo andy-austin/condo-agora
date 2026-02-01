@@ -2,14 +2,16 @@
 
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 export function CtaSection() {
   const t = useTranslations('cta');
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
 
   return (
-    <section className="section-padding">
+    <section className="section-padding" ref={ref}>
       <div className="container-tight">
-        <div className="relative overflow-hidden rounded-3xl bg-foreground text-background p-12 lg:p-20">
+        <div className={`relative overflow-hidden rounded-3xl bg-foreground text-background p-12 lg:p-20 scroll-reveal ${isVisible ? 'visible' : ''}`}>
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent" />
           <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
 

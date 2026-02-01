@@ -1,11 +1,17 @@
 'use client';
 
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play, Building2, Users, Vote } from "lucide-react";
 import Image from 'next/image';
 import { useTranslations } from "next-intl";
 
 export function HeroSection() {
   const t = useTranslations('hero');
+
+  const stats = [
+    { icon: Building2, value: '200+', labelKey: 'buildings' },
+    { icon: Users, value: '5,000+', labelKey: 'residents' },
+    { icon: Vote, value: '10,000+', labelKey: 'votes' },
+  ];
 
   return (
     <section className="pt-32 lg:pt-40 pb-20 lg:pb-32 overflow-hidden">
@@ -28,7 +34,7 @@ export function HeroSection() {
             {t('description')}
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
             <button className="btn-primary">
               {t('ctaPrimary')}
               <ArrowRight className="ml-2 w-5 h-5" />
@@ -37,6 +43,25 @@ export function HeroSection() {
               <Play className="mr-2 w-5 h-5" />
               {t('ctaSecondary')}
             </button>
+          </div>
+
+          {/* Stats Section */}
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mb-16">
+            {stats.map((stat, index) => {
+              const Icon = stat.icon;
+              return (
+                <div key={stat.labelKey} className="flex items-center gap-2">
+                  {index > 0 && (
+                    <span className="hidden sm:block w-px h-8 bg-border mr-4" />
+                  )}
+                  <Icon className="w-5 h-5 text-primary" />
+                  <div className="text-left">
+                    <p className="text-xl font-bold text-foreground">{stat.value}</p>
+                    <p className="text-xs text-muted-foreground">{t(`stats.${stat.labelKey}`)}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           <div className="relative">

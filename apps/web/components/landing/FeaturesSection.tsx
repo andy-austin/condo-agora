@@ -2,6 +2,7 @@
 
 import { FileText, Vote, BarChart3, Users, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const featureKeys = ['proposals', 'voting', 'transparency', 'roles'] as const;
 const featureIcons = {
@@ -13,11 +14,12 @@ const featureIcons = {
 
 export function FeaturesSection() {
   const t = useTranslations('features');
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
 
   return (
-    <section id="features" className="section-padding">
+    <section id="features" className="section-padding" ref={ref}>
       <div className="container-tight">
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <div className={`text-center max-w-2xl mx-auto mb-16 scroll-reveal ${isVisible ? 'visible' : ''}`}>
           <span className="text-sm font-medium text-primary mb-4 block">{t('label')}</span>
           <h2 className="heading-lg mb-6">
             {t('title')}
@@ -27,7 +29,7 @@ export function FeaturesSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className={`grid md:grid-cols-2 gap-6 stagger-children ${isVisible ? 'visible' : ''}`}>
           {featureKeys.map((key) => {
             const Icon = featureIcons[key];
             const benefits = t.raw(`items.${key}.benefits`) as string[];

@@ -2,6 +2,7 @@
 
 import { MessageCircleX, Eye, Clock, ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const problemKeys = ['lost', 'transparency', 'slow'] as const;
 const problemIcons = {
@@ -12,12 +13,13 @@ const problemIcons = {
 
 export function ProblemSection() {
   const t = useTranslations('problems');
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
 
   return (
-    <section className="section-padding bg-muted/30">
+    <section className="section-padding bg-muted/30" ref={ref}>
       <div className="container-tight">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div>
+          <div className={`scroll-reveal-left ${isVisible ? 'visible' : ''}`}>
             <span className="text-sm font-medium text-primary mb-4 block">{t('label')}</span>
             <h2 className="heading-lg mb-6">
               {t('title')}
@@ -31,7 +33,7 @@ export function ProblemSection() {
             </a>
           </div>
 
-          <div className="space-y-4">
+          <div className={`space-y-4 stagger-children ${isVisible ? 'visible' : ''}`}>
             {problemKeys.map((key) => {
               const Icon = problemIcons[key];
 
