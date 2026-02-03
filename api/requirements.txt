@@ -1,2 +1,0 @@
-# Re-use dependencies from apps/api
--r ../apps/api/requirements.txt
