@@ -6,8 +6,7 @@ from bson import ObjectId
 
 from apps.api.graphql_types.auth import Role
 from apps.api.resolvers.auth import resolve_me
-
-from ..conftest import (
+from apps.api.tests.conftest import (
     create_async_cursor_mock,
     mock_organization_members_collection,
     mock_organizations_collection,
