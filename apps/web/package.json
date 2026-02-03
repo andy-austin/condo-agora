@@ -2,7 +2,6 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@8.15.6",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -13,9 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@apollo/client": "^3.8.0",

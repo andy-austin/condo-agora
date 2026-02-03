@@ -1,4 +1,5 @@
 {
+  "version": 2,
   "builds": [
     {
       "src": "apps/web/package.json",
@@ -6,20 +7,17 @@
     },
     {
       "src": "apps/api/index.py",
-      "use": "@vercel/python@4.7.1",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
+      "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "apps/api/index.py"
+      "dest": "/apps/api/index.py"
     },
     {
       "src": "/(.*)",
-      "dest": "apps/web/$1"
+      "dest": "/apps/web/$1"
     }
   ]
 }
