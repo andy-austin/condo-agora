@@ -1,19 +1,9 @@
 import os
-import platform
-from pathlib import Path
+from typing import Optional
 
+import certifi
 from dotenv import load_dotenv
-
-# Set PRISMA_QUERY_ENGINE_BINARY for Linux (Vercel/serverless) before importing Prisma
-if platform.system() == "Linux":
-    _api_dir = Path(__file__).parent
-    _bin_dir = _api_dir / "bin"
-    for _f in _bin_dir.iterdir() if _bin_dir.exists() else []:
-        if _f.name.startswith("query-engine-") and _f.is_file():
-            os.environ["PRISMA_QUERY_ENGINE_BINARY"] = str(_f)
-            break
-
-from .prisma_client import Prisma  # noqa: E402
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 # Load environment variables from the root directory
 env_path = os.path.join(
@@ -29,10 +19,95 @@ api_env_path = os.path.join(
 )
 load_dotenv(api_env_path)
 
-db = Prisma()
+
+class MongoDB:
+    """Async MongoDB client wrapper using Motor."""
+
+    client: Optional[AsyncIOMotorClient] = None
+    db: Optional[AsyncIOMotorDatabase] = None
+    _connected: bool = False
+
+    def __init__(self):
+        self.uri = os.getenv("MONGODB_URI")
+        self.db_name = os.getenv("MONGODB_DB_NAME", "condo_agora")
+
+    async def connect(self) -> None:
+        """Connect to MongoDB Atlas."""
+        if self._connected:
+            return
+
+        if not self.uri:
+            raise ValueError(
+                "MONGODB_URI environment variable is not set. "
+                "Please set it to your MongoDB Atlas connection string."
+            )
+
+        self.client = AsyncIOMotorClient(self.uri, tlsCAFile=certifi.where())
+        self.db = self.client[self.db_name]
+        self._connected = True
+
+        # Create indexes for unique constraints
+        await self._create_indexes()
+
+    async def disconnect(self) -> None:
+        """Disconnect from MongoDB."""
+        if self.client:
+            self.client.close()
+            self._connected = False
+            self.client = None
+            self.db = None
+
+    async def health_check(self) -> bool:
+        """Check if the database connection is healthy."""
+        if not self._connected or not self.client:
+            return False
+        try:
+            await self.client.admin.command("ping")
+            return True
+        except Exception:
+            return False
+
+    def is_connected(self) -> bool:
+        """Check if client is connected."""
+        return self._connected
+
+    async def _create_indexes(self) -> None:
+        """Create indexes for unique constraints and query optimization."""
+        if self.db is None:
+            return
+
+        # Users collection indexes
+        await self.db.users.create_index("clerk_id", unique=True)
+        await self.db.users.create_index("email")
+
+        # Organizations collection indexes
+        await self.db.organizations.create_index("slug", unique=True)
+
+        # Organization members collection indexes
+        await self.db.organization_members.create_index(
+            [("user_id", 1), ("organization_id", 1)], unique=True
+        )
+        await self.db.organization_members.create_index("user_id")
+        await self.db.organization_members.create_index("organization_id")
+
+        # Invitations collection indexes
+        await self.db.invitations.create_index("token", unique=True)
+        await self.db.invitations.create_index("email")
+        await self.db.invitations.create_index("organization_id")
+
+        # Houses collection indexes
+        await self.db.houses.create_index("organization_id")
+
+        # Notes collection indexes
+        await self.db.notes.create_index("created_at")
 
 
-async def get_db():
+# Global database instance
+db = MongoDB()
+
+
+async def get_db() -> MongoDB:
+    """Get the database instance, connecting if necessary."""
     if not db.is_connected():
         await db.connect()
     return db

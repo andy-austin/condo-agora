@@ -21,7 +21,7 @@ class NoteQueries:
         return await NoteSchemaGenerator.get_all_query()
 
     @strawberry.field
-    async def note(self, id: int) -> Optional[Note]:
+    async def note(self, id: str) -> Optional[Note]:
         return await NoteSchemaGenerator.get_by_id_query(id)
 
 
@@ -32,9 +32,9 @@ class NoteMutations:
         return await NoteSchemaGenerator.create_mutation(input)
 
     @strawberry.field
-    async def update_note(self, id: int, input: UpdateNoteInput) -> Optional[Note]:
+    async def update_note(self, id: str, input: UpdateNoteInput) -> Optional[Note]:
         return await NoteSchemaGenerator.update_mutation(id, input)
 
     @strawberry.field
-    async def delete_note(self, id: int) -> bool:
+    async def delete_note(self, id: str) -> bool:
         return await NoteSchemaGenerator.delete_mutation(id)

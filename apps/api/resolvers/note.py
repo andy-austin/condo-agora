@@ -1,7 +1,8 @@
 from ..graphql_types.note import CreateNoteInput, UpdateNoteInput
-from ..prisma_client.models import Note as NoteModel
+from ..models.note import Note
 from .base import BaseResolver
 
 
-class NoteResolver(BaseResolver[NoteModel, CreateNoteInput, UpdateNoteInput]):
-    model_name = "note"
+class NoteResolver(BaseResolver[Note, CreateNoteInput, UpdateNoteInput]):
+    collection_name = "notes"
+    model_class = Note

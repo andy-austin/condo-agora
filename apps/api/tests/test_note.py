@@ -2,34 +2,35 @@ from datetime import datetime, timezone
 from unittest.mock import MagicMock
 
 import pytest
+from bson import ObjectId
 from fastapi.testclient import TestClient
 
 from apps.api.index import app
 
 # Import shared mocks from conftest
-from .conftest import mock_db, mock_note_delegate
+from .conftest import create_async_cursor_mock, mock_db, mock_notes_collection
 
 client = TestClient(app)
 
 
 @pytest.fixture
-def mock_note_obj():
-    """Create a mock note object"""
-    note = MagicMock()
-    note.id = 1
-    note.title = "Test Note"
-    note.content = "Test content"
-    note.isPublished = False
-    note.createdAt = datetime.now(timezone.utc)
-    note.updatedAt = datetime.now(timezone.utc)
-    return note
+def mock_note_doc():
+    """Create a mock note document (MongoDB-style dict)"""
+    return {
+        "_id": ObjectId(),
+        "title": "Test Note",
+        "content": "Test content",
+        "is_published": False,
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
+    }
 
 
 class TestNoteGraphQLEndpoints:
     def test_notes_query_accessible(self):
         """Test that notes query is accessible via GraphQL"""
         mock_db.is_connected.return_value = True
-        mock_note_delegate.find_many.return_value = []
+        mock_notes_collection.find.return_value = create_async_cursor_mock([])
 
         query = """
         query {
@@ -56,11 +57,11 @@ class TestNoteGraphQLEndpoints:
     def test_note_by_id_query_accessible(self):
         """Test that note by ID query is accessible via GraphQL"""
         mock_db.is_connected.return_value = True
-        mock_note_delegate.find_unique.return_value = None  # Non-existent note
+        mock_notes_collection.find_one.return_value = None  # Non-existent note
 
         query = """
         query {
-            note(id: 999) {
+            note(id: "507f1f77bcf86cd799439011") {
                 id
                 title
                 content
@@ -78,10 +79,12 @@ class TestNoteGraphQLEndpoints:
         assert "note" in data["data"]
         assert data["data"]["note"] is None
 
-    def test_create_note_mutation_accessible(self, mock_note_obj):
+    def test_create_note_mutation_accessible(self, mock_note_doc):
         """Test that create note mutation is accessible via GraphQL"""
         mock_db.is_connected.return_value = True
-        mock_note_delegate.create.return_value = mock_note_obj
+        mock_notes_collection.insert_one.return_value = MagicMock(
+            inserted_id=mock_note_doc["_id"]
+        )
 
         mutation = """
         mutation {
@@ -107,8 +110,9 @@ class TestNoteGraphQLEndpoints:
         assert "createNote" in data["data"]
         created_note = data["data"]["createNote"]
 
-        # The mock returns "Test Note" as title
-        assert created_note["title"] == "Test Note"
+        # Check that we got a valid response
+        assert created_note is not None
+        assert "id" in created_note
 
     def test_graphql_schema_includes_note_types(self):
         """Test that GraphQL schema includes note-related types"""

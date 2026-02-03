@@ -6,7 +6,7 @@ import strawberry
 
 @strawberry.type
 class Note:
-    id: int
+    id: str
     title: str
     content: Optional[str]
     is_published: bool

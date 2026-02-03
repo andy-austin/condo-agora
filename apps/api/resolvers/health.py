@@ -28,10 +28,9 @@ class HealthResolver:
         try:
             db = await get_db()
             try:
-                # Simple query to test connection
-                # query_raw returns a list of dicts
-                result = await db.query_raw("SELECT 1")
-                if result:
+                # Use MongoDB health check (ping command)
+                is_healthy = await db.health_check()
+                if is_healthy:
                     health_data["database"]["status"] = StatusValues.OK
                     health_data["database"]["connection"] = True
                     health_data["database"]["details"] = TranslationKeys.DB_CONNECTED

@@ -12,10 +12,14 @@ client = TestClient(app)
 class TestHealthEndpoint:
     def test_health_endpoint_returns_ok(self):
         """Test that the health endpoint returns OK status"""
+        mock_db.health_check.return_value = True
+
         response = client.get("/health")
 
         assert response.status_code == 200
-        assert response.json() == {"ok": True}
+        data = response.json()
+        assert data["ok"] is True
+        assert data["database"] == "mongodb"
 
     def test_health_endpoint_content_type(self):
         """Test that the health endpoint returns JSON content type"""
@@ -29,8 +33,8 @@ class TestGraphQLHealthQuery:
     def test_health_query_basic(self):
         """Test basic GraphQL health query"""
         mock_db.is_connected.return_value = True
-        mock_db.query_raw.return_value = [{"1": 1}]
-        mock_db.query_raw.side_effect = None
+        mock_db.health_check.return_value = True
+        mock_db.health_check.side_effect = None
 
         query = """
         query {
@@ -66,8 +70,8 @@ class TestGraphQLHealthQuery:
     def test_health_query_returns_valid_status(self):
         """Test that health query returns valid status values"""
         mock_db.is_connected.return_value = True
-        mock_db.query_raw.return_value = [{"1": 1}]
-        mock_db.query_raw.side_effect = None
+        mock_db.health_check.return_value = True
+        mock_db.health_check.side_effect = None
 
         query = """
         query {
@@ -99,8 +103,8 @@ class TestGraphQLHealthQuery:
     def test_health_query_details_success(self):
         """Test that health query returns correct translation key on success"""
         mock_db.is_connected.return_value = True
-        mock_db.query_raw.return_value = [{"1": 1}]
-        mock_db.query_raw.side_effect = None
+        mock_db.health_check.return_value = True
+        mock_db.health_check.side_effect = None
 
         query = """
         query {
@@ -124,7 +128,7 @@ class TestGraphQLHealthQuery:
     def test_health_query_details_error(self):
         """Test that health query returns correct translation key on error (no connection)"""
         # Simulate connection error by raising exception
-        mock_db.query_raw.side_effect = Exception("Connection refused")
+        mock_db.health_check.side_effect = Exception("Connection refused")
 
         query = """
         query {
@@ -145,5 +149,5 @@ class TestGraphQLHealthQuery:
         assert details == TranslationKeys.DB_QUERY_ERROR
 
         # Reset mock for other tests
-        mock_db.query_raw.side_effect = None
-        mock_db.query_raw.return_value = [{"1": 1}]
+        mock_db.health_check.side_effect = None
+        mock_db.health_check.return_value = True
