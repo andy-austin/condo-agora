@@ -1,25 +1,18 @@
 {
-  "builds": [
-    {
-      "src": "apps/web/package.json",
-      "use": "@vercel/next"
-    },
-    {
-      "src": "apps/api/index.py",
-      "use": "@vercel/python@4.7.1",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
+  "framework": "nextjs",
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm --filter web build",
+  "outputDirectory": "apps/web/.next",
+  "functions": {
+    "apps/api/index.py": {
+      "runtime": "python3.11",
+      "maxDuration": 30
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "apps/api/index.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "apps/web/$1"
+      "source": "/api/:path*",
+      "destination": "/apps/api/index.py"
     }
   ]
 }
