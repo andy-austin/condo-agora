@@ -1,43 +1,41 @@
 import uuid
 from datetime import datetime, timedelta
 
+from bson import ObjectId
 from fastapi import HTTPException
 
 from ...database import db
-from ...prisma_client.enums import Role
 from .clerk_utils import create_clerk_invitation
 
 
 async def create_invitation(
-    email: str, organization_id: str, inviter_id: str, role: Role
+    email: str, organization_id: str, inviter_id: str, role: str
 ):
     """
     Creates a new invitation for a user to join an organization.
     """
-    # Ensure DB is connected
     if not db.is_connected():
         await db.connect()
 
     token = str(uuid.uuid4())
-    # 7 days expiration as per spec
-    expires_at = datetime.now() + timedelta(days=7)
+    expires_at = datetime.utcnow() + timedelta(days=7)
 
-    # 1. Create local invitation record
-    invitation = await db.invitation.create(
-        data={
-            "email": email,
-            "token": token,
-            "organizationId": organization_id,
-            "inviterId": inviter_id,
-            "role": role,
-            "expiresAt": expires_at,
-        }
-    )
+    invitation_data = {
+        "email": email,
+        "token": token,
+        "organization_id": organization_id,
+        "inviter_id": inviter_id,
+        "role": role,
+        "expires_at": expires_at,
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
+        "accepted_at": None,
+    }
 
-    # 2. Trigger Clerk Invitation
-    # We pass the organization ID in metadata so we can track it later if needed
-    # The redirect URL should point to your sign-up page
-    # You might want to parameterize the base URL
+    result = await db.db.invitations.insert_one(invitation_data)
+    invitation_data["_id"] = str(result.inserted_id)
+
+    # Trigger Clerk Invitation
     try:
         await create_clerk_invitation(
             email=email,
@@ -46,8 +44,6 @@ async def create_invitation(
                 "role": role,
                 "invitation_token": token,
             },
-            # Assuming standard Clerk redirect, or specific app page
-            # redirect_url="http://localhost:3000/sign-up"
         )
         print(f"Clerk invitation sent to {email}")
     except HTTPException as e:
@@ -58,13 +54,11 @@ async def create_invitation(
             raise e
     except Exception as e:
         print(f"Failed to send Clerk invitation: {e}")
-        # We might want to rollback the DB creation here, but for now we'll just log it.
-        # raising exception will return error to frontend
         raise e
 
     print(f"Invitation created locally for {email} to join org {organization_id}")
 
-    return invitation
+    return invitation_data
 
 
 async def accept_invitation(token: str, user_id: str):
@@ -74,31 +68,34 @@ async def accept_invitation(token: str, user_id: str):
     if not db.is_connected():
         await db.connect()
 
-    invitation = await db.invitation.find_unique(
-        where={"token": token}, include={"organization": True}
-    )
+    invitation = await db.db.invitations.find_one({"token": token})
 
     if not invitation:
         return None, "Invalid invitation token"
 
-    if invitation.acceptedAt:
+    if invitation.get("accepted_at"):
         return None, "Invitation already accepted"
 
-    if invitation.expiresAt < datetime.now():
+    if invitation.get("expires_at") < datetime.utcnow():
         return None, "Invitation expired"
 
     # Add user to organization
-    await db.organizationmember.create(
-        data={
-            "userId": user_id,
-            "organizationId": invitation.organizationId,
-            "role": invitation.role,
-        }
-    )
+    member_data = {
+        "user_id": user_id,
+        "organization_id": invitation["organization_id"],
+        "role": invitation["role"],
+        "house_id": invitation.get("house_id"),
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
+    }
+    await db.db.organization_members.insert_one(member_data)
 
     # Mark invitation as accepted
-    updated_invitation = await db.invitation.update(
-        where={"id": invitation.id}, data={"acceptedAt": datetime.now()}
+    now = datetime.utcnow()
+    updated_invitation = await db.db.invitations.find_one_and_update(
+        {"_id": invitation["_id"]},
+        {"$set": {"accepted_at": now, "updated_at": now}},
+        return_document=True,
     )
 
     return updated_invitation, None
@@ -107,11 +104,38 @@ async def accept_invitation(token: str, user_id: str):
 async def get_user_with_memberships(user_id: str):
     """
     Fetches a user by ID, including their organization memberships.
+    Uses aggregation to join related collections.
     """
     if not db.is_connected():
         await db.connect()
 
-    return await db.user.find_unique(
-        where={"id": user_id},
-        include={"memberships": {"include": {"organization": True, "house": True}}},
-    )
+    try:
+        user = await db.db.users.find_one({"_id": ObjectId(user_id)})
+    except Exception:
+        return None
+
+    if not user:
+        return None
+
+    # Fetch memberships for this user
+    memberships = []
+    cursor = db.db.organization_members.find({"user_id": str(user["_id"])})
+    async for membership in cursor:
+        # Fetch organization for this membership
+        org = await db.db.organizations.find_one(
+            {"_id": ObjectId(membership["organization_id"])}
+        )
+
+        # Fetch house if assigned
+        house = None
+        if membership.get("house_id"):
+            house = await db.db.houses.find_one(
+                {"_id": ObjectId(membership["house_id"])}
+            )
+
+        membership["organization"] = org
+        membership["house"] = house
+        memberships.append(membership)
+
+    user["memberships"] = memberships
+    return user

@@ -15,70 +15,81 @@ from ..src.house.service import remove_resident_from_house as service_remove_res
 from ..src.house.service import update_house as service_update_house
 
 
-def _prisma_member_to_graphql(m) -> OrganizationMember:
-    """Convert a Prisma OrganizationMember to GraphQL type."""
-    org = (
-        Organization(
-            id=m.organization.id,
-            name=m.organization.name,
-            slug=m.organization.slug,
-            created_at=m.organization.createdAt,
-            updated_at=m.organization.updatedAt,
+def _mongo_member_to_graphql(m: dict) -> OrganizationMember:
+    """Convert a MongoDB OrganizationMember document to GraphQL type."""
+    org = None
+    if m.get("organization"):
+        o = m["organization"]
+        org = Organization(
+            id=str(o["_id"]),
+            name=o["name"],
+            slug=o["slug"],
+            created_at=o["created_at"],
+            updated_at=o["updated_at"],
         )
-        if hasattr(m, "organization") and m.organization
-        else None
-    )
+
+    house = None
+    if m.get("house"):
+        h = m["house"]
+        house = House(
+            id=str(h["_id"]),
+            name=h["name"],
+            organization_id=h["organization_id"],
+            created_at=h["created_at"],
+            updated_at=h["updated_at"],
+        )
 
     return OrganizationMember(
-        id=m.id,
-        user_id=m.userId,
-        organization_id=m.organizationId,
-        house_id=m.houseId,
-        role=Role(m.role),
-        created_at=m.createdAt,
+        id=str(m["_id"]),
+        user_id=m["user_id"],
+        organization_id=m["organization_id"],
+        house_id=m.get("house_id"),
+        role=Role(m["role"]),
+        created_at=m["created_at"],
         organization=org,
+        house=house,
     )
 
 
-def _prisma_house_to_graphql(h) -> House:
-    """Convert a Prisma House model to GraphQL House type."""
+def _mongo_house_to_graphql(h: dict) -> House:
+    """Convert a MongoDB House document to GraphQL House type."""
     residents = []
-    if hasattr(h, "residents") and h.residents:
-        for m in h.residents:
+    if h.get("residents"):
+        for m in h["residents"]:
             residents.append(
                 OrganizationMember(
-                    id=m.id,
-                    user_id=m.userId,
-                    organization_id=m.organizationId,
-                    house_id=m.houseId,
-                    role=Role(m.role),
-                    created_at=m.createdAt,
+                    id=str(m["_id"]),
+                    user_id=m["user_id"],
+                    organization_id=m["organization_id"],
+                    house_id=m.get("house_id"),
+                    role=Role(m["role"]),
+                    created_at=m["created_at"],
                     organization=(
                         Organization(
                             id="",
                             name="",
                             slug="",
-                            created_at=m.createdAt,
-                            updated_at=m.createdAt,
+                            created_at=m["created_at"],
+                            updated_at=m["created_at"],
                         )
-                        if not (hasattr(m, "organization") and m.organization)
+                        if not m.get("organization")
                         else Organization(
-                            id=m.organization.id,
-                            name=m.organization.name,
-                            slug=m.organization.slug,
-                            created_at=m.organization.createdAt,
-                            updated_at=m.organization.updatedAt,
+                            id=str(m["organization"]["_id"]),
+                            name=m["organization"]["name"],
+                            slug=m["organization"]["slug"],
+                            created_at=m["organization"]["created_at"],
+                            updated_at=m["organization"]["updated_at"],
                         )
                     ),
                 )
             )
 
     return House(
-        id=h.id,
-        name=h.name,
-        organization_id=h.organizationId,
-        created_at=h.createdAt,
-        updated_at=h.updatedAt,
+        id=str(h["_id"]),
+        name=h["name"],
+        organization_id=h["organization_id"],
+        created_at=h["created_at"],
+        updated_at=h["updated_at"],
         residents=residents,
     )
 
@@ -86,7 +97,7 @@ def _prisma_house_to_graphql(h) -> House:
 async def resolve_houses(info: Any, organization_id: str) -> List[House]:
     """Resolver for listing houses in an organization."""
     houses = await service_get_houses(organization_id)
-    return [_prisma_house_to_graphql(h) for h in houses]
+    return [_mongo_house_to_graphql(h) for h in houses]
 
 
 async def resolve_house(info: Any, id: str) -> Optional[House]:
@@ -94,7 +105,7 @@ async def resolve_house(info: Any, id: str) -> Optional[House]:
     house = await service_get_house(id)
     if not house:
         return None
-    return _prisma_house_to_graphql(house)
+    return _mongo_house_to_graphql(house)
 
 
 async def resolve_create_house(info: Any, organization_id: str, name: str) -> House:
@@ -104,7 +115,7 @@ async def resolve_create_house(info: Any, organization_id: str, name: str) -> Ho
         raise Exception("Authentication required")
 
     house = await service_create_house(organization_id, name)
-    return _prisma_house_to_graphql(house)
+    return _mongo_house_to_graphql(house)
 
 
 async def resolve_update_house(info: Any, id: str, name: str) -> House:
@@ -114,7 +125,7 @@ async def resolve_update_house(info: Any, id: str, name: str) -> House:
         raise Exception("Authentication required")
 
     house = await service_update_house(id, name)
-    return _prisma_house_to_graphql(house)
+    return _mongo_house_to_graphql(house)
 
 
 async def resolve_delete_house(info: Any, id: str) -> bool:
@@ -135,7 +146,7 @@ async def resolve_assign_resident_to_house(
         raise Exception("Authentication required")
 
     member = await service_assign_resident(user_id, house_id)
-    return _prisma_member_to_graphql(member)
+    return _mongo_member_to_graphql(member)
 
 
 async def resolve_remove_resident_from_house(
@@ -147,4 +158,4 @@ async def resolve_remove_resident_from_house(
         raise Exception("Authentication required")
 
     member = await service_remove_resident(user_id, organization_id)
-    return _prisma_member_to_graphql(member)
+    return _mongo_member_to_graphql(member)

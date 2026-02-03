@@ -18,7 +18,6 @@ pnpm lint                   # Run ESLint (web) + Black/Isort/Flake8 (api)
 pnpm lint:fix               # Fix linting issues
 pnpm test                   # Run Jest (web) + Pytest (api)
 pnpm typecheck              # TypeScript type checking
-pnpm migrate                # Run Prisma database migrations
 ```
 
 ### Single App Commands
@@ -28,14 +27,6 @@ pnpm --filter web dev       # Run frontend only
 pnpm --filter api dev       # Run backend only
 pnpm --filter web test      # Run frontend tests only
 pnpm --filter api test      # Run backend tests only
-```
-
-### Database
-
-```bash
-pnpm --filter api run prisma:generate   # Generate Prisma client
-pnpm --filter api run prisma:migrate    # Run migrations
-pnpm --filter api run prisma:studio     # Open Prisma Studio
 ```
 
 ### Running Single Tests
@@ -59,7 +50,8 @@ cd ../.. && .venv/bin/python -m pytest apps/api/tests/<test_file.py>::<test_func
 ### Backend (`apps/api/`)
 
 - FastAPI with Strawberry GraphQL at `/api/graphql`
-- Prisma Python Client for PostgreSQL (async)
+- MongoDB Atlas with Motor (async driver) for database
+- Pydantic models for document validation
 - Entry point: `apps/api/index.py` with `app` FastAPI instance
 
 ### GraphQL Layer Structure
@@ -68,19 +60,26 @@ cd ../.. && .venv/bin/python -m pytest apps/api/tests/<test_file.py>::<test_func
 apps/api/
 ├── schema.py              # Strawberry schema combining all queries/mutations
 ├── graphql_types/         # Strawberry type definitions (input/output types)
+├── models/                # Pydantic document models for MongoDB
+│   ├── base.py            # BaseDocument with ObjectId handling
+│   ├── user.py            # User document model
+│   ├── organization.py    # Organization document model
+│   ├── house.py           # House document model
+│   └── ...                # Other entity models
 ├── schemas/               # Query/Mutation class definitions + BaseSchemaGenerator
 │   └── base.py            # Generic schema generator for CRUD operations
-└── resolvers/             # Data access layer using Prisma
+└── resolvers/             # Data access layer using Motor
     └── base.py            # Generic resolver with CRUD operations
 ```
 
 **Pattern for adding new entities:**
 
-1. Add model to `apps/api/prisma/schema.prisma`
+1. Create Pydantic model in `models/<entity>.py`
 2. Create GraphQL types in `graphql_types/<entity>.py`
 3. Create resolver in `resolvers/<entity>.py` (extend `BaseResolver`)
 4. Create schema in `schemas/<entity>.py` (extend `BaseSchemaGenerator`)
 5. Register in `schema.py` Query/Mutation classes
+6. Add indexes in `database.py` `_create_indexes()` method
 
 ### Production Routing
 
@@ -93,8 +92,9 @@ Handled by `vercel.json`: `/api/*` routes to Python serverless function, everyth
 - Black formatter (line length 88)
 - isort for imports (black profile)
 - flake8 for linting (max line 120)
-- Async/await throughout (Prisma async interface)
-- GraphQL uses snake_case, Prisma models use camelCase - conversion handled in `BaseSchemaGenerator.model_to_graphql()`
+- Async/await throughout (Motor async interface)
+- MongoDB uses snake_case field names
+- GraphQL uses snake_case, conversion handled in resolvers
 
 ### TypeScript (Frontend)
 
@@ -104,8 +104,19 @@ Handled by `vercel.json`: `/api/*` routes to Python serverless function, everyth
 
 ## Environment Variables
 
-- `DATABASE_URL`: PostgreSQL connection string (required)
-- For Vercel deployment: `POSTGRES_URL_NON_POOLING` is checked in `database.py`
+- `MONGODB_URI`: MongoDB Atlas connection string (required)
+- `MONGODB_DB_NAME`: Database name (default: `condo_agora`)
+
+## Database Collections
+
+| Collection | Description |
+|------------|-------------|
+| `users` | User accounts (synced from Clerk) |
+| `organizations` | Condo organizations |
+| `organization_members` | User-organization memberships |
+| `houses` | Units/houses within organizations |
+| `invitations` | Pending invitations |
+| `notes` | Notes (example entity) |
 
 ## Detailed Documentation
 
@@ -116,7 +127,7 @@ For comprehensive documentation, see the `docs/` folder:
 | [docs/OVERVIEW.md](docs/OVERVIEW.md)     | System architecture and data flow        |
 | [docs/BACKEND.md](docs/BACKEND.md)       | FastAPI, GraphQL, resolver patterns      |
 | [docs/FRONTEND.md](docs/FRONTEND.md)     | Next.js, React components, hooks         |
-| [docs/DATABASE.md](docs/DATABASE.md)     | Prisma schema, migrations, queries       |
+| [docs/DATABASE.md](docs/DATABASE.md)     | MongoDB schema and queries               |
 | [docs/GRAPHQL.md](docs/GRAPHQL.md)       | GraphQL types, queries, mutations        |
 | [docs/TESTING.md](docs/TESTING.md)       | Jest and Pytest patterns                 |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel deployment configuration          |

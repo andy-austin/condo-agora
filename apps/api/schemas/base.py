@@ -17,24 +17,24 @@ class BaseSchemaGenerator(
 
     @classmethod
     def model_to_graphql(cls, model_instance: Any) -> GraphQLType:
-        """Convert Prisma model instance to GraphQL type"""
+        """Convert MongoDB document or Pydantic model to GraphQL type"""
         model_dict = {}
 
         # Get all GraphQL type fields using __annotations__
         graphql_fields = getattr(cls.graphql_type, "__annotations__", {})
 
         for field_name in graphql_fields.keys():
-            # Handle Prisma's camelCase vs GraphQL's snake_case
-            prisma_field_name = field_name
-            if field_name == "is_published":
-                prisma_field_name = "isPublished"
-            elif field_name == "created_at":
-                prisma_field_name = "createdAt"
-            elif field_name == "updated_at":
-                prisma_field_name = "updatedAt"
-
-            if hasattr(model_instance, prisma_field_name):
-                model_dict[field_name] = getattr(model_instance, prisma_field_name)
+            # Handle MongoDB documents (dicts) vs Pydantic models
+            if isinstance(model_instance, dict):
+                # Handle _id -> id conversion
+                if field_name == "id" and "_id" in model_instance:
+                    model_dict[field_name] = str(model_instance["_id"])
+                elif field_name in model_instance:
+                    model_dict[field_name] = model_instance[field_name]
+            else:
+                # Handle Pydantic models
+                if hasattr(model_instance, field_name):
+                    model_dict[field_name] = getattr(model_instance, field_name)
 
         return cls.graphql_type(**model_dict)
 
@@ -45,7 +45,7 @@ class BaseSchemaGenerator(
         return [cls.model_to_graphql(model) for model in models]
 
     @classmethod
-    async def get_by_id_query(cls, id: int) -> Optional[GraphQLType]:
+    async def get_by_id_query(cls, id: str) -> Optional[GraphQLType]:
         db = await get_db()
         model = await cls.resolver_class.get_by_id(db, id)
         if not model:
@@ -60,7 +60,7 @@ class BaseSchemaGenerator(
 
     @classmethod
     async def update_mutation(
-        cls, id: int, input: UpdateInputType
+        cls, id: str, input: UpdateInputType
     ) -> Optional[GraphQLType]:
         db = await get_db()
         model = await cls.resolver_class.update(db, id, input)
@@ -69,6 +69,6 @@ class BaseSchemaGenerator(
         return cls.model_to_graphql(model)
 
     @classmethod
-    async def delete_mutation(cls, id: int) -> bool:
+    async def delete_mutation(cls, id: str) -> bool:
         db = await get_db()
         return await cls.resolver_class.delete(db, id)

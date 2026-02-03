@@ -21,7 +21,6 @@ async def verify_clerk_webhook(request: Request):
     payload = await request.body()
     headers = request.headers
 
-    # Extract Svix headers
     svix_id = headers.get("svix-id")
     svix_timestamp = headers.get("svix-timestamp")
     svix_signature = headers.get("svix-signature")
@@ -32,7 +31,6 @@ async def verify_clerk_webhook(request: Request):
     wh = Webhook(CLERK_WEBHOOK_SECRET)
 
     try:
-        # Verify and parse the payload
         msg = wh.verify(
             payload.decode(),
             {
@@ -69,55 +67,70 @@ async def handle_user_created(data: dict):
     last_name = data.get("last_name")
     image_url = data.get("image_url")
 
-    # Ensure DB is connected
     if not db.is_connected():
         await db.connect()
 
-    # Use upsert for idempotency
-    user = await db.user.upsert(
-        where={"clerkId": clerk_id},
-        data={
-            "create": {
-                "clerkId": clerk_id,
-                "email": primary_email,
-                "firstName": first_name,
-                "lastName": last_name,
-                "avatarUrl": image_url,
+    now = datetime.utcnow()
+
+    # Upsert user - find by clerk_id, update or create
+    existing_user = await db.db.users.find_one({"clerk_id": clerk_id})
+
+    if existing_user:
+        await db.db.users.update_one(
+            {"clerk_id": clerk_id},
+            {
+                "$set": {
+                    "email": primary_email,
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "avatar_url": image_url,
+                    "updated_at": now,
+                }
             },
-            "update": {
-                "email": primary_email,
-                "firstName": first_name,
-                "lastName": last_name,
-                "avatarUrl": image_url,
-            },
-        },
-    )
+        )
+        user = await db.db.users.find_one({"clerk_id": clerk_id})
+    else:
+        user_data = {
+            "clerk_id": clerk_id,
+            "email": primary_email,
+            "first_name": first_name,
+            "last_name": last_name,
+            "avatar_url": image_url,
+            "created_at": now,
+            "updated_at": now,
+        }
+        result = await db.db.users.insert_one(user_data)
+        user = await db.db.users.find_one({"_id": result.inserted_id})
+
     print(f"User {clerk_id} created/synced in local DB")
 
     # Check for pending invitations matching this email
-    invitations = await db.invitation.find_many(
-        where={
+    cursor = db.db.invitations.find(
+        {
             "email": primary_email,
-            "acceptedAt": None,
-            "expiresAt": {"gt": datetime.now()},
+            "accepted_at": None,
+            "expires_at": {"$gt": now},
         }
     )
 
-    for invite in invitations:
+    async for invite in cursor:
         # Add user to organization
-        await db.organizationmember.create(
-            data={
-                "userId": user.id,
-                "organizationId": invite.organizationId,
-                "role": invite.role,
-            }
-        )
+        member_data = {
+            "user_id": str(user["_id"]),
+            "organization_id": invite["organization_id"],
+            "role": invite["role"],
+            "house_id": invite.get("house_id"),
+            "created_at": now,
+            "updated_at": now,
+        }
+        await db.db.organization_members.insert_one(member_data)
+
         # Mark invitation as accepted
-        await db.invitation.update(
-            where={"id": invite.id}, data={"acceptedAt": datetime.now()}
+        await db.db.invitations.update_one(
+            {"_id": invite["_id"]}, {"$set": {"accepted_at": now, "updated_at": now}}
         )
         print(
-            f"User {clerk_id} auto-joined organization {invite.organizationId} via invitation"
+            f"User {clerk_id} auto-joined organization {invite['organization_id']} via invitation"
         )
 
 
@@ -138,17 +151,19 @@ async def handle_user_updated(data: dict):
     last_name = data.get("last_name")
     image_url = data.get("image_url")
 
-    # Ensure DB is connected
     if not db.is_connected():
         await db.connect()
 
-    await db.user.update(
-        where={"clerkId": clerk_id},
-        data={
-            "email": primary_email,
-            "firstName": first_name,
-            "lastName": last_name,
-            "avatarUrl": image_url,
+    await db.db.users.update_one(
+        {"clerk_id": clerk_id},
+        {
+            "$set": {
+                "email": primary_email,
+                "first_name": first_name,
+                "last_name": last_name,
+                "avatar_url": image_url,
+                "updated_at": datetime.utcnow(),
+            }
         },
     )
     print(f"User {clerk_id} updated in local DB")

@@ -24,11 +24,10 @@ async def get_current_user(auth: HTTPAuthorizationCredentials = Security(securit
             status_code=401, detail="Invalid token payload: missing sub"
         )
 
-    # Ensure DB is connected
     if not db.is_connected():
         await db.connect()
 
-    user = await db.user.find_unique(where={"clerkId": clerk_id})
+    user = await db.db.users.find_one({"clerk_id": clerk_id})
 
     if not user:
         raise HTTPException(
@@ -36,6 +35,8 @@ async def get_current_user(auth: HTTPAuthorizationCredentials = Security(securit
             detail="User record not found. Identity sync may be in progress.",
         )
 
+    # Convert ObjectId to string for the id field
+    user["id"] = str(user["_id"])
     return user
 
 
@@ -60,7 +61,9 @@ async def get_current_user_optional(
         if not db.is_connected():
             await db.connect()
 
-        user = await db.user.find_unique(where={"clerkId": clerk_id})
+        user = await db.db.users.find_one({"clerk_id": clerk_id})
+        if user:
+            user["id"] = str(user["_id"])
         return user
     except Exception as e:
         print(f"Auth Error in optional dependency: {e}")
