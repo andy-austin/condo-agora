@@ -40,7 +40,10 @@ if [ ! -f ".env" ]; then
     if [ -f ".env.example" ]; then
         echo "Creating .env from .env.example..."
         cp .env.example .env
-        echo "Please update .env with your actual database credentials if needed."
+        echo ""
+        echo "IMPORTANT: Update .env with your MongoDB connection string!"
+        echo "  - MONGODB_URI: Your MongoDB Atlas connection string"
+        echo "  - MONGODB_DB_NAME: Database name (default: condo_agora)"
     else
         echo "Warning: .env.example not found. Skipping .env creation."
     fi
@@ -48,42 +51,16 @@ else
     echo ".env already exists"
 fi
 
-# Start Docker Postgres if Docker is available and no database is running
-echo "Checking database..."
-if command -v docker &> /dev/null; then
-    if ! docker ps --format '{{.Names}}' | grep -q "^condo-agora-db$"; then
-        echo "Starting PostgreSQL in Docker..."
-        # Remove stopped container if exists
-        docker rm -f condo-agora-db 2>/dev/null || true
-        docker run --name condo-agora-db \
-            -e POSTGRES_USER=postgres \
-            -e POSTGRES_PASSWORD=postgres \
-            -e POSTGRES_DB=condo_agora \
-            -p 5432:5432 \
-            -d postgres:15
-        echo "Waiting for PostgreSQL to be ready..."
-        sleep 3
-        echo "PostgreSQL is running on localhost:5432"
+# Verify MongoDB connection string is configured
+if [ -f ".env" ]; then
+    if grep -q "^MONGODB_URI=" .env && ! grep -q "MONGODB_URI=mongodb+srv://username:password" .env; then
+        echo "MongoDB URI appears to be configured."
     else
-        echo "PostgreSQL container 'condo-agora-db' is already running"
+        echo ""
+        echo "WARNING: MONGODB_URI not configured in .env"
+        echo "Please update .env with your MongoDB Atlas connection string."
     fi
-else
-    echo "Docker not found. Please ensure PostgreSQL is running manually."
-    echo "Expected connection: postgresql://postgres:postgres@localhost:5432/condo_agora"
 fi
-
-# Generate Prisma client
-echo "Generating Prisma client..."
-if [ -d "apps/api/prisma" ]; then
-    pnpm --filter api run prisma:generate
-    echo "Prisma client generated!"
-else
-    echo "Warning: Prisma schema directory not found in apps/api/prisma"
-fi
-
-# Run database migrations
-echo "Running database migrations..."
-pnpm migrate || echo "Warning: Migration failed. You may need to check your database connection."
 
 # Set up pre-commit hooks (optional)
 echo "Setting up pre-commit hooks..."
@@ -109,9 +86,8 @@ echo "  pnpm dev          - Start development servers"
 echo "  pnpm lint         - Run all linters"
 echo "  pnpm lint:fix     - Fix linting issues"
 echo "  pnpm test         - Run tests"
-echo "  pnpm migrate      - Run database migrations"
 echo ""
 echo "Database:"
-echo "  Docker container: condo-agora-db"
-echo "  Connection: postgresql://postgres:postgres@localhost:5432/condo_agora"
+echo "  Using MongoDB Atlas (cloud-hosted)"
+echo "  Connection configured via MONGODB_URI in .env"
 echo ""
