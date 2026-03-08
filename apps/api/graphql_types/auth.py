@@ -25,7 +25,7 @@ class Organization:
     created_at: datetime
     updated_at: datetime
     houses: List[
-        Annotated["House", strawberry.lazy("apps.api.graphql_types.house")]
+        Annotated["House", strawberry.lazy(".house")]
     ] = strawberry.field(default_factory=list)
     houses_count: int = 0
 
@@ -40,7 +40,7 @@ class OrganizationMember:
     created_at: datetime
     organization: Organization
     house: Optional[
-        Annotated["House", strawberry.lazy("apps.api.graphql_types.house")]
+        Annotated["House", strawberry.lazy(".house")]
     ] = None
 
 
@@ -87,5 +87,5 @@ class Invitation:
     created_at: datetime
     accepted_at: Optional[datetime]
     house: Optional[
-        Annotated["House", strawberry.lazy("apps.api.graphql_types.house")]
+        Annotated["House", strawberry.lazy(".house")]
     ] = None
