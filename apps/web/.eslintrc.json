@@ -4,6 +4,7 @@
     "project": "./tsconfig.json"
   },
   "rules": {
-    "@next/next/no-html-link-for-pages": ["error", "app"]
+    "@next/next/no-html-link-for-pages": ["error", "app"],
+    "no-unused-vars": ["error", { "args": "none", "ignoreRestSiblings": true }]
   }
 }

@@ -159,9 +159,7 @@ async def resolve_update_member_role(
 
     from bson import ObjectId
 
-    member = await db.db.organization_members.find_one(
-        {"_id": ObjectId(member_id)}
-    )
+    member = await db.db.organization_members.find_one({"_id": ObjectId(member_id)})
     if not member:
         raise Exception("Member not found")
 

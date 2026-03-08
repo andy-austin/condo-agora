@@ -164,9 +164,7 @@ async def get_organization_members(organization_id: str):
         await db.connect()
 
     members = []
-    cursor = db.db.organization_members.find(
-        {"organization_id": organization_id}
-    )
+    cursor = db.db.organization_members.find({"organization_id": organization_id})
     async for member in cursor:
         # Fetch user info
         user = await db.db.users.find_one({"_id": ObjectId(member["user_id"])})
@@ -194,18 +192,14 @@ async def get_organization_members(organization_id: str):
     return members
 
 
-async def update_member_role(
-    member_id: str, new_role: str, admin_user_id: str
-):
+async def update_member_role(member_id: str, new_role: str, admin_user_id: str):
     """
     Update a member's role. Prevents removing the last admin.
     """
     if not db.is_connected():
         await db.connect()
 
-    member = await db.db.organization_members.find_one(
-        {"_id": ObjectId(member_id)}
-    )
+    member = await db.db.organization_members.find_one({"_id": ObjectId(member_id)})
     if not member:
         raise Exception("Member not found")
 
@@ -224,7 +218,9 @@ async def update_member_role(
 
     # Prevent self-demotion from admin
     if member["user_id"] == admin_user_id and new_role != "ADMIN":
-        raise Exception("You cannot demote yourself. Ask another admin to change your role.")
+        raise Exception(
+            "You cannot demote yourself. Ask another admin to change your role."
+        )
 
     now = datetime.utcnow()
     updated = await db.db.organization_members.find_one_and_update(
@@ -245,9 +241,7 @@ async def update_member_role(
     house = None
     if updated.get("house_id"):
         try:
-            house = await db.db.houses.find_one(
-                {"_id": ObjectId(updated["house_id"])}
-            )
+            house = await db.db.houses.find_one({"_id": ObjectId(updated["house_id"])})
         except Exception:
             pass
     updated["house"] = house

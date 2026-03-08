@@ -12,7 +12,6 @@ import {
 } from '@/lib/queries/members';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 
 const ME_QUERY = `
   query Me {
@@ -39,7 +38,6 @@ export default function CommitteePage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [organizationName, setOrganizationName] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -72,7 +70,6 @@ export default function CommitteePage() {
 
         const membership = meData.me.memberships[0];
         const orgId = membership.organization.id;
-        setOrganizationId(orgId);
         setOrganizationName(membership.organization.name);
         setIsAdmin(membership.role === 'ADMIN');
 
