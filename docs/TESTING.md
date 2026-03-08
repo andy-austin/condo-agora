@@ -454,7 +454,7 @@ Two authentication strategies:
 
 Test credentials are configured via environment variables:
 - `E2E_USER_EMAIL` (default: `tests@agora.com`)
-- `E2E_USER_PASSWORD` (default: `Test1234`)
+- `E2E_USER_PASSWORD` (default: `3AgF…XrXqBX0Qa`)
 
 #### API-Level Tests (`fixtures/graphql.ts`)
 

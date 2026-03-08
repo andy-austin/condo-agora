@@ -8,6 +8,11 @@ from ..graphql_types.auth import (
     Role,
 )
 from ..graphql_types.house import House
+from ..src.auth.permissions import (
+    get_org_id_for_house,
+    require_org_admin,
+    require_org_member,
+)
 from ..src.house.service import assign_resident_to_house as service_assign_resident
 from ..src.house.service import create_house as service_create_house
 from ..src.house.service import delete_house as service_delete_house
@@ -90,6 +95,7 @@ def _mongo_house_to_graphql(h: dict) -> House:
         id=str(h["_id"]),
         name=h["name"],
         organization_id=h["organization_id"],
+        max_residents=h.get("max_residents", 1),
         created_at=h["created_at"],
         updated_at=h["updated_at"],
         residents=residents,
@@ -100,6 +106,10 @@ async def resolve_houses(
     info: strawberry.types.Info, organization_id: str
 ) -> List[House]:
     """Resolver for listing houses in an organization."""
+    user = info.context.get("user")
+    if user:
+        await require_org_member(user, organization_id)
+
     houses = await service_get_houses(organization_id)
     return [_mongo_house_to_graphql(h) for h in houses]
 
@@ -115,10 +125,9 @@ async def resolve_house(info: strawberry.types.Info, id: str) -> Optional[House]
 async def resolve_create_house(
     info: strawberry.types.Info, organization_id: str, name: str
 ) -> House:
-    """Resolver for creating a new house."""
+    """Resolver for creating a new house. ADMIN only."""
     user = info.context.get("user")
-    if not user:
-        raise Exception("Authentication required")
+    await require_org_admin(user, organization_id)
 
     house = await service_create_house(organization_id, name)
     return _mongo_house_to_graphql(house)
@@ -127,20 +136,30 @@ async def resolve_create_house(
 async def resolve_update_house(
     info: strawberry.types.Info, id: str, name: str
 ) -> House:
-    """Resolver for updating a house."""
+    """Resolver for updating a house. ADMIN only."""
     user = info.context.get("user")
     if not user:
         raise Exception("Authentication required")
+
+    org_id = await get_org_id_for_house(id)
+    if not org_id:
+        raise Exception("House not found")
+    await require_org_admin(user, org_id)
 
     house = await service_update_house(id, name)
     return _mongo_house_to_graphql(house)
 
 
 async def resolve_delete_house(info: strawberry.types.Info, id: str) -> bool:
-    """Resolver for deleting a house."""
+    """Resolver for deleting a house. ADMIN only."""
     user = info.context.get("user")
     if not user:
         raise Exception("Authentication required")
+
+    org_id = await get_org_id_for_house(id)
+    if not org_id:
+        raise Exception("House not found")
+    await require_org_admin(user, org_id)
 
     return await service_delete_house(id)
 
@@ -148,10 +167,15 @@ async def resolve_delete_house(info: strawberry.types.Info, id: str) -> bool:
 async def resolve_assign_resident_to_house(
     info: strawberry.types.Info, user_id: str, house_id: str
 ) -> OrganizationMember:
-    """Resolver for assigning a resident to a house."""
+    """Resolver for assigning a resident to a house. ADMIN only."""
     user = info.context.get("user")
     if not user:
         raise Exception("Authentication required")
+
+    org_id = await get_org_id_for_house(house_id)
+    if not org_id:
+        raise Exception("House not found")
+    await require_org_admin(user, org_id)
 
     member = await service_assign_resident(user_id, house_id)
     return _mongo_member_to_graphql(member)
@@ -160,10 +184,9 @@ async def resolve_assign_resident_to_house(
 async def resolve_remove_resident_from_house(
     info: strawberry.types.Info, user_id: str, organization_id: str
 ) -> OrganizationMember:
-    """Resolver for removing a resident from a house."""
+    """Resolver for removing a resident from a house. ADMIN only."""
     user = info.context.get("user")
-    if not user:
-        raise Exception("Authentication required")
+    await require_org_admin(user, organization_id)
 
     member = await service_remove_resident(user_id, organization_id)
     return _mongo_member_to_graphql(member)

@@ -8,6 +8,61 @@ from ...database import db
 from .clerk_utils import create_clerk_invitation
 
 
+def _slugify(text: str) -> str:
+    """Convert a string to a URL-friendly slug."""
+    import re
+    import unicodedata
+
+    text = unicodedata.normalize("NFKD", text)
+    text = text.encode("ascii", "ignore").decode("ascii")
+    text = text.lower().strip()
+    text = re.sub(r"[^\w\s-]", "", text)
+    text = re.sub(r"[-\s]+", "-", text)
+    return text.strip("-")
+
+
+async def create_organization(name: str, creator_user_id: str):
+    """
+    Create a new organization and make the creator an ADMIN.
+    Returns the created organization document.
+    """
+    if not db.is_connected():
+        await db.connect()
+
+    slug = _slugify(name)
+
+    # Check for slug uniqueness, append number if needed
+    existing = await db.db.organizations.find_one({"slug": slug})
+    if existing:
+        counter = 1
+        while await db.db.organizations.find_one({"slug": f"{slug}-{counter}"}):
+            counter += 1
+        slug = f"{slug}-{counter}"
+
+    now = datetime.utcnow()
+    org_data = {
+        "name": name,
+        "slug": slug,
+        "created_at": now,
+        "updated_at": now,
+    }
+    result = await db.db.organizations.insert_one(org_data)
+    org_data["_id"] = result.inserted_id
+
+    # Add creator as ADMIN
+    member_data = {
+        "user_id": creator_user_id,
+        "organization_id": str(result.inserted_id),
+        "role": "ADMIN",
+        "house_id": None,
+        "created_at": now,
+        "updated_at": now,
+    }
+    await db.db.organization_members.insert_one(member_data)
+
+    return org_data
+
+
 async def create_invitation(
     email: str, organization_id: str, inviter_id: str, role: str
 ):
@@ -99,6 +154,105 @@ async def accept_invitation(token: str, user_id: str):
     )
 
     return updated_invitation, None
+
+
+async def get_organization_members(organization_id: str):
+    """
+    Get all members of an organization with their user details.
+    """
+    if not db.is_connected():
+        await db.connect()
+
+    members = []
+    cursor = db.db.organization_members.find(
+        {"organization_id": organization_id}
+    )
+    async for member in cursor:
+        # Fetch user info
+        user = await db.db.users.find_one({"_id": ObjectId(member["user_id"])})
+        member["user"] = user
+
+        # Fetch house if assigned
+        house = None
+        if member.get("house_id"):
+            try:
+                house = await db.db.houses.find_one(
+                    {"_id": ObjectId(member["house_id"])}
+                )
+            except Exception:
+                pass
+        member["house"] = house
+
+        # Fetch org
+        org = await db.db.organizations.find_one(
+            {"_id": ObjectId(member["organization_id"])}
+        )
+        member["organization"] = org
+
+        members.append(member)
+
+    return members
+
+
+async def update_member_role(
+    member_id: str, new_role: str, admin_user_id: str
+):
+    """
+    Update a member's role. Prevents removing the last admin.
+    """
+    if not db.is_connected():
+        await db.connect()
+
+    member = await db.db.organization_members.find_one(
+        {"_id": ObjectId(member_id)}
+    )
+    if not member:
+        raise Exception("Member not found")
+
+    org_id = member["organization_id"]
+
+    # If demoting from ADMIN, check we're not removing the last admin
+    if member["role"] == "ADMIN" and new_role != "ADMIN":
+        admin_count = await db.db.organization_members.count_documents(
+            {"organization_id": org_id, "role": "ADMIN"}
+        )
+        if admin_count <= 1:
+            raise Exception(
+                "Cannot remove the last administrator. "
+                "Promote another member to admin first."
+            )
+
+    # Prevent self-demotion from admin
+    if member["user_id"] == admin_user_id and new_role != "ADMIN":
+        raise Exception("You cannot demote yourself. Ask another admin to change your role.")
+
+    now = datetime.utcnow()
+    updated = await db.db.organization_members.find_one_and_update(
+        {"_id": ObjectId(member_id)},
+        {"$set": {"role": new_role, "updated_at": now}},
+        return_document=True,
+    )
+
+    # Fetch related data
+    user = await db.db.users.find_one({"_id": ObjectId(updated["user_id"])})
+    updated["user"] = user
+
+    org = await db.db.organizations.find_one(
+        {"_id": ObjectId(updated["organization_id"])}
+    )
+    updated["organization"] = org
+
+    house = None
+    if updated.get("house_id"):
+        try:
+            house = await db.db.houses.find_one(
+                {"_id": ObjectId(updated["house_id"])}
+            )
+        except Exception:
+            pass
+    updated["house"] = house
+
+    return updated
 
 
 async def get_user_with_memberships(user_id: str):

@@ -30,6 +30,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 Properties
               </Link>
               <Link
+                href="/dashboard/committee"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Committee
+              </Link>
+              <Link
                 href="/dashboard/settings"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >

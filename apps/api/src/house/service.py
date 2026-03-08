@@ -56,7 +56,7 @@ async def get_house(house_id: str):
     return house
 
 
-async def create_house(organization_id: str, name: str):
+async def create_house(organization_id: str, name: str, max_residents: int = 1):
     """Create a new house within an organization."""
     await _ensure_connected()
 
@@ -64,6 +64,7 @@ async def create_house(organization_id: str, name: str):
     house_data = {
         "name": name,
         "organization_id": organization_id,
+        "max_residents": max_residents,
         "created_at": now,
         "updated_at": now,
     }
@@ -132,6 +133,17 @@ async def assign_resident_to_house(user_id: str, house_id: str):
     if not house:
         raise Exception("House not found")
 
+    # Check max_residents limit (default 1 for legacy houses)
+    max_residents = house.get("max_residents", 1)
+    current_resident_count = await db.db.organization_members.count_documents(
+        {"house_id": str(house["_id"])}
+    )
+    if current_resident_count >= max_residents:
+        raise Exception(
+            f"This unit already has the maximum number of residents ({max_residents}). "
+            "Remove an existing resident before assigning a new one."
+        )
+
     member = await db.db.organization_members.find_one(
         {
             "user_id": user_id,
@@ -140,6 +152,13 @@ async def assign_resident_to_house(user_id: str, house_id: str):
     )
     if not member:
         raise Exception("User is not a member of this organization")
+
+    # Check if this user is already assigned to a different house in this org
+    if member.get("house_id") and member["house_id"] != str(house["_id"]):
+        raise Exception(
+            "User is already assigned to another unit. "
+            "Remove them from their current unit first."
+        )
 
     now = datetime.utcnow()
     updated_member = await db.db.organization_members.find_one_and_update(

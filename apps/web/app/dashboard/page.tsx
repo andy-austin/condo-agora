@@ -18,6 +18,10 @@ export default function DashboardPage() {
           <h2 className="text-xl font-semibold mb-2">Properties</h2>
           <p className="text-sm text-muted-foreground">Manage houses and units in your community.</p>
         </Link>
+        <Link href="/dashboard/committee" className="block p-6 border rounded-lg hover:border-primary transition-colors">
+          <h2 className="text-xl font-semibold mb-2">Committee</h2>
+          <p className="text-sm text-muted-foreground">View board members and manage roles.</p>
+        </Link>
         <Link href="/dashboard/settings" className="block p-6 border rounded-lg hover:border-primary transition-colors">
           <h2 className="text-xl font-semibold mb-2">Settings</h2>
           <p className="text-sm text-muted-foreground">Invite users and manage your profile.</p>

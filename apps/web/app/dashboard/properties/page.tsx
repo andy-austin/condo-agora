@@ -51,6 +51,7 @@ export default function PropertiesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchHouses = useCallback(async (orgId: string) => {
     const token = await getAuthToken();
@@ -78,6 +79,7 @@ export default function PropertiesPage() {
         const orgId = membership.organization.id;
         setOrganizationId(orgId);
         setOrganizationName(membership.organization.name);
+        setIsAdmin(membership.role === 'ADMIN');
 
         const houseList = await fetchHouses(orgId);
 
@@ -150,10 +152,14 @@ export default function PropertiesPage() {
             <p className="text-muted-foreground mt-1">{organizationName}</p>
           )}
         </div>
-        <CreateHouseDialog onSubmit={handleCreate} />
+        {isAdmin && <CreateHouseDialog onSubmit={handleCreate} />}
       </div>
 
-      <HouseList houses={houses} onDelete={handleDelete} deleting={deleting} />
+      <HouseList
+        houses={houses}
+        onDelete={isAdmin ? handleDelete : undefined}
+        deleting={deleting}
+      />
     </div>
   );
 }

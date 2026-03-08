@@ -58,6 +58,23 @@ class User:
 
 
 @strawberry.type
+class MemberWithUser:
+    """Organization member with their user profile details."""
+
+    id: str
+    user_id: str
+    organization_id: str
+    house_id: Optional[str] = None
+    role: Role
+    created_at: datetime
+    email: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    avatar_url: Optional[str] = None
+    house_name: Optional[str] = None
+
+
+@strawberry.type
 class Invitation:
     id: str
     email: str

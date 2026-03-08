@@ -73,6 +73,7 @@ mock_organization_members_collection.insert_one = AsyncMock(
     return_value=MagicMock(inserted_id="mock_id")
 )
 mock_organization_members_collection.find_one_and_update = AsyncMock(return_value=None)
+mock_organization_members_collection.count_documents = AsyncMock(return_value=0)
 mock_organization_members_collection.create_index = AsyncMock()
 
 mock_invitations_collection = MagicMock()

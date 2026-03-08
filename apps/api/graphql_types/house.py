@@ -25,6 +25,7 @@ class House:
     id: str
     name: str
     organization_id: str
+    max_residents: int = 1
     created_at: datetime
     updated_at: datetime
     residents: List[
