@@ -43,7 +43,7 @@ turbo.json
 
 
 # Root config files not needed at runtime
-pyproject.toml
+/pyproject.toml
 /tsconfig.json
 .env.example
 

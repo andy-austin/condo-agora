@@ -1,17 +1,4 @@
 {
-  "builds": [
-    {
-      "src": "apps/web/package.json",
-      "use": "@vercel/next"
-    },
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python@4.7.1",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
-    }
-  ],
   "routes": [
     {
       "src": "/api/(.*)",
