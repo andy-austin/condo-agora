@@ -96,7 +96,9 @@ def _mongo_house_to_graphql(h: dict) -> House:
     )
 
 
-async def resolve_houses(info: strawberry.types.Info, organization_id: str) -> List[House]:
+async def resolve_houses(
+    info: strawberry.types.Info, organization_id: str
+) -> List[House]:
     """Resolver for listing houses in an organization."""
     houses = await service_get_houses(organization_id)
     return [_mongo_house_to_graphql(h) for h in houses]
@@ -110,7 +112,9 @@ async def resolve_house(info: strawberry.types.Info, id: str) -> Optional[House]
     return _mongo_house_to_graphql(house)
 
 
-async def resolve_create_house(info: strawberry.types.Info, organization_id: str, name: str) -> House:
+async def resolve_create_house(
+    info: strawberry.types.Info, organization_id: str, name: str
+) -> House:
     """Resolver for creating a new house."""
     user = info.context.get("user")
     if not user:
@@ -120,7 +124,9 @@ async def resolve_create_house(info: strawberry.types.Info, organization_id: str
     return _mongo_house_to_graphql(house)
 
 
-async def resolve_update_house(info: strawberry.types.Info, id: str, name: str) -> House:
+async def resolve_update_house(
+    info: strawberry.types.Info, id: str, name: str
+) -> House:
     """Resolver for updating a house."""
     user = info.context.get("user")
     if not user:
