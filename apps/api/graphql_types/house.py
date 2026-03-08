@@ -28,6 +28,6 @@ class House:
     max_residents: int = 1
     created_at: datetime
     updated_at: datetime
-    residents: List[
-        Annotated["OrganizationMember", strawberry.lazy(".auth")]
-    ] = strawberry.field(default_factory=list)
+    residents: List[Annotated["OrganizationMember", strawberry.lazy(".auth")]] = (
+        strawberry.field(default_factory=list)
+    )

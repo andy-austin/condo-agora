@@ -24,9 +24,9 @@ class Organization:
     slug: str
     created_at: datetime
     updated_at: datetime
-    houses: List[
-        Annotated["House", strawberry.lazy(".house")]
-    ] = strawberry.field(default_factory=list)
+    houses: List[Annotated["House", strawberry.lazy(".house")]] = strawberry.field(
+        default_factory=list
+    )
     houses_count: int = 0
 
 
@@ -39,9 +39,7 @@ class OrganizationMember:
     role: Role
     created_at: datetime
     organization: Organization
-    house: Optional[
-        Annotated["House", strawberry.lazy(".house")]
-    ] = None
+    house: Optional[Annotated["House", strawberry.lazy(".house")]] = None
 
 
 @strawberry.type
@@ -86,6 +84,4 @@ class Invitation:
     expires_at: datetime
     created_at: datetime
     accepted_at: Optional[datetime]
-    house: Optional[
-        Annotated["House", strawberry.lazy(".house")]
-    ] = None
+    house: Optional[Annotated["House", strawberry.lazy(".house")]] = None
