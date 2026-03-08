@@ -1,20 +1,29 @@
 # Testing Guide
 
-The project uses Jest for frontend testing and Pytest for backend testing.
+The project uses Jest for frontend unit/component testing, Pytest for backend testing, and Playwright for end-to-end testing.
 
 ## Running Tests
 
 ```bash
-# Run all tests (both frontend and backend)
+# Run all unit tests (both frontend and backend)
 pnpm test
 
-# Run frontend tests only
+# Run frontend unit tests only
 pnpm --filter web test
 
 # Run backend tests only
 pnpm --filter api test
 
-# Watch mode (frontend)
+# Run E2E tests
+cd apps/web && pnpm test:e2e
+
+# Run E2E tests with interactive UI
+cd apps/web && pnpm test:e2e:ui
+
+# Run E2E tests in headed browser
+cd apps/web && pnpm test:e2e:headed
+
+# Watch mode (frontend unit tests)
 cd apps/web && pnpm test:watch
 
 # Watch mode (backend)
@@ -371,9 +380,131 @@ cd ../.. && .venv/bin/python -m pytest apps/api/tests/test_note.py::TestNoteQuer
 cd ../.. && .venv/bin/python -m pytest apps/api/tests/ -k "health" -v
 ```
 
+## E2E Testing (Playwright)
+
+### Configuration
+
+**File**: `apps/web/playwright.config.ts`
+
+Playwright is configured with:
+- **Test directory**: `apps/web/e2e/`
+- **Browser projects**: Chromium (desktop) and Mobile Chrome
+- **Dev server**: Auto-starts via `pnpm dev` if not already running
+- **Screenshots**: Captured on failure
+- **Traces**: Recorded on first retry
+
+### Setup
+
+```bash
+# Install Playwright and browser binaries
+cd apps/web
+pnpm add -D @playwright/test
+npx playwright install chromium
+
+# Optionally install additional browsers
+npx playwright install firefox webkit
+```
+
+### Test Structure
+
+```
+apps/web/e2e/
+├── fixtures/
+│   ├── auth.ts              # Clerk auth mocking + real login helpers
+│   └── graphql.ts           # GraphQL route interception + API client
+├── .auth/                   # Saved auth state (gitignored)
+├── auth.spec.ts             # Authentication flow tests
+├── dashboard.spec.ts        # Dashboard page tests
+├── health.spec.ts           # Health check page tests
+├── invitation.spec.ts       # Invitation flow tests
+├── landing.spec.ts          # Landing page tests (desktop + mobile)
+├── notes-api.spec.ts        # Notes CRUD API-level tests
+├── properties.spec.ts       # Properties CRUD tests
+└── residents.spec.ts        # Residents management tests
+```
+
+### Test Fixtures
+
+#### GraphQL Mocking (`fixtures/graphql.ts`)
+
+Intercepts GraphQL requests and returns mock responses:
+
+```typescript
+import { mockGraphQL } from './fixtures/graphql';
+
+test('shows properties', async ({ page }) => {
+  await mockGraphQL(page, [
+    { query: 'Me', response: { data: { me: { id: '1', memberships: [...] } } } },
+    { query: 'GetHouses', response: { data: { houses: [...] } } },
+  ]);
+
+  await page.goto('/dashboard/properties');
+  await expect(page.getByText('Unit 101')).toBeVisible();
+});
+```
+
+Handlers match by `operationName` or by substring in the `query` body.
+
+#### Auth Fixtures (`fixtures/auth.ts`)
+
+Two authentication strategies:
+
+1. **Mock Clerk Auth** — Intercepts Clerk API calls client-side. Used for isolated UI tests with GraphQL mocking.
+2. **Real Clerk Login** — Logs in through the actual Clerk sign-in page using test credentials. Session is cached in `.auth/user.json` for reuse.
+
+Test credentials are configured via environment variables:
+- `E2E_USER_EMAIL` (default: `tests@agora.com`)
+- `E2E_USER_PASSWORD` (default: `Test1234`)
+
+#### API-Level Tests (`fixtures/graphql.ts`)
+
+The `graphqlRequest()` utility sends GraphQL requests directly to the backend, bypassing the browser. Used for Notes CRUD tests.
+
+### Writing E2E Tests
+
+```typescript
+import { test, expect } from '@playwright/test';
+import { mockGraphQL } from './fixtures/graphql';
+
+test.describe('My Feature', () => {
+  test('does something', async ({ page }) => {
+    // Set up GraphQL mocks before navigation
+    await mockGraphQL(page, [
+      { query: 'MyQuery', response: { data: { ... } } },
+    ]);
+
+    await page.goto('/my-page');
+    await expect(page.getByText('Expected content')).toBeVisible();
+  });
+});
+```
+
+### Running Single E2E Tests
+
+```bash
+# Run a specific spec file
+cd apps/web && pnpm test:e2e -- e2e/landing.spec.ts
+
+# Run a specific test by name
+cd apps/web && pnpm test:e2e -- -g "hero section"
+
+# Run only on a specific project
+cd apps/web && pnpm test:e2e -- --project=chromium
+
+# Debug a test with browser inspector
+cd apps/web && pnpm test:e2e -- --debug e2e/health.spec.ts
+```
+
+### Notes on E2E Tests
+
+- **Public pages** (landing, health) use standard `page` fixture with route interception for GraphQL
+- **Protected pages** (dashboard, properties, settings) work in Clerk dev mode without real auth; GraphQL calls are mocked via route interception
+- **Notes API tests** hit the backend directly and skip gracefully when the API is unavailable
+- **Mobile tests** handle viewport-specific UI (hamburger menus, sticky nav overlap) with `isMobile` parameter
+
 ## Best Practices
 
-### Frontend
+### Frontend (Unit Tests)
 1. Test component behavior, not implementation
 2. Use `screen` queries over container queries
 3. Prefer `userEvent` over `fireEvent`
@@ -386,3 +517,11 @@ cd ../.. && .venv/bin/python -m pytest apps/api/tests/ -k "health" -v
 3. Test GraphQL through schema execution
 4. Use fixtures for common test data
 5. Test both success and error cases
+
+### E2E Tests
+1. Set up GraphQL mocks **before** navigating to the page
+2. Use specific locators (`getByRole`, `getByLabel`) over generic ones (`getByText`)
+3. Add `{ exact: true }` to `getByText` when the string is a substring of other elements
+4. Scope locators with `.locator()` or `.filter()` to avoid strict mode violations
+5. Use `isMobile` parameter to handle responsive layout differences
+6. Keep API-level tests separate from browser tests for faster execution

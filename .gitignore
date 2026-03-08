@@ -225,6 +225,13 @@ apps/api/prisma_client/
 !.env.example
 !.env.*.example
 
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+e2e/.auth/
+
 # TurboRepo
 .turbo/
 .cache/
@@ -261,3 +268,4 @@ apps/web/.clerk/
 # Prisma generated (auto-generated at build time via prisma generate)
 apps/api/prisma_client/
 apps/api/bin/
+apps/web/package-lock.json

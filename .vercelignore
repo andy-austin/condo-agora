@@ -41,12 +41,10 @@ GEMINI.md
 .turbo/
 turbo.json
 
-# Lock files (dependencies resolved at build time)
-pnpm-lock.yaml
 
 # Root config files not needed at runtime
-pyproject.toml
-tsconfig.json
+/pyproject.toml
+/tsconfig.json
 .env.example
 
 # === Standard ignores ===
