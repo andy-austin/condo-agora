@@ -39,6 +39,18 @@ cd apps/web && pnpm test -- --testPathPattern="<pattern>"
 cd ../.. && .venv/bin/python -m pytest apps/api/tests/<test_file.py>::<test_function> -v
 ```
 
+### E2E Tests (Playwright)
+
+```bash
+cd apps/web
+pnpm test:e2e                          # Run all E2E tests
+pnpm test:e2e:ui                       # Interactive UI mode
+pnpm test:e2e:headed                   # Headed browser mode
+pnpm test:e2e -- e2e/landing.spec.ts   # Run single spec file
+pnpm test:e2e -- -g "hero section"     # Run test by name
+pnpm test:e2e -- --project=chromium    # Specific browser only
+```
+
 ## Architecture
 
 ### Frontend (`apps/web/`)
@@ -129,6 +141,6 @@ For comprehensive documentation, see the `docs/` folder:
 | [docs/FRONTEND.md](docs/FRONTEND.md)     | Next.js, React components, hooks         |
 | [docs/DATABASE.md](docs/DATABASE.md)     | MongoDB schema and queries               |
 | [docs/GRAPHQL.md](docs/GRAPHQL.md)       | GraphQL types, queries, mutations        |
-| [docs/TESTING.md](docs/TESTING.md)       | Jest and Pytest patterns                 |
+| [docs/TESTING.md](docs/TESTING.md)       | Jest, Pytest, and Playwright E2E testing |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel deployment configuration          |
 | [docs/PATTERNS.md](docs/PATTERNS.md)     | Code patterns for extending the codebase |

@@ -9,7 +9,7 @@ Deployed on Vercel.
 - **Backend**: Python FastAPI with Strawberry GraphQL
 - **Database**: PostgreSQL managed by Prisma (Python Client)
 - **Type Safety**: End-to-end type safety with GraphQL and Prisma generated models
-- **Testing**: Jest/React Testing Library for frontend, Pytest for backend
+- **Testing**: Jest/React Testing Library for frontend, Pytest for backend, Playwright for E2E
 - **Monorepo**: TurboRepo for efficient build and dependency management
 - **Linting**: ESLint, Prettier, Black, and Flake8
 - **CI/CD**: GitHub Actions for automated testing and linting
@@ -85,8 +85,19 @@ pnpm migrate
 | `pnpm build`     | Build for production      |
 | `pnpm lint`      | Run all linters           |
 | `pnpm lint:fix`  | Fix linting issues        |
-| `pnpm test`      | Run tests                 |
+| `pnpm test`      | Run unit tests            |
 | `pnpm typecheck` | Check TypeScript types    |
+
+### E2E Tests
+
+```bash
+cd apps/web
+pnpm test:e2e            # Run all E2E tests
+pnpm test:e2e:ui         # Interactive UI mode
+pnpm test:e2e:headed     # Headed browser mode
+```
+
+Requires Chromium browser installed: `npx playwright install chromium`
 | `pnpm migrate`   | Run database migrations   |
 
 ## Project Structure
