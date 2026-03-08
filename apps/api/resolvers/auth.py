@@ -1,4 +1,6 @@
-from typing import Any, Optional
+from typing import Optional
+
+import strawberry
 
 from ..graphql_types.auth import (
     Invitation,
@@ -23,7 +25,7 @@ def _mongo_house_to_graphql(h: dict) -> House:
     )
 
 
-async def resolve_me(info: Any) -> Optional[User]:
+async def resolve_me(info: strawberry.types.Info) -> Optional[User]:
     """
     Resolver for the current authenticated user.
     """
@@ -77,7 +79,7 @@ async def resolve_me(info: Any) -> Optional[User]:
 
 
 async def resolve_create_invitation(
-    info: Any, email: str, organization_id: str, role: Role
+    info: strawberry.types.Info, email: str, organization_id: str, role: Role
 ) -> Invitation:
     """
     Resolver for creating an invitation.

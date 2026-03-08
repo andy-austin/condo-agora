@@ -1,4 +1,6 @@
-from typing import Any, List, Optional
+from typing import List, Optional
+
+import strawberry
 
 from ..graphql_types.auth import (
     Organization,
@@ -94,13 +96,13 @@ def _mongo_house_to_graphql(h: dict) -> House:
     )
 
 
-async def resolve_houses(info: Any, organization_id: str) -> List[House]:
+async def resolve_houses(info: strawberry.types.Info, organization_id: str) -> List[House]:
     """Resolver for listing houses in an organization."""
     houses = await service_get_houses(organization_id)
     return [_mongo_house_to_graphql(h) for h in houses]
 
 
-async def resolve_house(info: Any, id: str) -> Optional[House]:
+async def resolve_house(info: strawberry.types.Info, id: str) -> Optional[House]:
     """Resolver for getting a single house by ID."""
     house = await service_get_house(id)
     if not house:
@@ -108,7 +110,7 @@ async def resolve_house(info: Any, id: str) -> Optional[House]:
     return _mongo_house_to_graphql(house)
 
 
-async def resolve_create_house(info: Any, organization_id: str, name: str) -> House:
+async def resolve_create_house(info: strawberry.types.Info, organization_id: str, name: str) -> House:
     """Resolver for creating a new house."""
     user = info.context.get("user")
     if not user:
@@ -118,7 +120,7 @@ async def resolve_create_house(info: Any, organization_id: str, name: str) -> Ho
     return _mongo_house_to_graphql(house)
 
 
-async def resolve_update_house(info: Any, id: str, name: str) -> House:
+async def resolve_update_house(info: strawberry.types.Info, id: str, name: str) -> House:
     """Resolver for updating a house."""
     user = info.context.get("user")
     if not user:
@@ -128,7 +130,7 @@ async def resolve_update_house(info: Any, id: str, name: str) -> House:
     return _mongo_house_to_graphql(house)
 
 
-async def resolve_delete_house(info: Any, id: str) -> bool:
+async def resolve_delete_house(info: strawberry.types.Info, id: str) -> bool:
     """Resolver for deleting a house."""
     user = info.context.get("user")
     if not user:
@@ -138,7 +140,7 @@ async def resolve_delete_house(info: Any, id: str) -> bool:
 
 
 async def resolve_assign_resident_to_house(
-    info: Any, user_id: str, house_id: str
+    info: strawberry.types.Info, user_id: str, house_id: str
 ) -> OrganizationMember:
     """Resolver for assigning a resident to a house."""
     user = info.context.get("user")
@@ -150,7 +152,7 @@ async def resolve_assign_resident_to_house(
 
 
 async def resolve_remove_resident_from_house(
-    info: Any, user_id: str, organization_id: str
+    info: strawberry.types.Info, user_id: str, organization_id: str
 ) -> OrganizationMember:
     """Resolver for removing a resident from a house."""
     user = info.context.get("user")
