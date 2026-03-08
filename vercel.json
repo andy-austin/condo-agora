@@ -5,7 +5,7 @@
       "use": "@vercel/next"
     },
     {
-      "src": "apps/api/index.py",
+      "src": "api/index.py",
       "use": "@vercel/python@4.7.1",
       "config": {
         "maxLambdaSize": "50mb"
@@ -15,7 +15,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "apps/api/index.py"
+      "dest": "api/index.py"
     },
     {
       "src": "/(.*)",
