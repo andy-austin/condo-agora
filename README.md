@@ -1,24 +1,25 @@
 # Condo Agora
 
-**Production-ready full-stack template** combining React and Python, designed for high performance and scalability.
-Deployed on Vercel.
+**Full-stack condo management platform** combining React and Python, deployed on Vercel.
 
 ## Features
 
 - **Frontend**: Next.js 14 (App Router) with TypeScript & Tailwind CSS
 - **Backend**: Python FastAPI with Strawberry GraphQL
-- **Database**: PostgreSQL managed by Prisma (Python Client)
-- **Type Safety**: End-to-end type safety with GraphQL and Prisma generated models
+- **Database**: MongoDB Atlas with Motor (async driver)
+- **Auth**: Clerk for authentication and user management
+- **Type Safety**: End-to-end type safety with GraphQL and Pydantic models
 - **Testing**: Jest/React Testing Library for frontend, Pytest for backend, Playwright for E2E
 - **Monorepo**: TurboRepo for efficient build and dependency management
-- **Linting**: ESLint, Prettier, Black, and Flake8
+- **Linting**: ESLint (frontend), Black, isort, and flake8 (backend)
 - **CI/CD**: GitHub Actions for automated testing and linting
 
 ## Prerequisites
 
 - Node.js >= 18
 - pnpm (install with `npm install -g pnpm`)
-- Docker (for local PostgreSQL database)
+- Python 3.11+ (managed via [uv](https://docs.astral.sh/uv/))
+- A MongoDB Atlas account (free tier works for development)
 
 ## Quick Start
 
@@ -39,13 +40,19 @@ This script will:
 
 - Install Node.js dependencies (pnpm)
 - Install Python dependencies (uv + virtual environment)
-- Start a PostgreSQL database in Docker
-- Create `.env` with default database configuration
-- Generate the Prisma client
-- Run database migrations
+- Create `.env` from `.env.example`
 - Set up git pre-commit hooks
 
-### 3. Start development servers
+### 3. Configure environment variables
+
+Update `.env` with your MongoDB Atlas connection string:
+
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority
+MONGODB_DB_NAME=condo_agora
+```
+
+### 4. Start development servers
 
 ```bash
 pnpm dev
@@ -56,26 +63,6 @@ The application will be available at:
 - **Frontend**: [http://localhost:3000](http://localhost:3000)
 - **API (direct)**: [http://localhost:8000](http://localhost:8000)
 - **GraphQL Playground**: [http://localhost:8000/graphql](http://localhost:8000/graphql)
-
-## Manual Database Setup
-
-If you prefer to manage the database manually instead of using the setup script:
-
-```bash
-# Start PostgreSQL in Docker
-docker run --name condo-agora-db \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=condo_agora \
-  -p 5432:5432 \
-  -d postgres:15
-
-# Create .env with the connection string
-echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/condo_agora" > .env
-
-# Run migrations
-pnpm migrate
-```
 
 ## Common Commands
 
@@ -98,7 +85,6 @@ pnpm test:e2e:headed     # Headed browser mode
 ```
 
 Requires Chromium browser installed: `npx playwright install chromium`
-| `pnpm migrate`   | Run database migrations   |
 
 ## Project Structure
 
@@ -109,11 +95,14 @@ condo-agora/
 │   │   ├── app/             # App router pages
 │   │   └── ...
 │   └── api/                 # FastAPI backend
-│       ├── prisma/          # Prisma schema
-│       ├── prisma_client/   # Generated Prisma client
-│       ├── resolvers/       # GraphQL resolvers
-│       └── ...
-├── .env                     # Environment variables (created by setup.sh)
+│       ├── models/          # Pydantic document models
+│       ├── graphql_types/   # Strawberry GraphQL types
+│       ├── schemas/         # Query/Mutation definitions
+│       ├── resolvers/       # Data access layer (Motor)
+│       ├── schema.py        # Root GraphQL schema
+│       ├── database.py      # MongoDB connection & indexes
+│       └── index.py         # FastAPI entry point
+├── docs/                    # Detailed documentation
 ├── .env.example             # Example environment variables
 ├── setup.sh                 # Development setup script
 └── ...
@@ -121,9 +110,10 @@ condo-agora/
 
 ## Environment Variables
 
-| Variable       | Description                  | Default                                                     |
-|----------------|------------------------------|-------------------------------------------------------------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://postgres:postgres@localhost:5432/condo_agora` |
+| Variable         | Description                    | Default       |
+|------------------|--------------------------------|---------------|
+| `MONGODB_URI`    | MongoDB Atlas connection string | *(required)*  |
+| `MONGODB_DB_NAME`| Database name                  | `condo_agora` |
 
 ## Deployment
 
@@ -131,14 +121,24 @@ The project is configured for deployment on Vercel:
 
 - **Frontend**: Deployed as a Next.js application
 - **Backend**: Deployed as a Python serverless function
-- **Database**: Use Vercel Postgres or any PostgreSQL provider
+- **Database**: MongoDB Atlas (cloud-hosted)
 
-Set the `DATABASE_URL` environment variable in your Vercel project settings.
+Set `MONGODB_URI` and `MONGODB_DB_NAME` in your Vercel project settings.
 
 ## Documentation
 
-- [Frontend](./apps/web/README.md)
-- [Backend](./apps/api/README.md)
+For comprehensive documentation, see the `docs/` folder:
+
+| Document                                 | Purpose                                  |
+|------------------------------------------|------------------------------------------|
+| [docs/OVERVIEW.md](docs/OVERVIEW.md)     | System architecture and data flow        |
+| [docs/BACKEND.md](docs/BACKEND.md)       | FastAPI, GraphQL, resolver patterns      |
+| [docs/FRONTEND.md](docs/FRONTEND.md)     | Next.js, React components, hooks         |
+| [docs/DATABASE.md](docs/DATABASE.md)     | MongoDB schema and queries               |
+| [docs/GRAPHQL.md](docs/GRAPHQL.md)       | GraphQL types, queries, mutations        |
+| [docs/TESTING.md](docs/TESTING.md)       | Jest, Pytest, and Playwright E2E testing |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel deployment configuration          |
+| [docs/PATTERNS.md](docs/PATTERNS.md)     | Code patterns for extending the codebase |
 
 ## License
 

@@ -2,10 +2,11 @@
 import sys
 from pathlib import Path
 
-# Add apps/api to the Python path
-sys.path.insert(0, str(Path(__file__).parent.parent / "apps" / "api"))
+# Add apps/ to the Python path so 'api' is importable as a package
+# This enables relative imports within apps/api/
+sys.path.insert(0, str(Path(__file__).parent.parent / "apps"))
 
-from index import app
+from api.index import app
 
 # Vercel expects 'app' or 'handler' to be exported
 handler = app
