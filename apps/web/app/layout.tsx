@@ -26,7 +26,7 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body>
-        <ClerkProvider afterSignOutUrl="/">
+        <ClerkProvider afterSignOutUrl="/" afterSignUpUrl="/dashboard">
           <NextIntlClientProvider messages={messages}>
             {children}
           </NextIntlClientProvider>

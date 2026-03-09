@@ -1,5 +1,46 @@
 # Testing Roadmap — Condo Agora E2E
 
+## Bugs Found in Manual Testing
+
+> These bugs were discovered during a manual E2E walkthrough of the invitation flow (2026-03-08).
+> Each item maps to a GitHub issue and belongs in the **Milestone: Invitation Flow Fixes** milestone.
+
+### [BUG] Clerk invitation link does not redirect to app after sign-up
+- **Issue title**: `fix: Clerk invitation accept link doesn't redirect back to app`
+- **Labels**: `bug`, `auth`, `backend`, `frontend`
+- **Milestone**: `Invitation Flow Fixes`
+- **Description**: When a new user clicks "Accept invitation" in the email, Clerk handles sign-up on its hosted page (`accounts.dev`) but never redirects to the app. Root cause: `create_clerk_invitation()` is called without `redirect_url`, and `ClerkProvider`/`<SignUp>` lack `afterSignUpUrl`.
+- **Affected files**: `service.py`, `layout.tsx`, `sign-up/page.tsx`
+- **Fix**: Pass `redirect_url="https://condo-agora.vercel.app/dashboard"` in `create_clerk_invitation()` call; add `afterSignUpUrl="/dashboard"` to ClerkProvider and SignUp component.
+- **Status**: Fixed
+
+### [BUG] Invited users not associated with organization after sign-up
+- **Issue title**: `fix: Invited users not added to org when JIT provisioning runs`
+- **Labels**: `bug`, `auth`, `backend`, `critical`
+- **Milestone**: `Invitation Flow Fixes`
+- **Description**: Users who accept an invitation land in the app with no org membership. The JIT provisioning path (`_provision_user_from_clerk()`) creates the user record but never checks for pending invitations. The webhook handler has this logic but can lose the race.
+- **Affected files**: `dependencies.py`
+- **Fix**: Mirror `handle_user_created()` invitation logic in `_provision_user_from_clerk()`, guarded by an existing-member check to prevent duplicates.
+- **Status**: Fixed
+
+### [BUG] Invitation email shows "Personal workspace" instead of org name
+- **Issue title**: `fix: Invitation email shows "Personal workspace" instead of organization name`
+- **Labels**: `bug`, `ux`, `clerk`
+- **Milestone**: `Invitation Flow Fixes`
+- **Description**: The Clerk invitation email body reads "Personal workspace has invited you to join them on condo-agora." This is the Clerk instance display name, not the actual org. Requires configuring the Clerk instance display name or customizing the email template.
+- **Affected files**: Clerk Dashboard configuration (not code)
+- **Status**: Open
+
+### [BUG] No UI feedback when sending an invitation
+- **Issue title**: `fix: Invite form shows no success/error feedback after submission`
+- **Labels**: `bug`, `ux`, `frontend`
+- **Milestone**: `Invitation Flow Fixes`
+- **Description**: The "Send Invite" button submits silently. On success, the form doesn't clear or show a toast. On error (e.g. duplicate), the error is logged to console but no message is shown to the user.
+- **Affected files**: `apps/web/app/dashboard/settings/page.tsx` (or the Settings component)
+- **Status**: Open
+
+---
+
 ## Current State Assessment
 
 ### Existing E2E Tests (11 spec files)
@@ -123,6 +164,8 @@ Full user journeys with real auth (primarily admin).
 - [ ] Admin sends invitation with ADMIN role
 - [ ] Duplicate email invitation handling (error message)
 - [ ] Invalid email format validation
+- [ ] Invited user is redirected to `/dashboard` after sign-up _(see Bug: redirect)_
+- [ ] Invited user sees org membership on first load _(see Bug: JIT org association)_
 
 #### `e2e/resident-assignment.spec.ts` — Resident Assignment
 - [ ] Admin assigns resident to a house
@@ -262,3 +305,4 @@ E2E_USER_PASSWORD=3AgF…XrXqBX0Qa
 | Backend auth enforcement tests | 0 | ~12 |
 | Page coverage | 7/11 routes | 11/11 routes |
 | Mobile-specific tests | 1 (landing) | ~10 |
+| Bugs found in manual testing | 4 | 0 |
