@@ -105,3 +105,33 @@ export type UpdateHouseResponse = {
 export type DeleteHouseResponse = {
   deleteHouse: boolean;
 };
+
+export const ASSIGN_RESIDENT_TO_HOUSE = `
+  mutation AssignResidentToHouse($userId: String!, $houseId: String!) {
+    assignResidentToHouse(userId: $userId, houseId: $houseId) {
+      id
+      userId
+      houseId
+      role
+    }
+  }
+`;
+
+export const REMOVE_RESIDENT_FROM_HOUSE = `
+  mutation RemoveResidentFromHouse($userId: String!, $organizationId: String!) {
+    removeResidentFromHouse(userId: $userId, organizationId: $organizationId) {
+      id
+      userId
+      houseId
+      role
+    }
+  }
+`;
+
+export type AssignResidentResponse = {
+  assignResidentToHouse: HouseResident;
+};
+
+export type RemoveResidentResponse = {
+  removeResidentFromHouse: HouseResident;
+};

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthToken } from '@/hooks/use-auth-token';
@@ -8,14 +8,22 @@ import { getApiClient } from '@/lib/api';
 import {
   GET_HOUSE,
   UPDATE_HOUSE,
+  REMOVE_RESIDENT_FROM_HOUSE,
   type House,
   type GetHouseResponse,
   type UpdateHouseResponse,
+  type RemoveResidentResponse,
 } from '@/lib/queries/house';
+import {
+  GET_ORGANIZATION_MEMBERS,
+  type Member,
+  type GetMembersResponse,
+} from '@/lib/queries/members';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ErrorState } from '@/components/dashboard/states';
 import Breadcrumb from '@/components/dashboard/Breadcrumb';
+import AssignResidentDialog from '@/components/properties/AssignResidentDialog';
 import {
   Building2,
   Users,
@@ -71,41 +79,41 @@ export default function HouseDetailPage() {
   const [editName, setEditName] = useState('');
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    const fetchHouse = async () => {
-      try {
-        const token = await getAuthToken();
-        const client = getApiClient(token);
+  const fetchHouse = useCallback(async () => {
+    try {
+      const token = await getAuthToken();
+      const client = getApiClient(token);
 
-        const [houseData, meData] = await Promise.all([
-          client.request<GetHouseResponse>(GET_HOUSE, { id: houseId }),
-          client.request<MeResponse>(ME_QUERY),
-        ]);
+      const [houseData, meData] = await Promise.all([
+        client.request<GetHouseResponse>(GET_HOUSE, { id: houseId }),
+        client.request<MeResponse>(ME_QUERY),
+      ]);
 
-        if (!houseData.house) {
-          setError('Property not found.');
-          return;
-        }
-
-        setHouse(houseData.house);
-        setEditName(houseData.house.name);
-
-        if (meData.me) {
-          const membership = meData.me.memberships.find(
-            (m) => m.organization.id === houseData.house!.organizationId
-          );
-          setIsAdmin(membership?.role === 'ADMIN');
-        }
-      } catch (err) {
-        console.error('Failed to load property:', err);
-        setError('Failed to load property details.');
-      } finally {
-        setLoading(false);
+      if (!houseData.house) {
+        setError('Property not found.');
+        return;
       }
-    };
 
-    fetchHouse();
+      setHouse(houseData.house);
+      setEditName(houseData.house.name);
+
+      if (meData.me) {
+        const membership = meData.me.memberships.find(
+          (m) => m.organization.id === houseData.house!.organizationId
+        );
+        setIsAdmin(membership?.role === 'ADMIN');
+      }
+    } catch (err) {
+      console.error('Failed to load property:', err);
+      setError('Failed to load property details.');
+    } finally {
+      setLoading(false);
+    }
   }, [houseId, getAuthToken]);
+
+  useEffect(() => {
+    fetchHouse();
+  }, [fetchHouse]);
 
   const handleSave = async () => {
     if (!editName.trim() || !house) return;
@@ -262,7 +270,14 @@ export default function HouseDetailPage() {
 
       {/* Tab Content */}
       {activeTab === 'overview' && <OverviewTab house={house} />}
-      {activeTab === 'residents' && <ResidentsTab house={house} isAdmin={isAdmin} />}
+      {activeTab === 'residents' && (
+        <ResidentsTab
+          house={house}
+          isAdmin={isAdmin}
+          getAuthToken={getAuthToken}
+          onRefresh={fetchHouse}
+        />
+      )}
     </div>
   );
 }
@@ -348,13 +363,86 @@ function OverviewTab({ house }: { house: House }) {
 
 // ---------- Residents Tab ----------
 
-function ResidentsTab({ house, isAdmin }: { house: House; isAdmin: boolean }) {
+function ResidentsTab({
+  house,
+  isAdmin,
+  getAuthToken,
+  onRefresh,
+}: {
+  house: House;
+  isAdmin: boolean;
+  getAuthToken: () => Promise<string | null>;
+  onRefresh: () => void;
+}) {
+  const [members, setMembers] = useState<Member[]>([]);
+  const [removing, setRemoving] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const token = await getAuthToken();
+        const client = getApiClient(token);
+        const data = await client.request<GetMembersResponse>(
+          GET_ORGANIZATION_MEMBERS,
+          { organizationId: house.organizationId }
+        );
+        setMembers(data.organizationMembers);
+      } catch (err) {
+        console.error('Failed to load members:', err);
+      }
+    };
+
+    fetchMembers();
+  }, [house.organizationId, getAuthToken]);
+
+  const memberMap = new Map(members.map((m) => [m.userId, m]));
+
+  const getMemberDisplay = (userId: string) => {
+    const member = memberMap.get(userId);
+    if (!member) return { name: 'Member', detail: userId.slice(0, 12) + '...' };
+    const name = [member.firstName, member.lastName].filter(Boolean).join(' ') || 'Member';
+    return { name, detail: member.email };
+  };
+
+  const handleRemove = async (userId: string) => {
+    if (!confirm('Are you sure you want to remove this resident?')) return;
+
+    setRemoving(userId);
+    try {
+      const token = await getAuthToken();
+      const client = getApiClient(token);
+      await client.request<RemoveResidentResponse>(REMOVE_RESIDENT_FROM_HOUSE, {
+        userId,
+        organizationId: house.organizationId,
+      });
+      onRefresh();
+    } catch (err) {
+      console.error('Failed to remove resident:', err);
+      const message =
+        err instanceof Error ? err.message : 'Failed to remove resident.';
+      alert(message);
+    } finally {
+      setRemoving(null);
+    }
+  };
+
+  const existingResidentUserIds = house.residents.map((r) => r.userId);
+
   return (
     <div className="border rounded-xl overflow-hidden">
-      <div className="p-4 border-b">
+      <div className="p-4 border-b flex items-center justify-between">
         <h2 className="text-base font-semibold">
           All Residents ({house.residents.length})
         </h2>
+        {isAdmin && (
+          <AssignResidentDialog
+            organizationId={house.organizationId}
+            houseId={house.id}
+            existingResidentUserIds={existingResidentUserIds}
+            onAssigned={onRefresh}
+            getAuthToken={getAuthToken}
+          />
+        )}
       </div>
 
       {house.residents.length === 0 ? (
@@ -365,9 +453,15 @@ function ResidentsTab({ house, isAdmin }: { house: House; isAdmin: boolean }) {
           <p className="text-muted-foreground text-sm mb-3">
             No residents assigned to this property yet.
           </p>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/dashboard/settings">Invite Members</Link>
-          </Button>
+          {isAdmin && (
+            <AssignResidentDialog
+              organizationId={house.organizationId}
+              houseId={house.id}
+              existingResidentUserIds={existingResidentUserIds}
+              onAssigned={onRefresh}
+              getAuthToken={getAuthToken}
+            />
+          )}
         </div>
       ) : (
         <table className="w-full">
@@ -380,7 +474,7 @@ function ResidentsTab({ house, isAdmin }: { house: House; isAdmin: boolean }) {
                 Role
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">
-                User ID
+                Email
               </th>
               {isAdmin && (
                 <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -390,31 +484,40 @@ function ResidentsTab({ house, isAdmin }: { house: House; isAdmin: boolean }) {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {house.residents.map((resident) => (
-              <tr key={resident.id} className="hover:bg-muted/20 transition-colors">
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <Users size={14} className="text-primary" />
+            {house.residents.map((resident) => {
+              const display = getMemberDisplay(resident.userId);
+              return (
+                <tr key={resident.id} className="hover:bg-muted/20 transition-colors">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <Users size={14} className="text-primary" />
+                      </div>
+                      <span className="text-sm font-medium">{display.name}</span>
                     </div>
-                    <span className="text-sm font-medium">Member</span>
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <Badge variant="outline">{resident.role}</Badge>
-                </td>
-                <td className="px-4 py-3 text-sm text-muted-foreground hidden sm:table-cell">
-                  {resident.userId.slice(0, 12)}...
-                </td>
-                {isAdmin && (
-                  <td className="px-4 py-3 text-right">
-                    <Button variant="ghost" size="sm" disabled>
-                      Manage
-                    </Button>
                   </td>
-                )}
-              </tr>
-            ))}
+                  <td className="px-4 py-3">
+                    <Badge variant="outline">{resident.role}</Badge>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground hidden sm:table-cell">
+                    {display.detail}
+                  </td>
+                  {isAdmin && (
+                    <td className="px-4 py-3 text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => handleRemove(resident.userId)}
+                        disabled={removing === resident.userId}
+                      >
+                        {removing === resident.userId ? 'Removing...' : 'Remove'}
+                      </Button>
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}
