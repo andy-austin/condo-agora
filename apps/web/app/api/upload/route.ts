@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const clerkClient = createClerkClient({
   secretKey: process.env.CLERK_SECRET_KEY,
+  publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
 });
 
 const ALLOWED_MIME_TYPES = new Set([
