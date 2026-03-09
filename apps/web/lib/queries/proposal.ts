@@ -156,6 +156,10 @@ export type DeleteProposalResponse = {
   deleteProposal: boolean;
 };
 
+export type AssignResponsibleHouseResponse = {
+  assignResponsibleHouse: Proposal;
+};
+
 export const PROPOSAL_STATUS_LABELS: Record<string, string> = {
   DRAFT: 'Draft',
   OPEN: 'Open',

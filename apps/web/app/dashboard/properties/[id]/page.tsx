@@ -439,6 +439,7 @@ function ResidentsTab({
             organizationId={house.organizationId}
             houseId={house.id}
             existingResidentUserIds={existingResidentUserIds}
+            maxResidents={house.maxResidents ?? 1}
             onAssigned={onRefresh}
             getAuthToken={getAuthToken}
           />

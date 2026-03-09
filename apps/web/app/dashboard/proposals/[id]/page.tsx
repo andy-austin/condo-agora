@@ -9,11 +9,13 @@ import {
   UPDATE_PROPOSAL,
   UPDATE_PROPOSAL_STATUS,
   DELETE_PROPOSAL,
+  ASSIGN_RESPONSIBLE_HOUSE,
   type Proposal,
   type GetProposalResponse,
   type UpdateProposalResponse,
   type UpdateProposalStatusResponse,
   type DeleteProposalResponse,
+  type AssignResponsibleHouseResponse,
   PROPOSAL_STATUS_LABELS,
   PROPOSAL_CATEGORY_LABELS,
   STATUS_COLORS,
@@ -188,6 +190,26 @@ export default function ProposalDetailPage() {
       setModerating(false);
       setShowRejectModal(false);
       setRejectionReason('');
+    }
+  };
+
+  const handleAssignHouse = async (houseId: string) => {
+    if (!proposal) return;
+    setModerating(true);
+    try {
+      const token = await getAuthToken();
+      const client = getApiClient(token);
+      const data = await client.request<AssignResponsibleHouseResponse>(
+        ASSIGN_RESPONSIBLE_HOUSE,
+        { proposalId: proposal.id, houseId }
+      );
+      setProposal({ ...proposal, ...data.assignResponsibleHouse });
+    } catch (err) {
+      console.error('Failed to assign house:', err);
+      const message = err instanceof Error ? err.message : 'Failed to assign house.';
+      alert(message);
+    } finally {
+      setModerating(false);
     }
   };
 
@@ -436,6 +458,7 @@ export default function ProposalDetailPage() {
               houses={houses}
               moderating={moderating}
               onStatusChange={handleStatusChange}
+              onAssignHouse={handleAssignHouse}
               onReject={() => setShowRejectModal(true)}
             />
           )}
@@ -549,12 +572,14 @@ function AdminModerationPanel({
   houses,
   moderating,
   onStatusChange,
+  onAssignHouse,
   onReject,
 }: {
   proposal: Proposal;
   houses: House[];
   moderating: boolean;
   onStatusChange: (status: string, opts?: { responsibleHouseId?: string }) => void;
+  onAssignHouse: (houseId: string) => void;
   onReject: () => void;
 }) {
   const [selectedHouseId, setSelectedHouseId] = useState('');
@@ -610,9 +635,7 @@ function AdminModerationPanel({
               variant="outline"
               className="text-xs"
               disabled={!selectedHouseId || moderating}
-              onClick={() =>
-                onStatusChange(proposal.status, { responsibleHouseId: selectedHouseId })
-              }
+              onClick={() => onAssignHouse(selectedHouseId)}
             >
               Assign
             </Button>
