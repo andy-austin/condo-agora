@@ -18,12 +18,12 @@ from ..src.auth.service import create_invitation as service_create_invitation
 from ..src.auth.service import create_organization as service_create_org
 from ..src.auth.service import get_organization_members as service_get_members
 from ..src.auth.service import get_pending_invitations as service_get_pending
-from ..src.auth.service import get_user_with_memberships
+from ..src.auth.service import (
+    get_user_with_memberships,
+)
+from ..src.auth.service import remove_member_from_organization as service_remove_member
 from ..src.auth.service import resend_invitation as service_resend_invitation
 from ..src.auth.service import revoke_invitation as service_revoke_invitation
-from ..src.auth.service import (
-    remove_member_from_organization as service_remove_member,
-)
 from ..src.auth.service import update_member_role as service_update_role
 
 
