@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 import strawberry
 
@@ -6,7 +6,6 @@ from ..graphql_types.budget import Budget, FinancialSummary
 from ..src.auth.permissions import require_org_admin, require_org_member
 from ..src.budget.service import create_or_update_budget as service_upsert
 from ..src.budget.service import get_budget as service_get
-from ..src.budget.service import get_budgets as service_list
 from ..src.budget.service import get_financial_summary as service_summary
 from ..src.budget.service import update_spent_amount as service_update_spent
 
