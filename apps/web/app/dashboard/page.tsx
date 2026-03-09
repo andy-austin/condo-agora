@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
@@ -58,6 +59,7 @@ type DashboardData = {
 
 export default function DashboardPage() {
   const { user } = useUser();
+  const t = useTranslations('dashboard');
   const { getAuthToken } = useAuthToken();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -131,7 +133,7 @@ export default function DashboardPage() {
   if (error) {
     return (
       <ErrorState
-        title="Could not load dashboard"
+        title={t('overview.couldNotLoad')}
         message={error}
         onRetry={() => window.location.reload()}
       />
@@ -151,17 +153,17 @@ export default function DashboardPage() {
   const onboardingComplete = hasOrg && hasProperty && hasMembers;
   const onboardingSteps = [
     {
-      label: 'Join or create an organization',
+      label: t('overview.stepJoinOrg'),
       done: hasOrg,
       href: '/onboarding',
     },
     {
-      label: 'Add your first property',
+      label: t('overview.stepAddProperty'),
       done: hasProperty,
       href: '/dashboard/properties',
     },
     {
-      label: 'Invite your first resident',
+      label: t('overview.stepInviteResident'),
       done: hasMembers,
       href: '/dashboard/settings',
     },
@@ -169,28 +171,28 @@ export default function DashboardPage() {
 
   const stats = [
     {
-      label: 'Properties',
+      label: t('overview.properties'),
       value: totalProperties,
       icon: Building2,
       href: '/dashboard/properties',
       color: 'text-blue-600 bg-blue-100',
     },
     {
-      label: 'Members',
+      label: t('overview.members'),
       value: totalResidents,
       icon: Users,
       href: '/dashboard/committee',
       color: 'text-emerald-600 bg-emerald-100',
     },
     {
-      label: 'Board Members',
+      label: t('overview.boardMembers'),
       value: totalAdmins,
       icon: Mail,
       href: '/dashboard/committee',
       color: 'text-amber-600 bg-amber-100',
     },
     {
-      label: 'Unassigned',
+      label: t('overview.unassigned'),
       value: unassignedMembers,
       icon: Lightbulb,
       href: '/dashboard/committee',
@@ -203,11 +205,11 @@ export default function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl lg:text-3xl font-bold">
-          Welcome back, {user?.firstName || 'User'}!
+          {t('overview.welcomeBack', { name: user?.firstName || 'User' })}
         </h1>
         {data?.organizationName && (
           <p className="text-muted-foreground mt-1">
-            {data.organizationName} &middot; Overview
+            {t('overview.orgOverview', { orgName: data.organizationName })}
           </p>
         )}
       </div>
@@ -232,7 +234,7 @@ export default function DashboardPage() {
               </div>
               <p className="text-2xl font-bold">{stat.value}</p>
               <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1 group-hover:text-primary transition-colors">
-                View details <ArrowRight size={12} />
+                {t('overview.viewDetails')} <ArrowRight size={12} />
               </p>
             </Link>
           );
@@ -254,24 +256,24 @@ export default function DashboardPage() {
           {/* Quick Actions */}
           {data?.isAdmin && (
             <div className="border rounded-xl p-6">
-              <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+              <h2 className="text-lg font-semibold mb-4">{t('overview.quickActions')}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <Button variant="outline" className="justify-start h-auto py-3" asChild>
                   <Link href="/dashboard/properties">
                     <Plus size={16} className="mr-2 text-primary" />
-                    Add Property
+                    {t('overview.addProperty')}
                   </Link>
                 </Button>
                 <Button variant="outline" className="justify-start h-auto py-3" asChild>
                   <Link href="/dashboard/settings">
                     <UserPlus size={16} className="mr-2 text-primary" />
-                    Invite Member
+                    {t('overview.inviteMember')}
                   </Link>
                 </Button>
                 <Button variant="outline" className="justify-start h-auto py-3" asChild>
                   <Link href="/dashboard/committee">
                     <Users size={16} className="mr-2 text-primary" />
-                    Manage Committee
+                    {t('overview.manageCommittee')}
                   </Link>
                 </Button>
               </div>
@@ -281,10 +283,10 @@ export default function DashboardPage() {
           {/* Recent Members */}
           <div className="border rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Recent Members</h2>
+              <h2 className="text-lg font-semibold">{t('overview.recentMembers')}</h2>
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/dashboard/committee">
-                  View all <ArrowRight size={14} className="ml-1" />
+                  {t('common.viewAll')} <ArrowRight size={14} className="ml-1" />
                 </Link>
               </Button>
             </div>
@@ -311,8 +313,8 @@ export default function DashboardPage() {
                           <p className="text-sm font-medium truncate">{name}</p>
                           <p className="text-xs text-muted-foreground truncate">
                             {member.houseName
-                              ? `Unit: ${member.houseName}`
-                              : 'No unit assigned'}
+                              ? t('overview.unitLabel', { name: member.houseName })
+                              : t('common.noUnitAssigned')}
                           </p>
                         </div>
                       </div>
@@ -331,7 +333,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground py-4 text-center">
-                No members yet. Invite your first team member to get started.
+                {t('overview.noMembersYet')}
               </p>
             )}
           </div>
@@ -352,9 +354,9 @@ export default function DashboardPage() {
           {/* Onboarding Checklist - only show if incomplete */}
           {!onboardingComplete && (
             <div className="border rounded-xl p-6 bg-primary/5 border-primary/20">
-              <h2 className="text-lg font-semibold mb-1">Getting Started</h2>
+              <h2 className="text-lg font-semibold mb-1">{t('overview.gettingStarted')}</h2>
               <p className="text-sm text-muted-foreground mb-4">
-                Complete these steps to set up your community.
+                {t('overview.completeSteps')}
               </p>
 
               {/* Progress bar */}
@@ -393,10 +395,10 @@ export default function DashboardPage() {
           {/* Properties Summary */}
           <div className="border rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Properties</h2>
+              <h2 className="text-lg font-semibold">{t('overview.propertiesSummary')}</h2>
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/dashboard/properties">
-                  View all <ArrowRight size={14} className="ml-1" />
+                  {t('common.viewAll')} <ArrowRight size={14} className="ml-1" />
                 </Link>
               </Button>
             </div>
@@ -415,14 +417,14 @@ export default function DashboardPage() {
                     </div>
                     <span className="text-xs text-muted-foreground shrink-0">
                       {house.residents.length}{' '}
-                      {house.residents.length === 1 ? 'resident' : 'residents'}
+                      {house.residents.length === 1 ? t('common.resident') : t('common.residents')}
                     </span>
                   </Link>
                 ))}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground py-4 text-center">
-                No properties yet. Add your first one!
+                {t('overview.noPropertiesYet')}
               </p>
             )}
           </div>

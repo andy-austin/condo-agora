@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, FormEvent } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import { Button } from '@/components/ui/button';
@@ -70,15 +71,17 @@ type MeQueryResponse = {
   me: User | null;
 };
 
-const tabs = [
-  { id: 'members', label: 'Members & Invitations', icon: Users },
-  { id: 'organization', label: 'Organization', icon: Building2 },
-  { id: 'roles', label: 'Roles & Permissions', icon: Shield, disabled: true },
-  { id: 'notifications', label: 'Notifications', icon: Bell, disabled: true },
-  { id: 'billing', label: 'Billing', icon: CreditCard, disabled: true },
-];
-
 export default function SettingsPage() {
+  const t = useTranslations('dashboard');
+
+  const tabs = [
+    { id: 'members', label: t('settings.membersAndInvitations'), icon: Users },
+    { id: 'organization', label: t('settings.organization'), icon: Building2 },
+    { id: 'roles', label: t('settings.rolesAndPermissions'), icon: Shield, disabled: true },
+    { id: 'notifications', label: t('settings.notificationsTab'), icon: Bell, disabled: true },
+    { id: 'billing', label: t('settings.billing'), icon: CreditCard, disabled: true },
+  ];
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTab = searchParams.get('tab') || 'members';
@@ -146,10 +149,10 @@ export default function SettingsPage() {
   if (!user || user.memberships.length === 0) {
     return (
       <div className="p-6 lg:p-8 max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Settings</h1>
+        <h1 className="text-2xl font-bold mb-6">{t('settings.title')}</h1>
         <div className="bg-primary/5 border border-primary/20 rounded-xl p-6">
           <p className="text-muted-foreground">
-            You do not belong to any organization yet. Please ask an administrator to invite you.
+            {t('settings.noOrgYet')}
           </p>
         </div>
       </div>
@@ -160,14 +163,14 @@ export default function SettingsPage() {
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
       <Breadcrumb
         items={[
-          { label: 'Settings', href: '/dashboard/settings' },
-          { label: tabs.find((t) => t.id === activeTab)?.label || 'Settings' },
+          { label: t('settings.title'), href: '/dashboard/settings' },
+          { label: tabs.find((tab) => tab.id === activeTab)?.label || t('settings.title') },
         ]}
       />
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Settings</h1>
+        <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Manage your organization, members, and preferences.
+          {t('settings.subtitle')}
         </p>
       </div>
 
@@ -189,7 +192,7 @@ export default function SettingsPage() {
                     <Icon size={18} className="shrink-0" />
                     <span>{tab.label}</span>
                     <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full ml-auto hidden lg:inline">
-                      Soon
+                      {t('common.soon')}
                     </span>
                   </div>
                 );
@@ -223,12 +226,14 @@ export default function SettingsPage() {
               isAdmin={isAdmin}
               getAuthToken={getAuthToken}
               onMembersChange={setMembers}
+              t={t}
             />
           )}
           {activeTab === 'organization' && (
             <OrganizationTab
               organizationName={currentMembership?.organization.name || ''}
               isAdmin={isAdmin}
+              t={t}
             />
           )}
         </div>
@@ -246,6 +251,7 @@ function MembersTab({
   isAdmin,
   getAuthToken,
   onMembersChange,
+  t,
 }: {
   members: Member[];
   user: User;
@@ -253,6 +259,7 @@ function MembersTab({
   isAdmin: boolean;
   getAuthToken: () => Promise<string | null>;
   onMembersChange: (members: Member[]) => void;
+  t: ReturnType<typeof useTranslations>;
 }) {
   const [search, setSearch] = useState('');
   const [email, setEmail] = useState('');
@@ -304,16 +311,16 @@ function MembersTab({
       <div className="border rounded-xl">
         <div className="p-4 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold">Members</h2>
+            <h2 className="text-lg font-semibold">{t('settings.membersAndInvitations')}</h2>
             <p className="text-sm text-muted-foreground">
-              {members.length} {members.length === 1 ? 'member' : 'members'} in your organization
+              {t('settings.membersCount', { count: members.length })}
             </p>
           </div>
           <div className="relative w-full sm:w-64">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search members..."
+              placeholder={t('settings.searchMembers')}
               className="w-full pl-9 pr-3 py-2 rounded-lg border bg-background text-sm"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -326,19 +333,19 @@ function MembersTab({
             <thead>
               <tr className="border-b text-left">
                 <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Name
+                  {t('settings.name')}
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">
-                  Email
+                  {t('settings.email')}
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Role
+                  {t('settings.role')}
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">
-                  Unit
+                  {t('settings.unitCol')}
                 </th>
                 <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden lg:table-cell">
-                  Joined
+                  {t('settings.joined')}
                 </th>
               </tr>
             </thead>
@@ -346,7 +353,7 @@ function MembersTab({
               {filteredMembers.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                    {search ? 'No members match your search.' : 'No members yet.'}
+                    {search ? t('settings.noMembersMatch') : t('settings.noMembersYet')}
                   </td>
                 </tr>
               ) : (
@@ -396,23 +403,23 @@ function MembersTab({
         <div className="border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <UserPlus size={20} className="text-primary" />
-            <h2 className="text-lg font-semibold">Invite New Member</h2>
+            <h2 className="text-lg font-semibold">{t('settings.inviteNewMember')}</h2>
           </div>
           <p className="text-sm text-muted-foreground mb-4">
-            Send an invitation to join {user.memberships.find(m => m.organization.id === organizationId)?.organization.name || 'your organization'}.
+            {t('settings.inviteSubtitle', { orgName: user.memberships.find(m => m.organization.id === organizationId)?.organization.name || '' })}
           </p>
 
           {inviteSuccess && (
             <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2">
               <Mail size={16} className="text-emerald-600" />
-              <p className="text-sm text-emerald-700">Invitation sent successfully!</p>
+              <p className="text-sm text-emerald-700">{t('settings.inviteSent')}</p>
             </div>
           )}
 
           <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-3">
             <input
               type="email"
-              placeholder="colleague@example.com"
+              placeholder={t('settings.emailPlaceholder')}
               className="flex-1 p-2.5 rounded-lg border bg-background text-sm"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -423,12 +430,12 @@ function MembersTab({
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >
-              <option value="MEMBER">Member</option>
-              <option value="ADMIN">Admin</option>
-              <option value="RESIDENT">Resident</option>
+              <option value="MEMBER">{t('labels.roles.member')}</option>
+              <option value="ADMIN">{t('labels.roles.admin')}</option>
+              <option value="RESIDENT">{t('labels.roles.resident')}</option>
             </select>
             <Button type="submit" disabled={submitting} className="sm:w-auto">
-              {submitting ? 'Sending...' : 'Send Invite'}
+              {submitting ? t('common.sending') : t('settings.sendInvite')}
             </Button>
           </form>
         </div>
@@ -442,17 +449,19 @@ function MembersTab({
 function OrganizationTab({
   organizationName,
   isAdmin,
+  t,
 }: {
   organizationName: string;
   isAdmin: boolean;
+  t: ReturnType<typeof useTranslations>;
 }) {
   return (
     <div className="space-y-6">
       <div className="border rounded-xl p-6">
-        <h2 className="text-lg font-semibold mb-4">Organization Profile</h2>
+        <h2 className="text-lg font-semibold mb-4">{t('settings.orgProfile')}</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1.5">Organization Name</label>
+            <label className="block text-sm font-medium mb-1.5">{t('settings.orgName')}</label>
             <input
               type="text"
               className="w-full p-2.5 rounded-lg border bg-background text-sm"
@@ -461,25 +470,25 @@ function OrganizationTab({
             />
             {!isAdmin && (
               <p className="text-xs text-muted-foreground mt-1">
-                Only administrators can edit organization details.
+                {t('settings.onlyAdminsCanEdit')}
               </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1.5">Address</label>
+            <label className="block text-sm font-medium mb-1.5">{t('settings.address')}</label>
             <input
               type="text"
-              placeholder="123 Main St, Suite 100"
+              placeholder={t('settings.addressPlaceholder')}
               className="w-full p-2.5 rounded-lg border bg-background text-sm"
               disabled={!isAdmin}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1.5">Description</label>
+            <label className="block text-sm font-medium mb-1.5">{t('settings.descriptionLabel')}</label>
             <textarea
-              placeholder="Tell members about your community..."
+              placeholder={t('settings.descriptionPlaceholder')}
               rows={3}
               className="w-full p-2.5 rounded-lg border bg-background text-sm resize-none"
               disabled={!isAdmin}
@@ -487,10 +496,10 @@ function OrganizationTab({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1.5">Contact Email</label>
+            <label className="block text-sm font-medium mb-1.5">{t('settings.contactEmail')}</label>
             <input
               type="email"
-              placeholder="admin@community.com"
+              placeholder={t('settings.contactEmailPlaceholder')}
               className="w-full p-2.5 rounded-lg border bg-background text-sm"
               disabled={!isAdmin}
             />
@@ -499,10 +508,10 @@ function OrganizationTab({
           {isAdmin && (
             <div className="pt-2">
               <Button disabled>
-                Save Changes
+                {t('settings.saveChanges')}
               </Button>
               <p className="text-xs text-muted-foreground mt-2">
-                Organization profile editing will be available in a future update.
+                {t('settings.editComingSoon')}
               </p>
             </div>
           )}

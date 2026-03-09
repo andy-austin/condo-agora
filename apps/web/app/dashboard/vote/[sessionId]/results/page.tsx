@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
@@ -10,7 +11,6 @@ import {
   type VotingResults,
   type VotingSession,
   type ProposalScore,
-  SESSION_STATUS_LABELS,
   SESSION_STATUS_COLORS,
 } from '@/lib/queries/voting';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +19,7 @@ import Breadcrumb from '@/components/dashboard/Breadcrumb';
 import { BarChart2, CheckCircle2, XCircle, Users, Loader2 } from 'lucide-react';
 
 export default function VotingResultsPage() {
+  const t = useTranslations('dashboard');
   const { sessionId } = useParams<{ sessionId: string }>();
   const { getAuthToken } = useAuthToken();
 
@@ -45,11 +46,11 @@ export default function VotingResultsPage() {
       setSession(sessionData.votingSession);
       setResults(resultsData.votingResults);
     } catch {
-      setError('Failed to load results');
+      setError(t('voting.failedToLoadResults'));
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, sessionId]);
+  }, [getAuthToken, sessionId, t]);
 
   useEffect(() => {
     fetchData();
@@ -70,7 +71,7 @@ export default function VotingResultsPage() {
     );
   }
 
-  if (error || !results) return <ErrorState message={error || 'No results'} />;
+  if (error || !results) return <ErrorState message={error || t('voting.noResults')} />;
 
   const maxScore = Math.max(...results.proposalScores.map((p) => p.score), 1);
 
@@ -78,12 +79,12 @@ export default function VotingResultsPage() {
     <div className="p-8 max-w-3xl mx-auto">
       <Breadcrumb
         items={[
-          { label: 'Voting', href: '/dashboard/vote' },
+          { label: t('voting.breadcrumb'), href: '/dashboard/vote' },
           {
             label: session?.title || 'Session',
             href: `/dashboard/vote/${sessionId}`,
           },
-          { label: 'Results' },
+          { label: t('voting.results') },
         ]}
       />
 
@@ -97,17 +98,17 @@ export default function VotingResultsPage() {
               <h1 className="text-2xl font-bold">{results.sessionTitle}</h1>
               {session && (
                 <Badge className={SESSION_STATUS_COLORS[session.status]}>
-                  {SESSION_STATUS_LABELS[session.status]}
+                  {t(`labels.sessionStatus.${session.status}`)}
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-muted-foreground">Voting Results</p>
+            <p className="text-sm text-muted-foreground">{t('voting.votingResults')}</p>
           </div>
         </div>
         {session?.status === 'OPEN' && (
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Loader2 className="w-3 h-3 animate-spin" />
-            Live
+            {t('voting.live')}
           </div>
         )}
       </div>
@@ -116,17 +117,17 @@ export default function VotingResultsPage() {
       <div className="grid grid-cols-3 gap-4 mb-8">
         <div className="border rounded-lg p-4 text-center">
           <div className="text-2xl font-bold">{results.votesCast}</div>
-          <div className="text-xs text-muted-foreground">Votes Cast</div>
+          <div className="text-xs text-muted-foreground">{t('voting.votesCast')}</div>
         </div>
         <div className="border rounded-lg p-4 text-center">
           <div className="text-2xl font-bold">{results.totalHouses}</div>
-          <div className="text-xs text-muted-foreground">Total Units</div>
+          <div className="text-xs text-muted-foreground">{t('voting.totalUnits')}</div>
         </div>
         <div className="border rounded-lg p-4 text-center">
           <div className="text-2xl font-bold">
             {results.participationRate.toFixed(0)}%
           </div>
-          <div className="text-xs text-muted-foreground">Participation</div>
+          <div className="text-xs text-muted-foreground">{t('voting.participation')}</div>
         </div>
       </div>
 
@@ -135,10 +136,10 @@ export default function VotingResultsPage() {
         <div className="flex items-center justify-between text-sm mb-1">
           <div className="flex items-center gap-1 text-muted-foreground">
             <Users className="w-4 h-4" />
-            Participation Rate
+            {t('voting.participationRate')}
           </div>
           <span className="font-medium">
-            {results.votesCast}/{results.totalHouses} units
+            {results.votesCast}/{results.totalHouses} {t('common.units')}
           </span>
         </div>
         <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -152,18 +153,18 @@ export default function VotingResultsPage() {
       {/* Rankings */}
       <div>
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Proposal Rankings
+          {t('voting.proposalRankings')}
         </h2>
         <div className="space-y-3">
           {results.proposalScores.map((ps) => (
-            <ProposalResultCard key={ps.proposalId} ps={ps} maxScore={maxScore} />
+            <ProposalResultCard key={ps.proposalId} ps={ps} maxScore={maxScore} t={t} />
           ))}
         </div>
       </div>
 
       {results.proposalScores.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
-          No votes have been cast yet.
+          {t('voting.noVotesYet')}
         </div>
       )}
     </div>
@@ -173,9 +174,11 @@ export default function VotingResultsPage() {
 function ProposalResultCard({
   ps,
   maxScore,
+  t,
 }: {
   ps: ProposalScore;
   maxScore: number;
+  t: ReturnType<typeof useTranslations>;
 }) {
   const barWidth = maxScore > 0 ? (ps.score / maxScore) * 100 : 0;
   const approvalWidth = Math.min(ps.approvalPercentage, 100);
@@ -193,7 +196,7 @@ function ProposalResultCard({
           <div>
             <div className="font-medium">{ps.title}</div>
             <div className="text-xs text-muted-foreground">
-              Score: {ps.score}
+              {t('voting.score', { score: ps.score })}
             </div>
           </div>
         </div>
@@ -202,14 +205,14 @@ function ProposalResultCard({
             <>
               <CheckCircle2 className="w-4 h-4 text-green-600" />
               <span className="text-green-700 font-medium text-xs">
-                Approved ({ps.approvalPercentage.toFixed(0)}%)
+                {t('voting.approved', { pct: ps.approvalPercentage.toFixed(0) })}
               </span>
             </>
           ) : (
             <>
               <XCircle className="w-4 h-4 text-gray-400" />
               <span className="text-muted-foreground text-xs">
-                {ps.approvalPercentage.toFixed(0)}% approval
+                {t('voting.approvalPct', { pct: ps.approvalPercentage.toFixed(0) })}
               </span>
             </>
           )}
@@ -229,7 +232,7 @@ function ProposalResultCard({
       {/* Approval bar */}
       <div>
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-0.5">
-          <span>Approval (66% threshold)</span>
+          <span>{t('voting.approvalThreshold')}</span>
           <span>{ps.approvalPercentage.toFixed(1)}%</span>
         </div>
         <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">

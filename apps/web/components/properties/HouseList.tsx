@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,20 +17,21 @@ type HouseListProps = {
   deleting?: string | null;
 };
 
-function getOccupancyStatus(house: House) {
-  if (house.residents.length === 0) return { label: 'Vacant', variant: 'outline' as const };
-  return { label: 'Occupied', variant: 'default' as const };
-}
-
 export default function HouseList({ houses, onDelete, deleting }: HouseListProps) {
+  const t = useTranslations('dashboard');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+
+  function getOccupancyStatus(house: House) {
+    if (house.residents.length === 0) return { label: t('properties.vacant'), variant: 'outline' as const };
+    return { label: t('properties.occupied'), variant: 'default' as const };
+  }
 
   if (houses.length === 0) {
     return (
       <EmptyState
         icon="properties"
-        title="No properties yet"
-        message="Create your first property to start managing your community's units and houses."
+        title={t('properties.noProperties')}
+        message={t('properties.noPropertiesMessage')}
       />
     );
   }
@@ -43,7 +45,7 @@ export default function HouseList({ houses, onDelete, deleting }: HouseListProps
           className={`p-2 rounded-lg transition-colors ${
             viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted'
           }`}
-          aria-label="Grid view"
+          aria-label={t('properties.gridView')}
         >
           <LayoutGrid size={18} />
         </button>
@@ -52,7 +54,7 @@ export default function HouseList({ houses, onDelete, deleting }: HouseListProps
           className={`p-2 rounded-lg transition-colors ${
             viewMode === 'table' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted'
           }`}
-          aria-label="Table view"
+          aria-label={t('properties.tableView')}
         >
           <List size={18} />
         </button>
@@ -85,7 +87,7 @@ export default function HouseList({ houses, onDelete, deleting }: HouseListProps
                   <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                     <span className="flex items-center gap-1">
                       <Users size={14} />
-                      {house.residents.length} {house.residents.length === 1 ? 'resident' : 'residents'}
+                      {house.residents.length} {house.residents.length === 1 ? t('common.resident') : t('common.residents')}
                     </span>
                     <span className="flex items-center gap-1">
                       <Calendar size={14} />
@@ -97,7 +99,7 @@ export default function HouseList({ houses, onDelete, deleting }: HouseListProps
                       href={`/dashboard/properties/${house.id}`}
                       className="text-sm text-primary hover:underline"
                     >
-                      View details
+                      {t('common.viewDetails')}
                     </Link>
                     {onDelete && (
                       <Button
@@ -108,11 +110,11 @@ export default function HouseList({ houses, onDelete, deleting }: HouseListProps
                         disabled={deleting === house.id || house.residents.length > 0}
                         title={
                           house.residents.length > 0
-                            ? 'Remove all residents before deleting'
-                            : 'Delete property'
+                            ? t('properties.removeResidentsFirst')
+                            : t('properties.deleteProperty')
                         }
                       >
-                        {deleting === house.id ? 'Deleting...' : 'Delete'}
+                        {deleting === house.id ? t('common.deleting') : t('common.delete')}
                       </Button>
                     )}
                   </div>
@@ -128,19 +130,19 @@ export default function HouseList({ houses, onDelete, deleting }: HouseListProps
             <thead>
               <tr className="border-b bg-muted/30">
                 <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Property
+                  {t('properties.property')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">
-                  Status
+                  {t('properties.status')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Residents
+                  {t('properties.residentsTab')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">
-                  Created
+                  {t('properties.created')}
                 </th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Actions
+                  {t('properties.actions')}
                 </th>
               </tr>
             </thead>
@@ -172,7 +174,7 @@ export default function HouseList({ houses, onDelete, deleting }: HouseListProps
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/dashboard/properties/${house.id}`}>View</Link>
+                          <Link href={`/dashboard/properties/${house.id}`}>{t('common.view')}</Link>
                         </Button>
                         {onDelete && (
                           <Button
@@ -182,7 +184,7 @@ export default function HouseList({ houses, onDelete, deleting }: HouseListProps
                             onClick={() => onDelete(house.id)}
                             disabled={deleting === house.id || house.residents.length > 0}
                           >
-                            {deleting === house.id ? '...' : 'Delete'}
+                            {deleting === house.id ? '...' : t('common.delete')}
                           </Button>
                         )}
                       </div>

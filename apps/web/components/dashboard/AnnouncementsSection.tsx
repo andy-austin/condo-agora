@@ -14,6 +14,7 @@ import {
 } from '@/lib/queries/announcement';
 import { Button } from '@/components/ui/button';
 import { Megaphone, Pin, Plus, Trash2, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 type Props = {
   organizationId: string;
@@ -21,6 +22,7 @@ type Props = {
 };
 
 export default function AnnouncementsSection({ organizationId, isAdmin }: Props) {
+  const t = useTranslations('dashboard');
   const { getAuthToken } = useAuthToken();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,14 +75,14 @@ export default function AnnouncementsSection({ organizationId, isAdmin }: Props)
       setShowForm(false);
     } catch (err) {
       console.error('Failed to create announcement:', err);
-      alert('Failed to create announcement.');
+      alert(t('announcements.failedToCreate'));
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this announcement?')) return;
+    if (!confirm(t('announcements.deleteConfirm'))) return;
     try {
       const token = await getAuthToken();
       const client = getApiClient(token);
@@ -104,7 +106,7 @@ export default function AnnouncementsSection({ organizationId, isAdmin }: Props)
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Megaphone size={18} className="text-primary" />
-          Announcements
+          {t('announcements.title')}
         </h2>
         {isAdmin && (
           <Button
@@ -113,7 +115,7 @@ export default function AnnouncementsSection({ organizationId, isAdmin }: Props)
             onClick={() => setShowForm(!showForm)}
           >
             {showForm ? <X size={14} /> : <Plus size={14} />}
-            {showForm ? 'Cancel' : 'New'}
+            {showForm ? t('common.cancel') : t('common.new')}
           </Button>
         )}
       </div>
@@ -125,14 +127,14 @@ export default function AnnouncementsSection({ organizationId, isAdmin }: Props)
             type="text"
             value={formTitle}
             onChange={(e) => setFormTitle(e.target.value)}
-            placeholder="Announcement title..."
+            placeholder={t('announcements.titlePlaceholder')}
             className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
             required
           />
           <textarea
             value={formContent}
             onChange={(e) => setFormContent(e.target.value)}
-            placeholder="Announcement content..."
+            placeholder={t('announcements.contentPlaceholder')}
             className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
             rows={3}
             required
@@ -146,10 +148,10 @@ export default function AnnouncementsSection({ organizationId, isAdmin }: Props)
                 className="rounded"
               />
               <Pin size={14} />
-              Pin announcement
+              {t('announcements.pinAnnouncement')}
             </label>
             <Button type="submit" size="sm" disabled={submitting}>
-              {submitting ? 'Posting...' : 'Post'}
+              {submitting ? t('common.posting') : t('common.post')}
             </Button>
           </div>
         </form>
@@ -158,7 +160,7 @@ export default function AnnouncementsSection({ organizationId, isAdmin }: Props)
       {/* List */}
       {announcements.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-4">
-          No announcements yet. Post one to keep your community informed.
+          {t('announcements.noAnnouncements')}
         </p>
       ) : (
         <div className="space-y-3">
@@ -177,11 +179,11 @@ export default function AnnouncementsSection({ organizationId, isAdmin }: Props)
                     {announcement.isPinned && (
                       <span className="flex items-center gap-1 text-xs font-medium text-primary">
                         <Pin size={11} />
-                        Pinned
+                        {t('announcements.pinned')}
                       </span>
                     )}
                     <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                      Official
+                      {t('announcements.official')}
                     </span>
                   </div>
                   <h4 className="text-sm font-semibold">{announcement.title}</h4>

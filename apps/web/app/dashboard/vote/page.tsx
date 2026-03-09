@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_VOTING_SESSIONS,
   type VotingSession,
-  SESSION_STATUS_LABELS,
   SESSION_STATUS_COLORS,
 } from '@/lib/queries/voting';
 import { Badge } from '@/components/ui/badge';
@@ -36,6 +36,7 @@ type MeResponse = {
 };
 
 export default function VotingPage() {
+  const t = useTranslations('dashboard');
   const { getAuthToken } = useAuthToken();
   const [sessions, setSessions] = useState<VotingSession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,11 +65,11 @@ export default function VotingPage() {
       );
       setSessions(data.votingSessions || []);
     } catch (e) {
-      setError('Failed to load voting sessions');
+      setError(t('voting.failedToLoad'));
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken]);
+  }, [getAuthToken, t]);
 
   useEffect(() => {
     fetchData();
@@ -93,7 +94,7 @@ export default function VotingPage() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <Breadcrumb items={[{ label: 'Voting' }]} />
+      <Breadcrumb items={[{ label: t('voting.breadcrumb') }]} />
 
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
@@ -101,9 +102,9 @@ export default function VotingPage() {
             <Vote className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Voting Sessions</h1>
+            <h1 className="text-2xl font-bold">{t('voting.title')}</h1>
             <p className="text-sm text-muted-foreground">
-              Rank proposals to determine community priorities
+              {t('voting.subtitle')}
             </p>
           </div>
         </div>
@@ -111,7 +112,7 @@ export default function VotingPage() {
           <Link href="/dashboard/vote/new">
             <Button>
               <Plus className="w-4 h-4 mr-2" />
-              New Session
+              {t('voting.newSession')}
             </Button>
           </Link>
         )}
@@ -120,10 +121,10 @@ export default function VotingPage() {
       {sessions.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">
           <Vote className="w-12 h-12 mx-auto mb-4 opacity-30" />
-          <p className="font-medium">No voting sessions yet</p>
+          <p className="font-medium">{t('voting.noSessions')}</p>
           {isAdmin && (
             <p className="text-sm mt-1">
-              Create a session to start collecting community votes.
+              {t('voting.noSessionsHint')}
             </p>
           )}
         </div>
@@ -132,7 +133,7 @@ export default function VotingPage() {
           {openSessions.length > 0 && (
             <div>
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                Active Sessions
+                {t('voting.activeSessions')}
               </h2>
               <div className="space-y-3">
                 {openSessions.map((session) => (
@@ -140,6 +141,7 @@ export default function VotingPage() {
                     key={session.id}
                     session={session}
                     isAdmin={isAdmin}
+                    t={t}
                   />
                 ))}
               </div>
@@ -149,7 +151,7 @@ export default function VotingPage() {
           {otherSessions.length > 0 && (
             <div>
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                All Sessions
+                {t('voting.allSessions')}
               </h2>
               <div className="space-y-3">
                 {otherSessions.map((session) => (
@@ -157,6 +159,7 @@ export default function VotingPage() {
                     key={session.id}
                     session={session}
                     isAdmin={isAdmin}
+                    t={t}
                   />
                 ))}
               </div>
@@ -171,9 +174,11 @@ export default function VotingPage() {
 function SessionCard({
   session,
   isAdmin,
+  t,
 }: {
   session: VotingSession;
   isAdmin: boolean;
+  t: ReturnType<typeof useTranslations>;
 }) {
   return (
     <div className="border rounded-lg p-4 bg-white hover:shadow-sm transition-shadow">
@@ -182,22 +187,25 @@ function SessionCard({
           <div className="flex items-center gap-2 mb-1">
             <h3 className="font-semibold">{session.title}</h3>
             <Badge className={SESSION_STATUS_COLORS[session.status]}>
-              {SESSION_STATUS_LABELS[session.status]}
+              {t(`labels.sessionStatus.${session.status}`)}
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground">
-            {session.proposalIds.length} proposal
-            {session.proposalIds.length !== 1 ? 's' : ''}
+            {session.proposalIds.length}{' '}
+            {session.proposalIds.length !== 1
+              ? t('common.proposals')
+              : t('common.proposal')}
           </p>
           {session.endDate && (
             <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
               <Calendar className="w-3 h-3" />
               <span>
-                Closes{' '}
-                {new Date(session.endDate).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
+                {t('voting.closes', {
+                  date: new Date(session.endDate).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  }),
                 })}
               </span>
             </div>
@@ -206,21 +214,21 @@ function SessionCard({
         <div className="flex gap-2">
           {session.status === 'OPEN' && (
             <Link href={`/dashboard/vote/${session.id}`}>
-              <Button size="sm">Cast Vote</Button>
+              <Button size="sm">{t('voting.castVote')}</Button>
             </Link>
           )}
           {(session.status === 'CLOSED' || isAdmin) && (
             <Link href={`/dashboard/vote/${session.id}/results`}>
               <Button size="sm" variant="outline">
                 <BarChart2 className="w-4 h-4 mr-1" />
-                Results
+                {t('voting.results')}
               </Button>
             </Link>
           )}
           {isAdmin && session.status === 'DRAFT' && (
             <Link href={`/dashboard/vote/${session.id}`}>
               <Button size="sm" variant="outline">
-                Manage
+                {t('voting.manage')}
               </Button>
             </Link>
           )}

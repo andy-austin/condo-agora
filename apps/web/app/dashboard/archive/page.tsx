@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_PROPOSALS,
   type Proposal,
   type GetProposalsResponse,
-  PROPOSAL_CATEGORY_LABELS,
   STATUS_COLORS,
   CATEGORIES,
 } from '@/lib/queries/proposal';
@@ -44,6 +44,7 @@ type MeResponse = {
 };
 
 export default function ArchivePage() {
+  const t = useTranslations('dashboard');
   const { getAuthToken } = useAuthToken();
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,7 +74,7 @@ export default function ArchivePage() {
       setProposals(data.proposals);
     } catch (err) {
       console.error('Failed to load archive:', err);
-      setError('Failed to load archive data.');
+      setError(t('archive.failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -126,7 +127,7 @@ export default function ArchivePage() {
   if (error) {
     return (
       <ErrorState
-        title="Could not load archive"
+        title={t('archive.couldNotLoad')}
         message={error}
         onRetry={() => window.location.reload()}
       />
@@ -135,15 +136,15 @@ export default function ArchivePage() {
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
-      <Breadcrumb items={[{ label: 'Archive' }]} />
+      <Breadcrumb items={[{ label: t('archive.title') }]} />
 
       <div>
         <h1 className="text-2xl lg:text-3xl font-bold flex items-center gap-2">
           <Archive size={28} className="text-emerald-600" />
-          Completed Projects Archive
+          {t('archive.pageTitle')}
         </h1>
         <p className="text-muted-foreground mt-1">
-          Browse completed projects with their outcomes and details.
+          {t('archive.subtitle')}
         </p>
       </div>
 
@@ -156,7 +157,7 @@ export default function ArchivePage() {
           />
           <input
             type="text"
-            placeholder="Search projects..."
+            placeholder={t('archive.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm bg-background"
@@ -169,10 +170,10 @@ export default function ArchivePage() {
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="appearance-none border rounded-lg px-3 py-2 pr-8 text-sm bg-background"
           >
-            <option value="">All Categories</option>
+            <option value="">{t('archive.allCategories')}</option>
             {CATEGORIES.map((cat) => (
               <option key={cat} value={cat}>
-                {PROPOSAL_CATEGORY_LABELS[cat]}
+                {t(`labels.category.${cat}`)}
               </option>
             ))}
           </select>
@@ -188,7 +189,7 @@ export default function ArchivePage() {
             onChange={(e) => setYearFilter(e.target.value)}
             className="appearance-none border rounded-lg px-3 py-2 pr-8 text-sm bg-background"
           >
-            <option value="">All Years</option>
+            <option value="">{t('archive.allYears')}</option>
             {years.map((year) => (
               <option key={year} value={year}>
                 {year}
@@ -204,8 +205,8 @@ export default function ArchivePage() {
 
       {/* Results count */}
       <p className="text-sm text-muted-foreground">
-        {filtered.length} completed project{filtered.length !== 1 ? 's' : ''}
-        {searchQuery || categoryFilter || yearFilter ? ' (filtered)' : ''}
+        {filtered.length} {filtered.length !== 1 ? t('archive.completedProjects') : t('archive.completedProject')}
+        {searchQuery || categoryFilter || yearFilter ? ` ${t('archive.filtered')}` : ''}
       </p>
 
       {/* Project list */}
@@ -229,11 +230,11 @@ export default function ArchivePage() {
                     <span
                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS['COMPLETED']}`}
                     >
-                      Completed
+                      {t('archive.completed')}
                     </span>
                     <span className="flex items-center gap-1">
                       <Tag size={12} />
-                      {PROPOSAL_CATEGORY_LABELS[proposal.category] || proposal.category}
+                      {t(`labels.category.${proposal.category}`)}
                     </span>
                     <span className="flex items-center gap-1">
                       <Calendar size={12} />
@@ -252,11 +253,11 @@ export default function ArchivePage() {
       ) : (
         <div className="text-center py-16 border rounded-xl">
           <Archive size={48} className="mx-auto text-muted-foreground/30 mb-4" />
-          <h3 className="text-lg font-semibold mb-1">No completed projects</h3>
+          <h3 className="text-lg font-semibold mb-1">{t('archive.noProjects')}</h3>
           <p className="text-sm text-muted-foreground">
             {searchQuery || categoryFilter || yearFilter
-              ? 'Try adjusting your filters.'
-              : 'Completed projects will appear here once proposals reach the completed stage.'}
+              ? t('archive.noProjectsFilterHint')
+              : t('archive.noProjectsHint')}
           </p>
           {(searchQuery || categoryFilter || yearFilter) && (
             <Button
@@ -269,7 +270,7 @@ export default function ArchivePage() {
                 setYearFilter('');
               }}
             >
-              Clear Filters
+              {t('archive.clearFilters')}
             </Button>
           )}
         </div>

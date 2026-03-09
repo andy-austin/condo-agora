@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, type ComponentType } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
@@ -58,16 +59,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   OTHER: 'bg-gray-500',
 };
 
-const CATEGORY_LABELS: Record<string, string> = {
-  SECURITY: 'Security',
-  INFRASTRUCTURE: 'Infrastructure',
-  COMMON_AREAS: 'Common Areas',
-  MAINTENANCE: 'Maintenance',
-  FINANCIAL: 'Financial',
-  OTHER: 'Other',
-};
-
 export default function ReportsPage() {
+  const t = useTranslations('dashboard');
   const { getAuthToken } = useAuthToken();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -111,11 +104,11 @@ export default function ReportsPage() {
       setSessions(sessionsData.votingSessions);
     } catch (err) {
       console.error('Failed to load reports:', err);
-      setError('Failed to load reports data.');
+      setError(t('reports.failedToLoad'));
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken]);
+  }, [getAuthToken, t]);
 
   useEffect(() => {
     fetchData();
@@ -168,7 +161,7 @@ export default function ReportsPage() {
   if (error) {
     return (
       <ErrorState
-        title="Could not load reports"
+        title={t('reports.couldNotLoad')}
         message={error}
         onRetry={() => window.location.reload()}
       />
@@ -182,12 +175,12 @@ export default function ReportsPage() {
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-8">
-      <Breadcrumb items={[{ label: 'Reports' }]} />
+      <Breadcrumb items={[{ label: t('reports.title') }]} />
 
       <div>
-        <h1 className="text-2xl lg:text-3xl font-bold">Reports & Analytics</h1>
+        <h1 className="text-2xl lg:text-3xl font-bold">{t('reports.pageTitle')}</h1>
         <p className="text-muted-foreground mt-1">
-          Community metrics, financial overview, and participation data.
+          {t('reports.subtitle')}
         </p>
       </div>
 
@@ -195,28 +188,28 @@ export default function ReportsPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           icon={FileText}
-          label="Total Proposals"
+          label={t('reports.totalProposals')}
           value={analytics?.totalProposals ?? 0}
           color="text-blue-600 bg-blue-100"
         />
         <MetricCard
           icon={CheckCircle2}
-          label="Approved"
+          label={t('reports.approved')}
           value={analytics?.approvedProposals ?? 0}
           sub={analytics && analytics.totalProposals > 0
-            ? `${Math.round(analytics.approvalRate * 100)}% rate`
+            ? `${Math.round(analytics.approvalRate * 100)}% ${t('reports.rate')}`
             : undefined}
           color="text-green-600 bg-green-100"
         />
         <MetricCard
           icon={Clock}
-          label="Active Projects"
+          label={t('reports.activeProjects')}
           value={analytics?.activeProjects ?? 0}
           color="text-purple-600 bg-purple-100"
         />
         <MetricCard
           icon={XCircle}
-          label="Rejected"
+          label={t('reports.rejected')}
           value={analytics?.rejectedProposals ?? 0}
           color="text-red-600 bg-red-100"
         />
@@ -227,23 +220,23 @@ export default function ReportsPage() {
         <div className="border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <DollarSign size={20} className="text-emerald-600" />
-            <h2 className="text-lg font-semibold">Financial Summary</h2>
+            <h2 className="text-lg font-semibold">{t('reports.financialSummary')}</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
             <div>
-              <p className="text-sm text-muted-foreground">Total Approved</p>
+              <p className="text-sm text-muted-foreground">{t('reports.totalApproved')}</p>
               <p className="text-2xl font-bold text-emerald-600">
                 {formatCurrency(financial.totalApproved, financial.currency)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Spent</p>
+              <p className="text-sm text-muted-foreground">{t('reports.totalSpent')}</p>
               <p className="text-2xl font-bold">
                 {formatCurrency(financial.totalSpent, financial.currency)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Remaining</p>
+              <p className="text-sm text-muted-foreground">{t('reports.remaining')}</p>
               <p className="text-2xl font-bold text-blue-600">
                 {formatCurrency(financial.totalRemaining, financial.currency)}
               </p>
@@ -252,7 +245,7 @@ export default function ReportsPage() {
           {/* Spent progress bar */}
           <div>
             <div className="flex items-center justify-between text-sm mb-1">
-              <span className="text-muted-foreground">Budget utilization</span>
+              <span className="text-muted-foreground">{t('reports.budgetUtilization')}</span>
               <span className="font-medium">{spentPercentage}%</span>
             </div>
             <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
@@ -262,7 +255,7 @@ export default function ReportsPage() {
               />
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Across {financial.projectCount} project{financial.projectCount !== 1 ? 's' : ''}
+              {financial.projectCount} {financial.projectCount !== 1 ? t('common.projects') : t('common.project')}
             </p>
           </div>
         </div>
@@ -273,7 +266,7 @@ export default function ReportsPage() {
         <div className="border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 size={20} className="text-blue-600" />
-            <h2 className="text-lg font-semibold">Category Breakdown</h2>
+            <h2 className="text-lg font-semibold">{t('reports.categoryBreakdown')}</h2>
           </div>
           {analytics && analytics.categoryBreakdown.length > 0 ? (
             <div className="space-y-3">
@@ -282,7 +275,7 @@ export default function ReportsPage() {
                 return (
                   <div key={cat.category}>
                     <div className="flex items-center justify-between text-sm mb-1">
-                      <span>{CATEGORY_LABELS[cat.category] || cat.category}</span>
+                      <span>{t(`labels.category.${cat.category}`)}</span>
                       <span className="text-muted-foreground">
                         {cat.count} ({pct}%)
                       </span>
@@ -299,7 +292,7 @@ export default function ReportsPage() {
             </div>
           ) : (
             <p className="text-sm text-muted-foreground text-center py-8">
-              No proposal data yet.
+              {t('reports.noProposalData')}
             </p>
           )}
         </div>
@@ -308,7 +301,7 @@ export default function ReportsPage() {
         <div className="border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp size={20} className="text-purple-600" />
-            <h2 className="text-lg font-semibold">Monthly Trends</h2>
+            <h2 className="text-lg font-semibold">{t('reports.monthlyTrends')}</h2>
           </div>
           {analytics && analytics.monthlyTrends.length > 0 ? (
             <div className="space-y-2">
@@ -336,7 +329,7 @@ export default function ReportsPage() {
             </div>
           ) : (
             <p className="text-sm text-muted-foreground text-center py-8">
-              No trends data yet.
+              {t('reports.noTrendsData')}
             </p>
           )}
         </div>
@@ -347,17 +340,17 @@ export default function ReportsPage() {
         <div className="border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <Users size={20} className="text-amber-600" />
-            <h2 className="text-lg font-semibold">Top Contributors</h2>
+            <h2 className="text-lg font-semibold">{t('reports.topContributors')}</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left text-muted-foreground">
-                  <th className="pb-2 font-medium">#</th>
-                  <th className="pb-2 font-medium">User</th>
-                  <th className="pb-2 font-medium text-center">Proposals</th>
-                  <th className="pb-2 font-medium text-center">Comments</th>
-                  <th className="pb-2 font-medium text-center">Score</th>
+                  <th className="pb-2 font-medium">{t('reports.rank')}</th>
+                  <th className="pb-2 font-medium">{t('reports.user')}</th>
+                  <th className="pb-2 font-medium text-center">{t('proposals.title')}</th>
+                  <th className="pb-2 font-medium text-center">{t('proposals.comments')}</th>
+                  <th className="pb-2 font-medium text-center">{t('reports.score')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -383,18 +376,18 @@ export default function ReportsPage() {
         <div className="border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <Vote size={20} className="text-indigo-600" />
-            <h2 className="text-lg font-semibold">Participation Reports</h2>
+            <h2 className="text-lg font-semibold">{t('reports.participationReports')}</h2>
           </div>
 
           <div className="flex items-center gap-3 mb-4">
-            <label className="text-sm text-muted-foreground">Select session:</label>
+            <label className="text-sm text-muted-foreground">{t('reports.selectSession')}</label>
             <div className="relative">
               <select
                 value={selectedSessionId || ''}
                 onChange={(e) => setSelectedSessionId(e.target.value || null)}
                 className="appearance-none border rounded-lg px-3 py-2 pr-8 text-sm bg-background"
               >
-                <option value="">Choose a session</option>
+                <option value="">{t('reports.chooseSession')}</option>
                 {sessions
                   .filter((s) => s.status === 'CLOSED')
                   .map((s) => (
@@ -419,30 +412,30 @@ export default function ReportsPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="text-center p-3 bg-muted/50 rounded-lg">
                   <p className="text-2xl font-bold">{participationReport.totalHouses}</p>
-                  <p className="text-xs text-muted-foreground">Total Units</p>
+                  <p className="text-xs text-muted-foreground">{t('voting.totalUnits')}</p>
                 </div>
                 <div className="text-center p-3 bg-muted/50 rounded-lg">
                   <p className="text-2xl font-bold">{participationReport.votesCast}</p>
-                  <p className="text-xs text-muted-foreground">Votes Cast</p>
+                  <p className="text-xs text-muted-foreground">{t('voting.votesCast')}</p>
                 </div>
                 <div className="text-center p-3 bg-muted/50 rounded-lg">
                   <p className="text-2xl font-bold">
                     {Math.round(participationReport.participationRate * 100)}%
                   </p>
-                  <p className="text-xs text-muted-foreground">Turnout</p>
+                  <p className="text-xs text-muted-foreground">{t('reports.turnout')}</p>
                 </div>
                 <div className="text-center p-3 bg-muted/50 rounded-lg">
                   <p className="text-2xl font-bold">
                     {participationReport.nonVotedHouseIds.length}
                   </p>
-                  <p className="text-xs text-muted-foreground">Did Not Vote</p>
+                  <p className="text-xs text-muted-foreground">{t('reports.didNotVote')}</p>
                 </div>
               </div>
 
               {/* Participation bar */}
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-muted-foreground">Participation rate</span>
+                  <span className="text-muted-foreground">{t('reports.participationRateLabel')}</span>
                   <span className="font-medium">
                     {Math.round(participationReport.participationRate * 100)}%
                   </span>
@@ -461,7 +454,7 @@ export default function ReportsPage() {
 
           {!selectedSessionId && !loadingReport && (
             <p className="text-sm text-muted-foreground text-center py-4">
-              Select a closed voting session to view its participation report.
+              {t('reports.selectClosedSession')}
             </p>
           )}
         </div>
@@ -470,7 +463,7 @@ export default function ReportsPage() {
       {/* Last Session Participation */}
       {analytics && analytics.lastSessionParticipationRate > 0 && (
         <div className="border rounded-xl p-6">
-          <h2 className="text-lg font-semibold mb-2">Last Session Participation</h2>
+          <h2 className="text-lg font-semibold mb-2">{t('reports.lastSessionParticipation')}</h2>
           <div className="flex items-center gap-4">
             <div className="text-3xl font-bold text-indigo-600">
               {Math.round(analytics.lastSessionParticipationRate * 100)}%
@@ -485,7 +478,7 @@ export default function ReportsPage() {
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                of units participated in the most recent voting session
+                {t('reports.ofUnitsParticipated')}
               </p>
             </div>
           </div>
