@@ -154,6 +154,15 @@ async def cast_vote(
     if session["status"] != "OPEN":
         raise Exception("Voting session is not open")
 
+    # Verify caller is the designated voter for this house
+    house = await db.db.houses.find_one({"_id": ObjectId(house_id)})
+    if not house:
+        raise Exception("House not found")
+    if not house.get("voter_user_id"):
+        raise Exception("No designated voter assigned to this house")
+    if house["voter_user_id"] != voter_id:
+        raise Exception("Only the designated voter can cast votes for this house")
+
     # Validate ranking completeness
     proposal_ids = set(session.get("proposal_ids", []))
     ranked_ids = {r["proposal_id"] for r in rankings}

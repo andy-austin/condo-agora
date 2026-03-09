@@ -26,7 +26,7 @@ function makeHouse(id: string, name: string, residents: unknown[] = []) {
     id,
     name,
     organizationId: ORG_ID,
-    maxResidents: 1,
+    voterUserId: null,
     createdAt: NOW,
     updatedAt: NOW,
     residents,

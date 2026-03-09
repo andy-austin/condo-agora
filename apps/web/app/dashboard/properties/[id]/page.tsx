@@ -10,10 +10,12 @@ import {
   GET_HOUSE,
   UPDATE_HOUSE,
   REMOVE_RESIDENT_FROM_HOUSE,
+  SET_HOUSE_VOTER,
   type House,
   type GetHouseResponse,
   type UpdateHouseResponse,
   type RemoveResidentResponse,
+  type SetHouseVoterResponse,
 } from '@/lib/queries/house';
 import {
   GET_ORGANIZATION_MEMBERS,
@@ -34,6 +36,7 @@ import {
   Lightbulb,
   History,
   LayoutDashboard,
+  Vote,
 } from 'lucide-react';
 
 const ME_QUERY = `
@@ -379,6 +382,7 @@ function ResidentsTab({
   const t = useTranslations('dashboard');
   const [members, setMembers] = useState<Member[]>([]);
   const [removing, setRemoving] = useState<string | null>(null);
+  const [settingVoter, setSettingVoter] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -429,6 +433,26 @@ function ResidentsTab({
     }
   };
 
+  const handleSetVoter = async (userId: string) => {
+    setSettingVoter(userId);
+    try {
+      const token = await getAuthToken();
+      const client = getApiClient(token);
+      await client.request<SetHouseVoterResponse>(SET_HOUSE_VOTER, {
+        houseId: house.id,
+        targetUserId: userId,
+      });
+      onRefresh();
+    } catch (err) {
+      console.error('Failed to set voter:', err);
+      const message =
+        err instanceof Error ? err.message : 'Failed to set voter.';
+      alert(message);
+    } finally {
+      setSettingVoter(null);
+    }
+  };
+
   const existingResidentUserIds = house.residents.map((r) => r.userId);
 
   return (
@@ -442,12 +466,18 @@ function ResidentsTab({
             organizationId={house.organizationId}
             houseId={house.id}
             existingResidentUserIds={existingResidentUserIds}
-            maxResidents={house.maxResidents ?? 1}
             onAssigned={onRefresh}
             getAuthToken={getAuthToken}
           />
         )}
       </div>
+
+      {house.residents.length > 0 && !house.voterUserId && (
+        <div className="px-4 py-3 bg-amber-50 dark:bg-amber-950/30 border-b text-sm text-amber-700 dark:text-amber-400 flex items-center gap-2">
+          <Vote size={16} />
+          {t('properties.noVoterAssigned')}
+        </div>
+      )}
 
       {house.residents.length === 0 ? (
         <div className="p-8 text-center">
@@ -501,22 +531,42 @@ function ResidentsTab({
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant="outline">{resident.role}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{resident.role}</Badge>
+                      {house.voterUserId === resident.userId && (
+                        <Badge variant="default" className="bg-emerald-600 hover:bg-emerald-700">
+                          <Vote size={12} className="mr-1" />
+                          {t('properties.voterBadge')}
+                        </Badge>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-sm text-muted-foreground hidden sm:table-cell">
                     {display.detail}
                   </td>
                   {isAdmin && (
                     <td className="px-4 py-3 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => handleRemove(resident.userId)}
-                        disabled={removing === resident.userId}
-                      >
-                        {removing === resident.userId ? t('common.removing') : t('common.remove')}
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        {house.voterUserId !== resident.userId && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleSetVoter(resident.userId)}
+                            disabled={settingVoter === resident.userId}
+                          >
+                            {settingVoter === resident.userId ? '...' : t('properties.setAsVoter')}
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => handleRemove(resident.userId)}
+                          disabled={removing === resident.userId}
+                        >
+                          {removing === resident.userId ? t('common.removing') : t('common.remove')}
+                        </Button>
+                      </div>
                     </td>
                   )}
                 </tr>

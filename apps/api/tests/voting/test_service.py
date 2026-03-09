@@ -176,11 +176,18 @@ class TestCastVote:
     @pytest.mark.asyncio
     async def test_casts_vote_on_open_session(self):
         session_id = str(ObjectId())
+        house_id = str(ObjectId())
         pid1, pid2 = str(ObjectId()), str(ObjectId())
         session = _make_session(status="OPEN", proposal_ids=[pid1, pid2])
         session["_id"] = (
             ObjectId(session_id) if len(session_id) == 24 else session["_id"]
         )
+
+        house = {
+            "_id": ObjectId(house_id),
+            "voter_user_id": "user-1",
+            "organization_id": "org-1",
+        }
 
         rankings = [
             {"proposal_id": pid1, "rank": 1},
@@ -189,35 +196,46 @@ class TestCastVote:
         vote = _make_vote(session_id=session_id, rankings=rankings)
 
         mock_voting_sessions_collection.find_one.return_value = session
+        mock_houses_collection.find_one.return_value = house
         mock_votes_collection.find_one.return_value = None  # no existing vote
         mock_votes_collection.insert_one.return_value = MagicMock(
             inserted_id=vote["_id"]
         )
         mock_votes_collection.find_one.side_effect = [None, vote]
 
-        result = await cast_vote(session_id, "house-1", "user-1", rankings)
+        result = await cast_vote(session_id, house_id, "user-1", rankings)
         assert result is not None
 
     @pytest.mark.asyncio
     async def test_raises_when_session_not_open(self):
         session_id = str(ObjectId())
+        house_id = str(ObjectId())
         session = _make_session(status="DRAFT")
         mock_voting_sessions_collection.find_one.return_value = session
 
         with pytest.raises(Exception, match="not open"):
-            await cast_vote(session_id, "house-1", "user-1", [])
+            await cast_vote(session_id, house_id, "user-1", [])
 
     @pytest.mark.asyncio
     async def test_raises_on_incomplete_rankings(self):
         session_id = str(ObjectId())
+        house_id = str(ObjectId())
         pid1, pid2 = str(ObjectId()), str(ObjectId())
         session = _make_session(status="OPEN", proposal_ids=[pid1, pid2])
+
+        house = {
+            "_id": ObjectId(house_id),
+            "voter_user_id": "user-1",
+            "organization_id": "org-1",
+        }
+
         mock_voting_sessions_collection.find_one.return_value = session
+        mock_houses_collection.find_one.return_value = house
 
         with pytest.raises(Exception, match="all proposals"):
             await cast_vote(
                 session_id,
-                "house-1",
+                house_id,
                 "user-1",
                 [{"proposal_id": pid1, "rank": 1}],  # missing pid2
             )
@@ -250,3 +268,82 @@ class TestGetVotingResults:
 
         with pytest.raises(Exception, match="not found"):
             await get_voting_results(str(ObjectId()))
+
+
+class TestDesignatedVoterEnforcement:
+    @pytest.mark.asyncio
+    async def test_designated_voter_can_cast_vote(self):
+        session_id = str(ObjectId())
+        house_id = str(ObjectId())
+        pid1, pid2 = str(ObjectId()), str(ObjectId())
+        session = _make_session(status="OPEN", proposal_ids=[pid1, pid2])
+
+        house = {
+            "_id": ObjectId(house_id),
+            "voter_user_id": "voter-1",
+            "organization_id": "org-1",
+        }
+
+        rankings = [
+            {"proposal_id": pid1, "rank": 1},
+            {"proposal_id": pid2, "rank": 2},
+        ]
+        vote = _make_vote(session_id=session_id, rankings=rankings)
+
+        mock_voting_sessions_collection.find_one.return_value = session
+        mock_houses_collection.find_one.return_value = house
+        mock_votes_collection.find_one.side_effect = [None, vote]
+        mock_votes_collection.insert_one.return_value = MagicMock(
+            inserted_id=vote["_id"]
+        )
+
+        result = await cast_vote(session_id, house_id, "voter-1", rankings)
+        assert result is not None
+
+    @pytest.mark.asyncio
+    async def test_non_designated_resident_cannot_cast_vote(self):
+        session_id = str(ObjectId())
+        house_id = str(ObjectId())
+        pid1 = str(ObjectId())
+        session = _make_session(status="OPEN", proposal_ids=[pid1])
+
+        house = {
+            "_id": ObjectId(house_id),
+            "voter_user_id": "voter-1",
+            "organization_id": "org-1",
+        }
+
+        mock_voting_sessions_collection.find_one.return_value = session
+        mock_houses_collection.find_one.return_value = house
+
+        with pytest.raises(Exception, match="designated voter"):
+            await cast_vote(
+                session_id,
+                house_id,
+                "not-the-voter",
+                [{"proposal_id": pid1, "rank": 1}],
+            )
+
+    @pytest.mark.asyncio
+    async def test_house_with_no_voter_cannot_cast_vote(self):
+        session_id = str(ObjectId())
+        house_id = str(ObjectId())
+        pid1 = str(ObjectId())
+        session = _make_session(status="OPEN", proposal_ids=[pid1])
+
+        house = {
+            "_id": ObjectId(house_id),
+            "voter_user_id": None,
+            "organization_id": "org-1",
+        }
+
+        mock_voting_sessions_collection.find_one.return_value = session
+        mock_houses_collection.find_one.return_value = house
+
+        with pytest.raises(Exception, match="No designated voter"):
+            await cast_vote(
+                session_id,
+                house_id,
+                "user-1",
+                [{"proposal_id": pid1, "rank": 1}],
+            )

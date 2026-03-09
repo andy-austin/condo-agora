@@ -18,7 +18,6 @@ type AssignResidentDialogProps = {
   organizationId: string;
   houseId: string;
   existingResidentUserIds: string[];
-  maxResidents?: number;
   onAssigned: () => void;
   getAuthToken: () => Promise<string | null>;
 };
@@ -27,11 +26,9 @@ export default function AssignResidentDialog({
   organizationId,
   houseId,
   existingResidentUserIds,
-  maxResidents = 1,
   onAssigned,
   getAuthToken,
 }: AssignResidentDialogProps) {
-  const atCapacity = existingResidentUserIds.length >= maxResidents;
   const [open, setOpen] = useState(false);
   const [members, setMembers] = useState<Member[]>([]);
   const [selectedUserId, setSelectedUserId] = useState('');
@@ -98,7 +95,7 @@ export default function AssignResidentDialog({
 
   if (!open) {
     return (
-      <Button size="sm" onClick={() => setOpen(true)} disabled={atCapacity} title={atCapacity ? `Maximum ${maxResidents} resident(s) reached` : undefined}>
+      <Button size="sm" onClick={() => setOpen(true)}>
         + Add Resident
       </Button>
     );
