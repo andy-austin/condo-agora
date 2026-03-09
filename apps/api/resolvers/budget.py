@@ -38,7 +38,7 @@ async def resolve_proposal_budget(
         raise Exception("Proposal not found")
     await require_org_member(user, proposal["organization_id"])
 
-    from ...database import db
+    from ..database import db
 
     total_houses = await db.db.houses.count_documents(
         {"organization_id": proposal["organization_id"]}
@@ -84,7 +84,7 @@ async def resolve_set_budget(
 
     created_by = user.get("id") or str(user.get("_id"))
 
-    from ...database import db
+    from ..database import db
 
     total_houses = await db.db.houses.count_documents(
         {"organization_id": proposal["organization_id"]}
@@ -107,7 +107,7 @@ async def resolve_update_spent_amount(
         raise Exception("Proposal not found")
     await require_org_admin(user, proposal["organization_id"])
 
-    from ...database import db
+    from ..database import db
 
     total_houses = await db.db.houses.count_documents(
         {"organization_id": proposal["organization_id"]}
