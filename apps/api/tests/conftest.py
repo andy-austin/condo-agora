@@ -142,6 +142,26 @@ mock_notifications_collection.update_many = AsyncMock(
 mock_notifications_collection.count_documents = AsyncMock(return_value=0)
 mock_notifications_collection.create_index = AsyncMock()
 
+mock_voting_sessions_collection = MagicMock()
+mock_voting_sessions_collection.find = MagicMock(
+    return_value=create_async_cursor_mock([])
+)
+mock_voting_sessions_collection.find_one = AsyncMock(return_value=None)
+mock_voting_sessions_collection.insert_one = AsyncMock(
+    return_value=MagicMock(inserted_id="mock_id")
+)
+mock_voting_sessions_collection.find_one_and_update = AsyncMock(return_value=None)
+mock_voting_sessions_collection.create_index = AsyncMock()
+
+mock_votes_collection = MagicMock()
+mock_votes_collection.find = MagicMock(return_value=create_async_cursor_mock([]))
+mock_votes_collection.find_one = AsyncMock(return_value=None)
+mock_votes_collection.insert_one = AsyncMock(
+    return_value=MagicMock(inserted_id="mock_id")
+)
+mock_votes_collection.find_one_and_update = AsyncMock(return_value=None)
+mock_votes_collection.create_index = AsyncMock()
+
 # Create mock database with collections
 mock_motor_db = MagicMock()
 mock_motor_db.notes = mock_notes_collection
@@ -154,6 +174,8 @@ mock_motor_db.proposals = mock_proposals_collection
 mock_motor_db.comments = mock_comments_collection
 mock_motor_db.announcements = mock_announcements_collection
 mock_motor_db.notifications = mock_notifications_collection
+mock_motor_db.voting_sessions = mock_voting_sessions_collection
+mock_motor_db.votes = mock_votes_collection
 mock_motor_db.__getitem__ = lambda self, key: getattr(self, key)
 
 # Create mock MongoDB client
@@ -242,3 +264,15 @@ def announcements_collection_mock():
 def notifications_collection_mock():
     """Return the mock notifications collection for tests that need to configure it"""
     return mock_notifications_collection
+
+
+@pytest.fixture
+def voting_sessions_collection_mock():
+    """Return the mock voting_sessions collection for tests that need to configure it"""
+    return mock_voting_sessions_collection
+
+
+@pytest.fixture
+def votes_collection_mock():
+    """Return the mock votes collection for tests that need to configure it"""
+    return mock_votes_collection

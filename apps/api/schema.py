@@ -8,6 +8,7 @@ from .schemas.house import HouseMutations, HouseQueries
 from .schemas.note import NoteMutations, NoteQueries
 from .schemas.notification import NotificationMutations, NotificationQueries
 from .schemas.proposal import ProposalMutations, ProposalQueries
+from .schemas.voting import VotingMutations, VotingQueries
 
 
 @strawberry.type
@@ -20,6 +21,7 @@ class Query(
     CommentQueries,
     AnnouncementQueries,
     NotificationQueries,
+    VotingQueries,
 ):
     pass
 
@@ -33,6 +35,7 @@ class Mutation(
     CommentMutations,
     AnnouncementMutations,
     NotificationMutations,
+    VotingMutations,
 ):
     pass
 
