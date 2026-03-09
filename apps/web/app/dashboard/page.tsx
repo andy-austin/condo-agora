@@ -27,6 +27,7 @@ import {
 import { Button } from '@/components/ui/button';
 import AnnouncementsSection from '@/components/dashboard/AnnouncementsSection';
 import ActivityFeed from '@/components/dashboard/ActivityFeed';
+import ActiveProjectsWidget from '@/components/dashboard/ActiveProjectsWidget';
 
 const ME_QUERY = `
   query Me {
@@ -338,6 +339,11 @@ export default function DashboardPage() {
           {/* Activity Feed */}
           {data?.organizationId && (
             <ActivityFeed organizationId={data.organizationId} />
+          )}
+
+          {/* Active Projects */}
+          {data?.organizationId && (
+            <ActiveProjectsWidget organizationId={data.organizationId} />
           )}
         </div>
 
