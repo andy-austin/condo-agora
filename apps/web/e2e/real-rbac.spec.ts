@@ -9,15 +9,32 @@ import { graphqlRequest } from './fixtures/graphql';
  */
 
 // ---------------------------------------------------------------------------
+// Types for GraphQL responses
+// ---------------------------------------------------------------------------
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type GqlResult = { data?: any; errors?: Array<{ message: string }> };
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 /** Extract a session token from the page's cookies/storage for direct API calls. */
 async function getSessionToken(page: import('@playwright/test').Page): Promise<string | undefined> {
-  // Clerk stores the session JWT in a cookie named __session
   const cookies = await page.context().cookies();
   const sessionCookie = cookies.find((c) => c.name === '__session');
   return sessionCookie?.value;
+}
+
+/** Send a typed GraphQL request. */
+async function gql(
+  baseURL: string,
+  query: string,
+  variables?: Record<string, unknown>,
+  token?: string,
+): Promise<GqlResult> {
+  return graphqlRequest(baseURL, query, variables, token) as Promise<GqlResult>;
 }
 
 const ME_QUERY = `
@@ -93,25 +110,20 @@ const GET_MEMBERS_QUERY = `
 
 test.describe('Real RBAC — Property mutations', () => {
   let adminToken: string | undefined;
-  let residentToken: string | undefined;
-  let memberToken: string | undefined;
   let organizationId: string;
-  let createdHouseIds: string[] = [];
+  const createdHouseIds: string[] = [];
 
   test.beforeAll(async ({ browser }) => {
-    // We need to log in as admin to get the org ID
     const adminContext = await browser.newContext();
     const adminPage = await adminContext.newPage();
 
-    // Import and use the login helper
     const { clerkLogin, TEST_USERS: users } = await import('./fixtures/auth');
     await clerkLogin(adminPage, users.admin.email, users.admin.password);
 
     adminToken = await getSessionToken(adminPage);
 
-    // Get org ID from the Me query
     const baseURL = adminPage.url().replace(/\/dashboard.*/, '');
-    const meResult = await graphqlRequest(baseURL, ME_QUERY, {}, adminToken);
+    const meResult = await gql(baseURL, ME_QUERY, {}, adminToken);
     organizationId = meResult.data?.me?.memberships?.[0]?.organizationId;
 
     await adminPage.close();
@@ -119,7 +131,6 @@ test.describe('Real RBAC — Property mutations', () => {
   });
 
   test.afterAll(async ({ browser }) => {
-    // Clean up any houses created during tests
     if (createdHouseIds.length > 0 && adminToken) {
       const context = await browser.newContext();
       const page = await context.newPage();
@@ -129,7 +140,7 @@ test.describe('Real RBAC — Property mutations', () => {
       await context.close();
 
       for (const houseId of createdHouseIds) {
-        await graphqlRequest(baseURL, DELETE_HOUSE_MUTATION, { id: houseId }, adminToken);
+        await gql(baseURL, DELETE_HOUSE_MUTATION, { id: houseId }, adminToken);
       }
     }
   });
@@ -139,7 +150,7 @@ test.describe('Real RBAC — Property mutations', () => {
     await adminPage.goto('/');
     const baseURL = adminPage.url().replace(/\/$/, '');
 
-    const result = await graphqlRequest(baseURL, CREATE_HOUSE_MUTATION, {
+    const result = await gql(baseURL, CREATE_HOUSE_MUTATION, {
       organizationId,
       name: '[E2E] Admin Created Property',
     }, token);
@@ -148,8 +159,7 @@ test.describe('Real RBAC — Property mutations', () => {
     expect(result.data?.createHouse?.id).toBeTruthy();
     expect(result.data?.createHouse?.name).toBe('[E2E] Admin Created Property');
 
-    // Track for cleanup
-    createdHouseIds.push(result.data!.createHouse.id as string);
+    createdHouseIds.push(result.data.createHouse.id);
   });
 
   test('resident cannot create a property via GraphQL', async ({ residentPage }) => {
@@ -157,7 +167,7 @@ test.describe('Real RBAC — Property mutations', () => {
     await residentPage.goto('/');
     const baseURL = residentPage.url().replace(/\/$/, '');
 
-    const result = await graphqlRequest(baseURL, CREATE_HOUSE_MUTATION, {
+    const result = await gql(baseURL, CREATE_HOUSE_MUTATION, {
       organizationId,
       name: '[E2E] Resident Should Not Create',
     }, token);
@@ -171,7 +181,7 @@ test.describe('Real RBAC — Property mutations', () => {
     await memberPage.goto('/');
     const baseURL = memberPage.url().replace(/\/$/, '');
 
-    const result = await graphqlRequest(baseURL, CREATE_HOUSE_MUTATION, {
+    const result = await gql(baseURL, CREATE_HOUSE_MUTATION, {
       organizationId,
       name: '[E2E] Member Should Not Create',
     }, token);
@@ -185,16 +195,14 @@ test.describe('Real RBAC — Property mutations', () => {
     await adminPage.goto('/');
     const baseURL = adminPage.url().replace(/\/$/, '');
 
-    // First create a house to update
-    const createResult = await graphqlRequest(baseURL, CREATE_HOUSE_MUTATION, {
+    const createResult = await gql(baseURL, CREATE_HOUSE_MUTATION, {
       organizationId,
       name: '[E2E] To Update',
     }, token);
-    const houseId = createResult.data?.createHouse?.id as string;
+    const houseId = createResult.data?.createHouse?.id;
     createdHouseIds.push(houseId);
 
-    // Now update it
-    const result = await graphqlRequest(baseURL, UPDATE_HOUSE_MUTATION, {
+    const result = await gql(baseURL, UPDATE_HOUSE_MUTATION, {
       id: houseId,
       name: '[E2E] Updated Name',
     }, token);
@@ -208,17 +216,15 @@ test.describe('Real RBAC — Property mutations', () => {
     await adminPage.goto('/');
     const baseURL = adminPage.url().replace(/\/$/, '');
 
-    // Admin creates a house
-    const createResult = await graphqlRequest(baseURL, CREATE_HOUSE_MUTATION, {
+    const createResult = await gql(baseURL, CREATE_HOUSE_MUTATION, {
       organizationId,
       name: '[E2E] Resident Update Test',
     }, adminTkn);
-    const houseId = createResult.data?.createHouse?.id as string;
+    const houseId = createResult.data?.createHouse?.id;
     createdHouseIds.push(houseId);
 
-    // Resident tries to update
     const residentTkn = await getSessionToken(residentPage);
-    const result = await graphqlRequest(baseURL, UPDATE_HOUSE_MUTATION, {
+    const result = await gql(baseURL, UPDATE_HOUSE_MUTATION, {
       id: houseId,
       name: '[E2E] Unauthorized Update',
     }, residentTkn);
@@ -232,15 +238,13 @@ test.describe('Real RBAC — Property mutations', () => {
     await adminPage.goto('/');
     const baseURL = adminPage.url().replace(/\/$/, '');
 
-    // First create a house to delete
-    const createResult = await graphqlRequest(baseURL, CREATE_HOUSE_MUTATION, {
+    const createResult = await gql(baseURL, CREATE_HOUSE_MUTATION, {
       organizationId,
       name: '[E2E] To Delete',
     }, token);
-    const houseId = createResult.data?.createHouse?.id as string;
+    const houseId = createResult.data?.createHouse?.id;
 
-    // Delete it
-    const result = await graphqlRequest(baseURL, DELETE_HOUSE_MUTATION, {
+    const result = await gql(baseURL, DELETE_HOUSE_MUTATION, {
       id: houseId,
     }, token);
 
@@ -253,17 +257,15 @@ test.describe('Real RBAC — Property mutations', () => {
     await adminPage.goto('/');
     const baseURL = adminPage.url().replace(/\/$/, '');
 
-    // Admin creates a house
-    const createResult = await graphqlRequest(baseURL, CREATE_HOUSE_MUTATION, {
+    const createResult = await gql(baseURL, CREATE_HOUSE_MUTATION, {
       organizationId,
       name: '[E2E] Member Delete Test',
     }, adminTkn);
-    const houseId = createResult.data?.createHouse?.id as string;
+    const houseId = createResult.data?.createHouse?.id;
     createdHouseIds.push(houseId);
 
-    // Member tries to delete
     const memberTkn = await getSessionToken(memberPage);
-    const result = await graphqlRequest(baseURL, DELETE_HOUSE_MUTATION, {
+    const result = await gql(baseURL, DELETE_HOUSE_MUTATION, {
       id: houseId,
     }, memberTkn);
 
@@ -290,19 +292,15 @@ test.describe('Real RBAC — Invitation & role change mutations', () => {
     const token = await getSessionToken(page);
     const baseURL = page.url().replace(/\/dashboard.*/, '');
 
-    // Get org ID
-    const meResult = await graphqlRequest(baseURL, ME_QUERY, {}, token);
+    const meResult = await gql(baseURL, ME_QUERY, {}, token);
     organizationId = meResult.data?.me?.memberships?.[0]?.organizationId;
 
-    // Get a non-admin member ID for role change tests
-    const membersResult = await graphqlRequest(baseURL, GET_MEMBERS_QUERY, {
+    const membersResult = await gql(baseURL, GET_MEMBERS_QUERY, {
       organizationId,
     }, token);
-    const members = membersResult.data?.organizationMembers as Array<{
-      id: string;
-      role: string;
-      email: string;
-    }>;
+    const members = membersResult.data?.organizationMembers as
+      | Array<{ id: string; role: string; email: string }>
+      | undefined;
     const nonAdmin = members?.find((m) => m.role !== 'ADMIN');
     if (nonAdmin) {
       nonAdminMemberId = nonAdmin.id;
@@ -317,7 +315,7 @@ test.describe('Real RBAC — Invitation & role change mutations', () => {
     await adminPage.goto('/');
     const baseURL = adminPage.url().replace(/\/$/, '');
 
-    const result = await graphqlRequest(baseURL, CREATE_INVITATION_MUTATION, {
+    const result = await gql(baseURL, CREATE_INVITATION_MUTATION, {
       email: `e2e-test-${Date.now()}@example.com`,
       organizationId,
       role: 'MEMBER',
@@ -332,7 +330,7 @@ test.describe('Real RBAC — Invitation & role change mutations', () => {
     await residentPage.goto('/');
     const baseURL = residentPage.url().replace(/\/$/, '');
 
-    const result = await graphqlRequest(baseURL, CREATE_INVITATION_MUTATION, {
+    const result = await gql(baseURL, CREATE_INVITATION_MUTATION, {
       email: `e2e-unauthorized-${Date.now()}@example.com`,
       organizationId,
       role: 'MEMBER',
@@ -347,7 +345,7 @@ test.describe('Real RBAC — Invitation & role change mutations', () => {
     await memberPage.goto('/');
     const baseURL = memberPage.url().replace(/\/$/, '');
 
-    const result = await graphqlRequest(baseURL, CREATE_INVITATION_MUTATION, {
+    const result = await gql(baseURL, CREATE_INVITATION_MUTATION, {
       email: `e2e-unauthorized-${Date.now()}@example.com`,
       organizationId,
       role: 'MEMBER',
@@ -364,20 +362,17 @@ test.describe('Real RBAC — Invitation & role change mutations', () => {
     await adminPage.goto('/');
     const baseURL = adminPage.url().replace(/\/$/, '');
 
-    // Get the current role first so we can restore it
-    const membersResult = await graphqlRequest(baseURL, GET_MEMBERS_QUERY, {
+    const membersResult = await gql(baseURL, GET_MEMBERS_QUERY, {
       organizationId,
     }, token);
-    const members = membersResult.data?.organizationMembers as Array<{
-      id: string;
-      role: string;
-    }>;
+    const members = membersResult.data?.organizationMembers as
+      | Array<{ id: string; role: string }>
+      | undefined;
     const target = members?.find((m) => m.id === nonAdminMemberId);
     const originalRole = target?.role || 'MEMBER';
 
-    // Change role
     const newRole = originalRole === 'MEMBER' ? 'RESIDENT' : 'MEMBER';
-    const result = await graphqlRequest(baseURL, UPDATE_MEMBER_ROLE_MUTATION, {
+    const result = await gql(baseURL, UPDATE_MEMBER_ROLE_MUTATION, {
       memberId: nonAdminMemberId,
       role: newRole,
     }, token);
@@ -386,7 +381,7 @@ test.describe('Real RBAC — Invitation & role change mutations', () => {
     expect(result.data?.updateMemberRole?.role).toBe(newRole);
 
     // Restore original role
-    await graphqlRequest(baseURL, UPDATE_MEMBER_ROLE_MUTATION, {
+    await gql(baseURL, UPDATE_MEMBER_ROLE_MUTATION, {
       memberId: nonAdminMemberId,
       role: originalRole,
     }, token);
@@ -399,7 +394,7 @@ test.describe('Real RBAC — Invitation & role change mutations', () => {
     await residentPage.goto('/');
     const baseURL = residentPage.url().replace(/\/$/, '');
 
-    const result = await graphqlRequest(baseURL, UPDATE_MEMBER_ROLE_MUTATION, {
+    const result = await gql(baseURL, UPDATE_MEMBER_ROLE_MUTATION, {
       memberId: nonAdminMemberId,
       role: 'ADMIN',
     }, token);
