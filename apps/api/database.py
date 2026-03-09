@@ -107,6 +107,23 @@ class MongoDB:
         await self.db.proposals.create_index("status")
         await self.db.proposals.create_index([("created_at", -1)])
 
+        # Comments collection indexes
+        await self.db.comments.create_index("proposal_id")
+        await self.db.comments.create_index("author_id")
+        await self.db.comments.create_index("parent_id")
+        await self.db.comments.create_index([("created_at", 1)])
+
+        # Announcements collection indexes
+        await self.db.announcements.create_index("organization_id")
+        await self.db.announcements.create_index(
+            [("is_pinned", -1), ("created_at", -1)]
+        )
+
+        # Notifications collection indexes
+        await self.db.notifications.create_index("user_id")
+        await self.db.notifications.create_index([("user_id", 1), ("is_read", 1)])
+        await self.db.notifications.create_index([("created_at", -1)])
+
 
 # Global database instance
 db = MongoDB()

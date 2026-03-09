@@ -20,6 +20,7 @@ import {
   CATEGORIES,
 } from '@/lib/queries/proposal';
 import { GET_HOUSES, type House, type GetHousesResponse } from '@/lib/queries/house';
+import CommentSection from '@/components/proposals/CommentSection';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ErrorState } from '@/components/dashboard/states';
@@ -363,6 +364,14 @@ export default function ProposalDetailPage() {
               <p className="text-sm">{proposal.rejectionReason}</p>
             </div>
           )}
+
+          {/* Comments */}
+          <CommentSection
+            proposalId={proposal.id}
+            currentUserId={currentUserId}
+            isAdmin={isAdmin}
+            getAuthToken={getAuthToken}
+          />
         </div>
 
         {/* Sidebar */}

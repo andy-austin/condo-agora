@@ -25,6 +25,8 @@ import {
   Circle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import AnnouncementsSection from '@/components/dashboard/AnnouncementsSection';
+import ActivityFeed from '@/components/dashboard/ActivityFeed';
 
 const ME_QUERY = `
   query Me {
@@ -46,6 +48,7 @@ type MeResponse = {
 };
 
 type DashboardData = {
+  organizationId: string;
   organizationName: string;
   isAdmin: boolean;
   houses: House[];
@@ -67,6 +70,7 @@ export default function DashboardPage() {
 
       if (!meData.me || meData.me.memberships.length === 0) {
         setData({
+          organizationId: '',
           organizationName: '',
           isAdmin: false,
           houses: [],
@@ -87,6 +91,7 @@ export default function DashboardPage() {
       ]);
 
       setData({
+        organizationId: orgId,
         organizationName: membership.organization.name,
         isAdmin: membership.role === 'ADMIN',
         houses: housesData.houses,
@@ -233,9 +238,17 @@ export default function DashboardPage() {
         })}
       </div>
 
+      {/* Announcements */}
+      {data?.organizationId && (
+        <AnnouncementsSection
+          organizationId={data.organizationId}
+          isAdmin={data.isAdmin}
+        />
+      )}
+
       {/* Main content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left column - Quick Actions + Recent Members */}
+        {/* Left column - Quick Actions + Recent Members + Activity Feed */}
         <div className="lg:col-span-2 space-y-6">
           {/* Quick Actions */}
           {data?.isAdmin && (
@@ -321,6 +334,11 @@ export default function DashboardPage() {
               </p>
             )}
           </div>
+
+          {/* Activity Feed */}
+          {data?.organizationId && (
+            <ActivityFeed organizationId={data.organizationId} />
+          )}
         </div>
 
         {/* Right column - Onboarding + Properties */}

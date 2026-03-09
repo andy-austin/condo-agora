@@ -17,6 +17,7 @@ import {
   X,
   ChevronLeft,
 } from 'lucide-react';
+import NotificationBell from './NotificationBell';
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
@@ -177,14 +178,17 @@ function SidebarNav({
             }}
           />
           {!collapsed && (
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium truncate">
-                {user?.firstName} {user?.lastName}
-              </p>
-              <p className="text-xs text-muted-foreground truncate">
-                {user?.primaryEmailAddress?.emailAddress}
-              </p>
-            </div>
+            <>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium truncate">
+                  {user?.firstName} {user?.lastName}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {user?.primaryEmailAddress?.emailAddress}
+                </p>
+              </div>
+              <NotificationBell />
+            </>
           )}
         </div>
       </div>
