@@ -59,5 +59,5 @@ export default clerkMiddleware(async (auth, request) => {
 });
 
 export const config = {
-  matcher: ['/((?!api|_next|.*\\..*).*)', '/api/upload']
+  matcher: ['/((?!api|_next|.*\\..*).*)']
 };
