@@ -4,6 +4,7 @@ export const GET_HOUSES = `
       id
       name
       organizationId
+      maxResidents
       createdAt
       updatedAt
       residents {
@@ -21,6 +22,7 @@ export const GET_HOUSE = `
       id
       name
       organizationId
+      maxResidents
       createdAt
       updatedAt
       residents {
@@ -73,6 +75,7 @@ export type House = {
   id: string;
   name: string;
   organizationId: string;
+  maxResidents: number;
   createdAt: string;
   updatedAt: string;
   residents: HouseResident[];
