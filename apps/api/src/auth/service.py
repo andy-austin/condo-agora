@@ -11,6 +11,21 @@ from .clerk_utils import create_clerk_invitation
 EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 
 
+def _get_app_url() -> str:
+    """Resolve the app base URL from environment variables."""
+    import os
+
+    return os.getenv("NEXT_PUBLIC_APP_URL") or (
+        f"https://{os.getenv('VERCEL_PROJECT_PRODUCTION_URL')}"
+        if os.getenv("VERCEL_PROJECT_PRODUCTION_URL")
+        else (
+            f"https://{os.getenv('VERCEL_URL')}"
+            if os.getenv("VERCEL_URL")
+            else "http://localhost:3000"
+        )
+    )
+
+
 def _slugify(text: str) -> str:
     """Convert a string to a URL-friendly slug."""
     import re
@@ -77,8 +92,6 @@ async def create_invitation(
     Creates a new invitation for a user to join an organization.
     Validates email, prevents duplicates, and notifies existing users.
     """
-    import os
-
     from ..notification.service import create_notification
 
     if not db.is_connected():
@@ -123,8 +136,7 @@ async def create_invitation(
     invitation_data["_id"] = str(result.inserted_id)
 
     # Trigger Clerk Invitation
-    app_url = os.getenv("NEXT_PUBLIC_APP_URL", "http://localhost:3000")
-    redirect_url = f"{app_url}/dashboard"
+    redirect_url = f"{_get_app_url()}/dashboard"
 
     try:
         await create_clerk_invitation(
@@ -266,8 +278,6 @@ async def revoke_invitation(invitation_id: str):
 
 async def resend_invitation(invitation_id: str):
     """Resend a pending invitation via Clerk."""
-    import os
-
     if not db.is_connected():
         await db.connect()
 
@@ -279,8 +289,7 @@ async def resend_invitation(invitation_id: str):
         raise Exception("Cannot resend an already accepted invitation")
 
     # Resend via Clerk
-    app_url = os.getenv("NEXT_PUBLIC_APP_URL", "http://localhost:3000")
-    redirect_url = f"{app_url}/dashboard"
+    redirect_url = f"{_get_app_url()}/dashboard"
 
     try:
         await create_clerk_invitation(
