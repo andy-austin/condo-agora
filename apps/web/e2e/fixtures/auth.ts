@@ -4,18 +4,47 @@ import path from 'path';
 /**
  * Authentication fixtures for E2E tests.
  *
- * Two strategies available:
- * 1. `authedPage` — Uses real Clerk login (cached via storageState) for full integration tests.
- *    Credentials come from E2E_USER_EMAIL / E2E_USER_PASSWORD env vars.
- * 2. `mockAuthedPage` — Uses route interception to mock Clerk auth for isolated UI tests.
+ * Three strategies available:
+ * 1. `authedPage` — Uses route interception to mock Clerk auth for isolated UI tests.
+ * 2. `realAuthedPage` — Uses real Clerk login (cached via storageState) for full integration tests.
+ * 3. `adminPage` / `residentPage` / `memberPage` — Role-specific real Clerk login fixtures.
  */
 
-// Test account credentials (set via env or defaults)
+// ---------------------------------------------------------------------------
+// Test user credentials (from env or defaults)
+// ---------------------------------------------------------------------------
+
+export type UserRole = 'admin' | 'resident' | 'member';
+
+export const TEST_USERS: Record<UserRole, { email: string; password: string }> = {
+  admin: {
+    email: process.env.E2E_ADMIN_EMAIL || 'admin@agora.com',
+    password: process.env.E2E_USER_PASSWORD || '3AgF…XrXqBX0Qa',
+  },
+  resident: {
+    email: process.env.E2E_RESIDENT_EMAIL || 'resident@agora.com',
+    password: process.env.E2E_USER_PASSWORD || '3AgF…XrXqBX0Qa',
+  },
+  member: {
+    email: process.env.E2E_MEMBER_EMAIL || 'member@agora.com',
+    password: process.env.E2E_USER_PASSWORD || '3AgF…XrXqBX0Qa',
+  },
+};
+
+// Legacy single-user credentials (backward compat)
 const E2E_EMAIL = process.env.E2E_USER_EMAIL || 'tests@agora.com';
 const E2E_PASSWORD = process.env.E2E_USER_PASSWORD || '3AgF…XrXqBX0Qa';
 
+// Auth state paths — one per role + legacy
 export const AUTH_STATE_PATH = path.join(__dirname, '../.auth/user.json');
 
+export const AUTH_STATE_PATHS: Record<UserRole, string> = {
+  admin: path.join(__dirname, '../.auth/admin.json'),
+  resident: path.join(__dirname, '../.auth/resident.json'),
+  member: path.join(__dirname, '../.auth/member.json'),
+};
+
+// Legacy test constants (used by existing mocked tests)
 export const TEST_USER = {
   id: 'user_test_123',
   firstName: 'Test',
@@ -35,10 +64,17 @@ export const TEST_MEMBERSHIP = {
   role: 'ADMIN',
 };
 
+// ---------------------------------------------------------------------------
+// Clerk login helpers
+// ---------------------------------------------------------------------------
+
 /**
- * Log in through Clerk's sign-in page and save the authenticated state.
+ * Log in through Clerk's sign-in page with specific credentials.
  */
-export async function clerkLogin(page: Page) {
+export async function clerkLogin(page: Page, email?: string, password?: string) {
+  const loginEmail = email || E2E_EMAIL;
+  const loginPassword = password || E2E_PASSWORD;
+
   await page.goto('/sign-in');
 
   // Wait for Clerk's sign-in form to load
@@ -47,7 +83,7 @@ export async function clerkLogin(page: Page) {
   // Fill email
   const emailInput = page.locator('input[name="identifier"], input[type="email"]').first();
   await emailInput.waitFor({ state: 'visible', timeout: 10_000 });
-  await emailInput.fill(E2E_EMAIL);
+  await emailInput.fill(loginEmail);
 
   // Click continue (Clerk uses a two-step flow)
   await page.getByRole('button', { name: /continue/i }).click();
@@ -55,7 +91,7 @@ export async function clerkLogin(page: Page) {
   // Fill password
   const passwordInput = page.locator('input[name="password"], input[type="password"]').first();
   await passwordInput.waitFor({ state: 'visible', timeout: 10_000 });
-  await passwordInput.fill(E2E_PASSWORD);
+  await passwordInput.fill(loginPassword);
 
   // Click sign in
   await page.getByRole('button', { name: /sign in|continue/i }).click();
@@ -65,8 +101,43 @@ export async function clerkLogin(page: Page) {
 }
 
 /**
+ * Log in as a specific role and cache the auth state.
+ */
+async function loginAsRole(browser: import('@playwright/test').Browser, role: UserRole): Promise<BrowserContext> {
+  const { email, password } = TEST_USERS[role];
+  const statePath = AUTH_STATE_PATHS[role];
+
+  // Try to reuse saved auth state
+  try {
+    const context = await browser.newContext({ storageState: statePath });
+    // Verify the saved state is still valid
+    const page = await context.newPage();
+    await page.goto('/dashboard');
+    // If we get redirected to sign-in, the session expired
+    await page.waitForURL(/\/dashboard/, { timeout: 10_000 });
+    await page.close();
+    return context;
+  } catch {
+    // No saved state or expired — perform fresh login
+  }
+
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await clerkLogin(page, email, password);
+  await context.storageState({ path: statePath });
+  await page.close();
+  await context.close();
+
+  // Recreate context from saved state
+  return browser.newContext({ storageState: statePath });
+}
+
+// ---------------------------------------------------------------------------
+// Clerk auth mocking (for isolated UI tests)
+// ---------------------------------------------------------------------------
+
+/**
  * Sets up Clerk auth mocking by intercepting Clerk frontend API requests.
- * Useful for isolated UI tests that don't need real backend auth.
  */
 export async function mockClerkAuth(page: Page) {
   await page.route('**/clerk**', async (route) => {
@@ -141,14 +212,16 @@ export function mockMeQuery(organizationId = TEST_ORGANIZATION.id) {
   };
 }
 
-/**
- * Extended test fixtures.
- * - `authedPage`: Page with mocked Clerk auth (for isolated UI tests with GraphQL mocking)
- * - `realAuthedPage`: Page with real Clerk login (for full integration tests)
- */
+// ---------------------------------------------------------------------------
+// Playwright fixtures
+// ---------------------------------------------------------------------------
+
 export const test = base.extend<{
   authedPage: Page;
   realAuthedPage: Page;
+  adminPage: Page;
+  residentPage: Page;
+  memberPage: Page;
 }>({
   authedPage: async ({ page }, use) => {
     await mockClerkAuth(page);
@@ -172,6 +245,27 @@ export const test = base.extend<{
       context = await browser.newContext({ storageState: AUTH_STATE_PATH });
     }
 
+    const page = await context.newPage();
+    await use(page);
+    await context.close();
+  },
+
+  adminPage: async ({ browser }, use) => {
+    const context = await loginAsRole(browser, 'admin');
+    const page = await context.newPage();
+    await use(page);
+    await context.close();
+  },
+
+  residentPage: async ({ browser }, use) => {
+    const context = await loginAsRole(browser, 'resident');
+    const page = await context.newPage();
+    await use(page);
+    await context.close();
+  },
+
+  memberPage: async ({ browser }, use) => {
+    const context = await loginAsRole(browser, 'member');
     const page = await context.newPage();
     await use(page);
     await context.close();
