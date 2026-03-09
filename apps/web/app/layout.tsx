@@ -24,14 +24,14 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <ClerkProvider afterSignOutUrl="/">
-      <html lang={locale}>
-        <body>
+    <html lang={locale}>
+      <body>
+        <ClerkProvider afterSignOutUrl="/">
           <NextIntlClientProvider messages={messages}>
             {children}
           </NextIntlClientProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }

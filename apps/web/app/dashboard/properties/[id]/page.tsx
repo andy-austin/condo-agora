@@ -16,6 +16,25 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
+const ME_QUERY = `
+  query Me {
+    me {
+      id
+      memberships {
+        organization { id }
+        role
+      }
+    }
+  }
+`;
+
+type MeResponse = {
+  me: {
+    id: string;
+    memberships: { organization: { id: string }; role: string }[];
+  } | null;
+};
+
 export default function HouseDetailPage() {
   const params = useParams();
   const houseId = params.id as string;
@@ -24,6 +43,7 @@ export default function HouseDetailPage() {
   const [house, setHouse] = useState<House | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Inline edit state
   const [editing, setEditing] = useState(false);
@@ -35,17 +55,28 @@ export default function HouseDetailPage() {
       try {
         const token = await getAuthToken();
         const client = getApiClient(token);
-        const data = await client.request<GetHouseResponse>(GET_HOUSE, {
-          id: houseId,
-        });
 
-        if (!data.house) {
+        // Fetch house and user role in parallel
+        const [houseData, meData] = await Promise.all([
+          client.request<GetHouseResponse>(GET_HOUSE, { id: houseId }),
+          client.request<MeResponse>(ME_QUERY),
+        ]);
+
+        if (!houseData.house) {
           setError('Property not found.');
           return;
         }
 
-        setHouse(data.house);
-        setEditName(data.house.name);
+        setHouse(houseData.house);
+        setEditName(houseData.house.name);
+
+        // Check if user is admin for this house's organization
+        if (meData.me) {
+          const membership = meData.me.memberships.find(
+            (m) => m.organization.id === houseData.house!.organizationId
+          );
+          setIsAdmin(membership?.role === 'ADMIN');
+        }
       } catch (err) {
         console.error('Failed to load property:', err);
         setError('Failed to load property details.');
@@ -134,13 +165,15 @@ export default function HouseDetailPage() {
             ) : (
               <>
                 <CardTitle className="text-2xl">{house.name}</CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setEditing(true)}
-                >
-                  Edit
-                </Button>
+                {isAdmin && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEditing(true)}
+                  >
+                    Edit
+                  </Button>
+                )}
               </>
             )}
           </div>

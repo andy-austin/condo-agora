@@ -12,7 +12,7 @@ import path from 'path';
 
 // Test account credentials (set via env or defaults)
 const E2E_EMAIL = process.env.E2E_USER_EMAIL || 'tests@agora.com';
-const E2E_PASSWORD = process.env.E2E_USER_PASSWORD || 'Test1234';
+const E2E_PASSWORD = process.env.E2E_USER_PASSWORD || '3AgF…XrXqBX0Qa';
 
 export const AUTH_STATE_PATH = path.join(__dirname, '../.auth/user.json');
 
