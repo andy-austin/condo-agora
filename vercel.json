@@ -1,9 +1,12 @@
 {
-  "rewrites": [
-    { "source": "/api/graphql", "destination": "/api" },
-    { "source": "/api/graphql/:path*", "destination": "/api" },
-    { "source": "/api/webhooks/:path*", "destination": "/api" },
-    { "source": "/api/health", "destination": "/api" },
-    { "source": "/api/debug", "destination": "/api" }
+  "routes": [
+    {
+      "src": "/api/(?!upload)(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "apps/web/$1"
+    }
   ]
 }
