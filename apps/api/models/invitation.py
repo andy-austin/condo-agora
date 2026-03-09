@@ -1,10 +1,16 @@
 from datetime import datetime
+from enum import Enum
 from typing import Optional
 
 from pydantic import Field
 
 from .base import BaseDocument
 from .organization_member import Role
+
+
+class InvitationMethod(str, Enum):
+    EMAIL = "EMAIL"
+    LINK = "LINK"
 
 
 class Invitation(BaseDocument):
@@ -16,6 +22,9 @@ class Invitation(BaseDocument):
     inviter_id: str = Field(..., description="Reference to inviting user")
     house_id: Optional[str] = Field(default=None, description="Reference to house")
     role: Role = Field(default=Role.MEMBER, description="Assigned role")
+    method: InvitationMethod = Field(
+        default=InvitationMethod.EMAIL, description="Invitation delivery method"
+    )
     expires_at: datetime = Field(..., description="Invitation expiration timestamp")
     accepted_at: Optional[datetime] = Field(
         default=None, description="Timestamp when invitation was accepted"

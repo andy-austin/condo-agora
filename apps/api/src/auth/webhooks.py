@@ -114,6 +114,16 @@ async def handle_user_created(data: dict):
     )
 
     async for invite in cursor:
+        # Guard against duplicates (webhook + JIT race condition)
+        existing_member = await db.db.organization_members.find_one(
+            {
+                "user_id": str(user["_id"]),
+                "organization_id": invite["organization_id"],
+            }
+        )
+        if existing_member:
+            continue
+
         # Add user to organization
         member_data = {
             "user_id": str(user["_id"]),

@@ -24,6 +24,7 @@ import {
   UserPlus,
   Mail,
 } from 'lucide-react';
+import PendingInvitationsTable from '@/components/settings/PendingInvitationsTable';
 
 const ME_QUERY = `
   query Me {
@@ -46,7 +47,6 @@ const CREATE_INVITATION = `
     createInvitation(email: $email, organizationId: $organizationId, role: $role) {
       id
       email
-      token
     }
   }
 `;
@@ -439,6 +439,15 @@ function MembersTab({
             </Button>
           </form>
         </div>
+      )}
+
+      {/* Pending Invitations */}
+      {isAdmin && organizationId && (
+        <PendingInvitationsTable
+          organizationId={organizationId}
+          getAuthToken={getAuthToken}
+          t={t}
+        />
       )}
     </div>
   );
