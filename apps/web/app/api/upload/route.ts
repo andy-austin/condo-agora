@@ -42,15 +42,23 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const blob = await put(file.name, file, {
-    access: 'public',
-    contentType: file.type,
-  });
+  try {
+    const blob = await put(file.name, file, {
+      access: 'public',
+      contentType: file.type,
+    });
 
-  return NextResponse.json({
-    url: blob.url,
-    fileName: file.name,
-    fileSize: file.size,
-    mimeType: file.type,
-  });
+    return NextResponse.json({
+      url: blob.url,
+      fileName: file.name,
+      fileSize: file.size,
+      mimeType: file.type,
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Upload failed' },
+      { status: 500 }
+    );
+  }
 }
