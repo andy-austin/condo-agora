@@ -1,7 +1,9 @@
 import strawberry
 
+from .schemas.analytics import AnalyticsQueries
 from .schemas.announcement import AnnouncementMutations, AnnouncementQueries
 from .schemas.auth import AuthMutations, AuthQueries
+from .schemas.budget import BudgetMutations, BudgetQueries
 from .schemas.comment import CommentMutations, CommentQueries
 from .schemas.document import DocumentMutations, DocumentQueries
 from .schemas.health import HealthQueries
@@ -29,6 +31,8 @@ class Query(
     VotingQueries,
     DocumentQueries,
     ProjectMilestoneQueries,
+    BudgetQueries,
+    AnalyticsQueries,
 ):
     pass
 
@@ -45,6 +49,7 @@ class Mutation(
     VotingMutations,
     DocumentMutations,
     ProjectMilestoneMutations,
+    BudgetMutations,
 ):
     pass
 

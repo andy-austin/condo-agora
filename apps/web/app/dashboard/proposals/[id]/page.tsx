@@ -23,6 +23,7 @@ import { GET_HOUSES, type House, type GetHousesResponse } from '@/lib/queries/ho
 import CommentSection from '@/components/proposals/CommentSection';
 import DocumentSection from '@/components/proposals/DocumentSection';
 import ProjectMilestones from '@/components/proposals/ProjectMilestones';
+import BudgetSection from '@/components/proposals/BudgetSection';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ErrorState } from '@/components/dashboard/states';
@@ -402,6 +403,13 @@ export default function ProposalDetailPage() {
             <h3 className="text-sm font-semibold mb-4">Status Timeline</h3>
             <StatusTimeline currentStatus={proposal.status} />
           </div>
+
+          {/* Budget - for approved, in-progress, and completed proposals */}
+          {['APPROVED', 'IN_PROGRESS', 'COMPLETED'].includes(proposal.status) && (
+            <div className="border rounded-xl p-5">
+              <BudgetSection proposalId={proposal.id} isAdmin={isAdmin} />
+            </div>
+          )}
 
           {/* Author actions for DRAFT */}
           {canSubmit && (
