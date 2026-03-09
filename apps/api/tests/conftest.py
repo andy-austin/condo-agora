@@ -93,7 +93,9 @@ mock_proposals_collection.insert_one = AsyncMock(
     return_value=MagicMock(inserted_id="mock_id")
 )
 mock_proposals_collection.find_one_and_update = AsyncMock(return_value=None)
-mock_proposals_collection.delete_one = AsyncMock(return_value=MagicMock(deleted_count=1))
+mock_proposals_collection.delete_one = AsyncMock(
+    return_value=MagicMock(deleted_count=1)
+)
 mock_proposals_collection.count_documents = AsyncMock(return_value=0)
 mock_proposals_collection.create_index = AsyncMock()
 

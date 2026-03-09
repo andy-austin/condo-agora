@@ -46,9 +46,7 @@ async def resolve_proposals(
     return [_mongo_proposal_to_graphql(p) for p in proposals]
 
 
-async def resolve_proposal(
-    info: strawberry.types.Info, id: str
-) -> Optional[Proposal]:
+async def resolve_proposal(info: strawberry.types.Info, id: str) -> Optional[Proposal]:
     """Resolver for getting a single proposal by ID."""
     user = info.context.get("user")
     if not user:
@@ -160,9 +158,7 @@ async def resolve_assign_responsible_house(
     return _mongo_proposal_to_graphql(updated)
 
 
-async def resolve_delete_proposal(
-    info: strawberry.types.Info, id: str
-) -> bool:
+async def resolve_delete_proposal(info: strawberry.types.Info, id: str) -> bool:
     """Resolver for deleting a proposal. ADMIN or author (DRAFT only)."""
     user = info.context.get("user")
     if not user:
