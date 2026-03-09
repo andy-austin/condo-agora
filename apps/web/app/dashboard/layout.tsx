@@ -1,12 +1,19 @@
-import { ReactNode } from 'react';
-import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
-import { DashboardLayoutClient } from './layout-client';
+'use client';
 
-export default async function DashboardLayout({ children }: { children: ReactNode }) {
-  const { userId } = await auth();
-  if (!userId) {
-    redirect('/sign-in');
+import { ReactNode } from 'react';
+import { useAuth, RedirectToSignIn } from '@clerk/nextjs';
+import { SidebarLayout } from '@/components/dashboard/Sidebar';
+
+export default function DashboardLayout({ children }: { children: ReactNode }) {
+  const { isLoaded, isSignedIn } = useAuth();
+
+  if (!isLoaded) {
+    return null;
   }
-  return <DashboardLayoutClient>{children}</DashboardLayoutClient>;
+
+  if (!isSignedIn) {
+    return <RedirectToSignIn />;
+  }
+
+  return <SidebarLayout>{children}</SidebarLayout>;
 }
