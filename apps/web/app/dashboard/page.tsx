@@ -108,15 +108,15 @@ export default function DashboardPage() {
     return (
       <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-8">
         <div className="space-y-2">
-          <div className="animate-pulse h-8 w-64 bg-muted rounded-lg" />
-          <div className="animate-pulse h-4 w-80 bg-muted rounded-lg" />
+          <div className="skeleton h-8 w-64" />
+          <div className="skeleton h-4 w-80" />
         </div>
         <StatCardsSkeleton count={4} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-4">
-            <div className="animate-pulse h-64 bg-muted rounded-xl" />
+            <div className="skeleton h-64 rounded-xl" />
           </div>
-          <div className="animate-pulse h-64 bg-muted rounded-xl" />
+          <div className="skeleton h-64 rounded-xl" />
         </div>
       </div>
     );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
@@ -12,11 +12,20 @@ import {
   type GetHouseResponse,
   type UpdateHouseResponse,
 } from '@/lib/queries/house';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ErrorState } from '@/components/dashboard/states';
-import { ListSkeleton } from '@/components/dashboard/states';
+import {
+  Building2,
+  Users,
+  Calendar,
+  ChevronRight,
+  Pencil,
+  FileText,
+  Lightbulb,
+  History,
+  LayoutDashboard,
+} from 'lucide-react';
 
 const ME_QUERY = `
   query Me {
@@ -37,9 +46,20 @@ type MeResponse = {
   } | null;
 };
 
+const detailTabs = [
+  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { id: 'residents', label: 'Residents', icon: Users },
+  { id: 'proposals', label: 'Proposals', icon: Lightbulb, disabled: true },
+  { id: 'documents', label: 'Documents', icon: FileText, disabled: true },
+  { id: 'history', label: 'History', icon: History, disabled: true },
+];
+
 export default function HouseDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const houseId = params.id as string;
+  const activeTab = searchParams.get('tab') || 'overview';
   const { getAuthToken } = useAuthToken();
 
   const [house, setHouse] = useState<House | null>(null);
@@ -47,7 +67,6 @@ export default function HouseDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Inline edit state
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [saving, setSaving] = useState(false);
@@ -58,7 +77,6 @@ export default function HouseDetailPage() {
         const token = await getAuthToken();
         const client = getApiClient(token);
 
-        // Fetch house and user role in parallel
         const [houseData, meData] = await Promise.all([
           client.request<GetHouseResponse>(GET_HOUSE, { id: houseId }),
           client.request<MeResponse>(ME_QUERY),
@@ -72,7 +90,6 @@ export default function HouseDetailPage() {
         setHouse(houseData.house);
         setEditName(houseData.house.name);
 
-        // Check if user is admin for this house's organization
         if (meData.me) {
           const membership = meData.me.memberships.find(
             (m) => m.organization.id === houseData.house!.organizationId
@@ -112,17 +129,12 @@ export default function HouseDetailPage() {
     }
   };
 
+  const setTab = (tabId: string) => {
+    router.push(`/dashboard/properties/${houseId}?tab=${tabId}`, { scroll: false });
+  };
+
   if (loading) {
-    return (
-      <div className="p-8 max-w-3xl mx-auto">
-        <div className="animate-pulse h-4 w-24 bg-muted rounded mb-6" />
-        <div className="border rounded-xl p-6 mb-6 space-y-3">
-          <div className="animate-pulse h-7 w-48 bg-muted rounded" />
-          <div className="animate-pulse h-4 w-32 bg-muted rounded" />
-        </div>
-        <ListSkeleton count={3} />
-      </div>
-    );
+    return <DetailSkeleton />;
   }
 
   if (error || !house) {
@@ -135,104 +147,309 @@ export default function HouseDetailPage() {
     );
   }
 
+  const occupancyStatus = house.residents.length > 0 ? 'Occupied' : 'Vacant';
+
   return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <div className="mb-6">
-        <Link
-          href="/dashboard/properties"
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          &larr; All Properties
+    <div className="p-6 lg:p-8 max-w-5xl mx-auto">
+      {/* Breadcrumbs */}
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-6">
+        <Link href="/dashboard/properties" className="hover:text-foreground transition-colors">
+          Properties
         </Link>
+        <ChevronRight size={14} />
+        <span className="text-foreground font-medium truncate">{house.name}</span>
+      </nav>
+
+      {/* Property Header */}
+      <div className="border rounded-xl p-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div className="flex items-start gap-4">
+            {/* Property icon placeholder */}
+            <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <Building2 size={28} className="text-primary" />
+            </div>
+            <div>
+              {editing ? (
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="text"
+                    className="text-xl font-semibold bg-background border rounded-lg px-3 py-1"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    autoFocus
+                  />
+                  <Button size="sm" onClick={handleSave} disabled={saving}>
+                    {saving ? 'Saving...' : 'Save'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setEditing(false);
+                      setEditName(house.name);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 mb-1">
+                  <h1 className="text-xl font-bold">{house.name}</h1>
+                  {isAdmin && (
+                    <button
+                      onClick={() => setEditing(true)}
+                      className="p-1 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                      aria-label="Edit property name"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                  )}
+                </div>
+              )}
+              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                <Badge variant={house.residents.length > 0 ? 'default' : 'outline'}>
+                  {occupancyStatus}
+                </Badge>
+                <span className="flex items-center gap-1">
+                  <Users size={14} />
+                  {house.residents.length} {house.residents.length === 1 ? 'resident' : 'residents'}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Calendar size={14} />
+                  Created {new Date(house.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            {editing ? (
-              <div className="flex items-center gap-2 flex-1 mr-4">
-                <input
-                  type="text"
-                  className="text-2xl font-semibold bg-background border rounded-lg px-3 py-1 flex-1"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  autoFocus
-                />
-                <Button size="sm" onClick={handleSave} disabled={saving}>
-                  {saving ? 'Saving...' : 'Save'}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setEditing(false);
-                    setEditName(house.name);
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            ) : (
-              <>
-                <CardTitle className="text-2xl">{house.name}</CardTitle>
-                {isAdmin && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setEditing(true)}
-                  >
-                    Edit
-                  </Button>
-                )}
-              </>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-sm text-muted-foreground">
-            Created {new Date(house.createdAt).toLocaleDateString()}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Tabs */}
+      <div className="border-b mb-6">
+        <div className="flex gap-0 overflow-x-auto">
+          {detailTabs.map((tab) => {
+            const Icon = tab.icon;
+            const active = activeTab === tab.id;
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Residents</CardTitle>
-            <Badge variant="secondary">
-              {house.residents.length} {house.residents.length === 1 ? 'resident' : 'residents'}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {house.residents.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              No residents assigned yet. Invite members from the{' '}
-              <Link href="/dashboard/settings" className="text-primary hover:underline">
-                Settings
-              </Link>{' '}
-              page.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {house.residents.map((resident) => (
+            if (tab.disabled) {
+              return (
                 <div
-                  key={resident.id}
-                  className="flex items-center justify-between p-3 rounded-lg border"
+                  key={tab.id}
+                  className="flex items-center gap-1.5 px-4 py-3 text-sm text-muted-foreground/50 cursor-not-allowed whitespace-nowrap border-b-2 border-transparent"
                 >
+                  <Icon size={16} />
+                  <span>{tab.label}</span>
+                  <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full">Soon</span>
+                </div>
+              );
+            }
+
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setTab(tab.id)}
+                className={`flex items-center gap-1.5 px-4 py-3 text-sm whitespace-nowrap border-b-2 transition-colors ${
+                  active
+                    ? 'border-primary text-primary font-medium'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Icon size={16} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'overview' && <OverviewTab house={house} />}
+      {activeTab === 'residents' && <ResidentsTab house={house} isAdmin={isAdmin} />}
+    </div>
+  );
+}
+
+// ---------- Overview Tab ----------
+
+function OverviewTab({ house }: { house: House }) {
+  const stats = [
+    { label: 'Total Residents', value: house.residents.length, icon: Users },
+    {
+      label: 'Status',
+      value: house.residents.length > 0 ? 'Occupied' : 'Vacant',
+      icon: Building2,
+    },
+    {
+      label: 'Created',
+      value: new Date(house.createdAt).toLocaleDateString(),
+      icon: Calendar,
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Key Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <div key={stat.label} className="border rounded-xl p-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">{stat.label}</span>
+                <Icon size={18} className="text-muted-foreground" />
+              </div>
+              <p className="text-lg font-semibold">{stat.value}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Residents Quick View */}
+      <div className="border rounded-xl p-6">
+        <h3 className="text-base font-semibold mb-3">Residents</h3>
+        {house.residents.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No residents assigned yet. Invite members from the{' '}
+            <Link href="/dashboard/settings" className="text-primary hover:underline">
+              Settings
+            </Link>{' '}
+            page.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {house.residents.slice(0, 5).map((resident) => (
+              <div
+                key={resident.id}
+                className="flex items-center justify-between p-3 rounded-lg border"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Users size={14} className="text-primary" />
+                  </div>
                   <div className="text-sm">
                     <span className="font-medium">Member</span>
                     <span className="text-muted-foreground ml-2">
                       ID: {resident.userId.slice(0, 8)}...
                     </span>
                   </div>
-                  <Badge variant="outline">{resident.role}</Badge>
                 </div>
-              ))}
+                <Badge variant="outline">{resident.role}</Badge>
+              </div>
+            ))}
+            {house.residents.length > 5 && (
+              <p className="text-sm text-muted-foreground text-center pt-2">
+                +{house.residents.length - 5} more residents
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------- Residents Tab ----------
+
+function ResidentsTab({ house, isAdmin }: { house: House; isAdmin: boolean }) {
+  return (
+    <div className="border rounded-xl overflow-hidden">
+      <div className="p-4 border-b">
+        <h2 className="text-base font-semibold">
+          All Residents ({house.residents.length})
+        </h2>
+      </div>
+
+      {house.residents.length === 0 ? (
+        <div className="p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <Users size={24} className="text-primary" />
+          </div>
+          <p className="text-muted-foreground text-sm mb-3">
+            No residents assigned to this property yet.
+          </p>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/dashboard/settings">Invite Members</Link>
+          </Button>
+        </div>
+      ) : (
+        <table className="w-full">
+          <thead>
+            <tr className="border-b bg-muted/30">
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Member
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Role
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">
+                User ID
+              </th>
+              {isAdmin && (
+                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Actions
+                </th>
+              )}
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {house.residents.map((resident) => (
+              <tr key={resident.id} className="hover:bg-muted/20 transition-colors">
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <Users size={14} className="text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Member</span>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <Badge variant="outline">{resident.role}</Badge>
+                </td>
+                <td className="px-4 py-3 text-sm text-muted-foreground hidden sm:table-cell">
+                  {resident.userId.slice(0, 12)}...
+                </td>
+                {isAdmin && (
+                  <td className="px-4 py-3 text-right">
+                    <Button variant="ghost" size="sm" disabled>
+                      Manage
+                    </Button>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
+// ---------- Detail Skeleton ----------
+
+function DetailSkeleton() {
+  return (
+    <div className="p-6 lg:p-8 max-w-5xl mx-auto">
+      <div className="skeleton h-4 w-32 mb-6" />
+      <div className="border rounded-xl p-6 mb-6">
+        <div className="flex items-start gap-4">
+          <div className="skeleton w-14 h-14 rounded-xl" />
+          <div className="space-y-2 flex-1">
+            <div className="skeleton h-6 w-48" />
+            <div className="flex gap-3">
+              <div className="skeleton h-5 w-20 rounded-full" />
+              <div className="skeleton h-5 w-24" />
+              <div className="skeleton h-5 w-32" />
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </div>
+      <div className="skeleton h-10 w-full mb-6 rounded-lg" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="skeleton h-24 rounded-xl" />
+        ))}
+      </div>
+      <div className="skeleton h-48 rounded-xl" />
     </div>
   );
 }

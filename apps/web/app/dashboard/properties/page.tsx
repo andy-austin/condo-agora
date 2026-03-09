@@ -140,8 +140,8 @@ export default function PropertiesPage() {
     return (
       <div className="p-8 max-w-5xl mx-auto">
         <div className="mb-8 space-y-2">
-          <div className="animate-pulse h-8 w-48 bg-muted rounded-lg" />
-          <div className="animate-pulse h-4 w-64 bg-muted rounded-lg" />
+          <div className="skeleton h-8 w-48" />
+          <div className="skeleton h-4 w-64" />
         </div>
         <PropertyGridSkeleton />
       </div>

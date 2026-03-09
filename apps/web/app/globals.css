@@ -145,6 +145,28 @@
   .divider {
     @apply h-px bg-gradient-to-r from-transparent via-border to-transparent;
   }
+
+  /* Shimmer skeleton loading */
+  .skeleton {
+    @apply rounded-lg relative overflow-hidden bg-muted;
+  }
+
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--muted-foreground) / 0.08) 50%,
+      transparent 100%
+    );
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
 }
 
 @layer utilities {

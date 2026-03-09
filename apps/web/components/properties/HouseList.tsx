@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/dashboard/states';
+import { Building2, LayoutGrid, List, Users, Calendar } from 'lucide-react';
 import type { House } from '@/lib/queries/house';
 
 type HouseListProps = {
@@ -14,7 +16,14 @@ type HouseListProps = {
   deleting?: string | null;
 };
 
+function getOccupancyStatus(house: House) {
+  if (house.residents.length === 0) return { label: 'Vacant', variant: 'outline' as const };
+  return { label: 'Occupied', variant: 'default' as const };
+}
+
 export default function HouseList({ houses, onDelete, deleting }: HouseListProps) {
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+
   if (houses.length === 0) {
     return (
       <EmptyState
@@ -26,49 +35,165 @@ export default function HouseList({ houses, onDelete, deleting }: HouseListProps
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {houses.map((house) => (
-        <Card key={house.id} className="hover:border-primary/50 transition-colors">
-          <CardHeader className="pb-3">
-            <div className="flex items-start justify-between">
-              <Link href={`/dashboard/properties/${house.id}`}>
-                <CardTitle className="text-lg hover:underline cursor-pointer">
-                  {house.name}
-                </CardTitle>
-              </Link>
-              <Badge variant="secondary">
-                {house.residents.length} {house.residents.length === 1 ? 'resident' : 'residents'}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <Link
-                href={`/dashboard/properties/${house.id}`}
-                className="text-sm text-primary hover:underline"
-              >
-                View details
-              </Link>
-              {onDelete && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-destructive hover:text-destructive"
-                  onClick={() => onDelete(house.id)}
-                  disabled={deleting === house.id || house.residents.length > 0}
-                  title={
-                    house.residents.length > 0
-                      ? 'Remove all residents before deleting'
-                      : 'Delete property'
-                  }
-                >
-                  {deleting === house.id ? 'Deleting...' : 'Delete'}
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+    <div>
+      {/* View Toggle */}
+      <div className="flex items-center justify-end gap-1 mb-4">
+        <button
+          onClick={() => setViewMode('grid')}
+          className={`p-2 rounded-lg transition-colors ${
+            viewMode === 'grid' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted'
+          }`}
+          aria-label="Grid view"
+        >
+          <LayoutGrid size={18} />
+        </button>
+        <button
+          onClick={() => setViewMode('table')}
+          className={`p-2 rounded-lg transition-colors ${
+            viewMode === 'table' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted'
+          }`}
+          aria-label="Table view"
+        >
+          <List size={18} />
+        </button>
+      </div>
+
+      {viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {houses.map((house) => {
+            const status = getOccupancyStatus(house);
+            return (
+              <Card key={house.id} className="hover:border-primary/50 transition-colors group">
+                {/* Color placeholder header */}
+                <div className="h-2 bg-gradient-to-r from-primary/60 to-primary/20 rounded-t-xl" />
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        <Building2 size={18} className="text-primary" />
+                      </div>
+                      <Link href={`/dashboard/properties/${house.id}`}>
+                        <CardTitle className="text-base hover:underline cursor-pointer group-hover:text-primary transition-colors">
+                          {house.name}
+                        </CardTitle>
+                      </Link>
+                    </div>
+                    <Badge variant={status.variant}>{status.label}</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                    <span className="flex items-center gap-1">
+                      <Users size={14} />
+                      {house.residents.length} {house.residents.length === 1 ? 'resident' : 'residents'}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Calendar size={14} />
+                      {new Date(house.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <Link
+                      href={`/dashboard/properties/${house.id}`}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      View details
+                    </Link>
+                    {onDelete && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => onDelete(house.id)}
+                        disabled={deleting === house.id || house.residents.length > 0}
+                        title={
+                          house.residents.length > 0
+                            ? 'Remove all residents before deleting'
+                            : 'Delete property'
+                        }
+                      >
+                        {deleting === house.id ? 'Deleting...' : 'Delete'}
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      ) : (
+        /* Table View */
+        <div className="border rounded-xl overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b bg-muted/30">
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Property
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Residents
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">
+                  Created
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {houses.map((house) => {
+                const status = getOccupancyStatus(house);
+                return (
+                  <tr key={house.id} className="hover:bg-muted/20 transition-colors">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2.5">
+                        <Building2 size={16} className="text-muted-foreground shrink-0" />
+                        <Link
+                          href={`/dashboard/properties/${house.id}`}
+                          className="text-sm font-medium hover:text-primary transition-colors"
+                        >
+                          {house.name}
+                        </Link>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <Badge variant={status.variant}>{status.label}</Badge>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-muted-foreground">
+                      {house.residents.length}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-muted-foreground hidden md:table-cell">
+                      {new Date(house.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/dashboard/properties/${house.id}`}>View</Link>
+                        </Button>
+                        {onDelete && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => onDelete(house.id)}
+                            disabled={deleting === house.id || house.residents.length > 0}
+                          >
+                            {deleting === house.id ? '...' : 'Delete'}
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
