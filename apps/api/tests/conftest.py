@@ -99,6 +99,49 @@ mock_proposals_collection.delete_one = AsyncMock(
 mock_proposals_collection.count_documents = AsyncMock(return_value=0)
 mock_proposals_collection.create_index = AsyncMock()
 
+mock_comments_collection = MagicMock()
+mock_comments_collection.find = MagicMock(return_value=create_async_cursor_mock([]))
+mock_comments_collection.find_one = AsyncMock(return_value=None)
+mock_comments_collection.insert_one = AsyncMock(
+    return_value=MagicMock(inserted_id="mock_id")
+)
+mock_comments_collection.find_one_and_update = AsyncMock(return_value=None)
+mock_comments_collection.delete_one = AsyncMock(return_value=MagicMock(deleted_count=1))
+mock_comments_collection.delete_many = AsyncMock(
+    return_value=MagicMock(deleted_count=0)
+)
+mock_comments_collection.count_documents = AsyncMock(return_value=0)
+mock_comments_collection.create_index = AsyncMock()
+
+mock_announcements_collection = MagicMock()
+mock_announcements_collection.find = MagicMock(
+    return_value=create_async_cursor_mock([])
+)
+mock_announcements_collection.find_one = AsyncMock(return_value=None)
+mock_announcements_collection.insert_one = AsyncMock(
+    return_value=MagicMock(inserted_id="mock_id")
+)
+mock_announcements_collection.find_one_and_update = AsyncMock(return_value=None)
+mock_announcements_collection.delete_one = AsyncMock(
+    return_value=MagicMock(deleted_count=1)
+)
+mock_announcements_collection.create_index = AsyncMock()
+
+mock_notifications_collection = MagicMock()
+mock_notifications_collection.find = MagicMock(
+    return_value=create_async_cursor_mock([])
+)
+mock_notifications_collection.find_one = AsyncMock(return_value=None)
+mock_notifications_collection.insert_one = AsyncMock(
+    return_value=MagicMock(inserted_id="mock_id")
+)
+mock_notifications_collection.find_one_and_update = AsyncMock(return_value=None)
+mock_notifications_collection.update_many = AsyncMock(
+    return_value=MagicMock(modified_count=0)
+)
+mock_notifications_collection.count_documents = AsyncMock(return_value=0)
+mock_notifications_collection.create_index = AsyncMock()
+
 # Create mock database with collections
 mock_motor_db = MagicMock()
 mock_motor_db.notes = mock_notes_collection
@@ -108,6 +151,9 @@ mock_motor_db.organizations = mock_organizations_collection
 mock_motor_db.organization_members = mock_organization_members_collection
 mock_motor_db.invitations = mock_invitations_collection
 mock_motor_db.proposals = mock_proposals_collection
+mock_motor_db.comments = mock_comments_collection
+mock_motor_db.announcements = mock_announcements_collection
+mock_motor_db.notifications = mock_notifications_collection
 mock_motor_db.__getitem__ = lambda self, key: getattr(self, key)
 
 # Create mock MongoDB client
@@ -178,3 +224,21 @@ def invitations_collection_mock():
 def proposals_collection_mock():
     """Return the mock proposals collection for tests that need to configure it"""
     return mock_proposals_collection
+
+
+@pytest.fixture
+def comments_collection_mock():
+    """Return the mock comments collection for tests that need to configure it"""
+    return mock_comments_collection
+
+
+@pytest.fixture
+def announcements_collection_mock():
+    """Return the mock announcements collection for tests that need to configure it"""
+    return mock_announcements_collection
+
+
+@pytest.fixture
+def notifications_collection_mock():
+    """Return the mock notifications collection for tests that need to configure it"""
+    return mock_notifications_collection
