@@ -267,9 +267,7 @@ def _reset_mocks():
         # Restore default behaviors
         m.find = MagicMock(return_value=create_async_cursor_mock([]))
         m.find_one = AsyncMock(return_value=None)
-        m.insert_one = AsyncMock(
-            return_value=MagicMock(inserted_id="mock_id")
-        )
+        m.insert_one = AsyncMock(return_value=MagicMock(inserted_id="mock_id"))
         m.find_one_and_update = AsyncMock(return_value=None)
         m.delete_one = AsyncMock(return_value=MagicMock(deleted_count=1))
         m.delete_many = AsyncMock(return_value=MagicMock(deleted_count=0))
