@@ -12,6 +12,7 @@ import {
 } from '@/lib/queries/members';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ErrorState, ListSkeleton } from '@/components/dashboard/states';
 
 const ME_QUERY = `
   query Me {
@@ -111,11 +112,25 @@ export default function CommitteePage() {
   };
 
   if (loading) {
-    return <div className="p-8">Loading committee...</div>;
+    return (
+      <div className="p-8 max-w-3xl mx-auto">
+        <div className="mb-8 space-y-2">
+          <div className="animate-pulse h-8 w-48 bg-muted rounded-lg" />
+          <div className="animate-pulse h-4 w-64 bg-muted rounded-lg" />
+        </div>
+        <ListSkeleton count={4} />
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="p-8 text-destructive">{error}</div>;
+    return (
+      <ErrorState
+        title="Could not load committee"
+        message={error}
+        onRetry={() => window.location.reload()}
+      />
+    );
   }
 
   const admins = members.filter((m) => m.role === 'ADMIN');

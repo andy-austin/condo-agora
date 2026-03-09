@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/dashboard/states';
 import type { House } from '@/lib/queries/house';
 
 type HouseListProps = {
@@ -16,13 +17,11 @@ type HouseListProps = {
 export default function HouseList({ houses, onDelete, deleting }: HouseListProps) {
   if (houses.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center">
-          <p className="text-muted-foreground">
-            No properties yet. Create your first one to get started.
-          </p>
-        </CardContent>
-      </Card>
+      <EmptyState
+        icon="properties"
+        title="No properties yet"
+        message="Create your first property to start managing your community's units and houses."
+      />
     );
   }
 

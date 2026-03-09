@@ -15,6 +15,7 @@ import {
 } from '@/lib/queries/house';
 import HouseList from '@/components/properties/HouseList';
 import CreateHouseDialog from '@/components/properties/CreateHouseDialog';
+import { ErrorState, PropertyGridSkeleton } from '@/components/dashboard/states';
 
 const ME_QUERY = `
   query Me {
@@ -136,11 +137,25 @@ export default function PropertiesPage() {
   };
 
   if (loading) {
-    return <div className="p-8">Loading properties...</div>;
+    return (
+      <div className="p-8 max-w-5xl mx-auto">
+        <div className="mb-8 space-y-2">
+          <div className="animate-pulse h-8 w-48 bg-muted rounded-lg" />
+          <div className="animate-pulse h-4 w-64 bg-muted rounded-lg" />
+        </div>
+        <PropertyGridSkeleton />
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="p-8 text-destructive">{error}</div>;
+    return (
+      <ErrorState
+        title="Could not load properties"
+        message={error}
+        onRetry={() => window.location.reload()}
+      />
+    );
   }
 
   return (
