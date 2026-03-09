@@ -68,7 +68,7 @@ async def migrate():
         if update_op:
             await db.houses.update_one({"_id": house["_id"]}, update_op)
 
-    print(f"Migration complete:")
+    print("Migration complete:")
     print(f"  Total houses processed: {total}")
     print(f"  Voters auto-assigned: {voters_set}")
     print(f"  max_residents fields removed: {max_residents_removed}")
