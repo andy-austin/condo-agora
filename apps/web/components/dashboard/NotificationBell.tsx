@@ -13,6 +13,7 @@ import {
   type GetNotificationsResponse,
   type UnreadCountResponse,
 } from '@/lib/queries/notification';
+import { ACCEPT_INVITATION } from '@/lib/queries/invitation';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -90,6 +91,17 @@ export default function NotificationBell() {
         prev.map((n) => (n.id === notification.id ? { ...n, isRead: true } : n))
       );
       setUnreadCount((prev) => Math.max(0, prev - (notification.isRead ? 0 : 1)));
+
+      // Auto-accept invitation when clicking notification
+      if (notification.type === 'INVITATION' && notification.referenceId) {
+        try {
+          await client.request(ACCEPT_INVITATION, {
+            invitationId: notification.referenceId,
+          });
+        } catch {
+          // Invitation may already be accepted or expired — navigate anyway
+        }
+      }
     } catch {
       // silently fail
     }

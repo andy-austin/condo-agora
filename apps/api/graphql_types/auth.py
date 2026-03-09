@@ -72,16 +72,22 @@ class MemberWithUser:
     house_name: Optional[str] = None
 
 
+@strawberry.enum
+class InvitationMethod(Enum):
+    EMAIL = "EMAIL"
+    LINK = "LINK"
+
+
 @strawberry.type
 class Invitation:
     id: str
     email: str
-    token: str
     organization_id: str
     inviter_id: str
     house_id: Optional[str] = None
     role: Role
+    method: InvitationMethod = InvitationMethod.EMAIL
     expires_at: datetime
     created_at: datetime
-    accepted_at: Optional[datetime]
+    accepted_at: Optional[datetime] = None
     house: Optional[Annotated["House", strawberry.lazy(".house")]] = None

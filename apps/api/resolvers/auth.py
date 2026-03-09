@@ -4,6 +4,7 @@ import strawberry
 
 from ..graphql_types.auth import (
     Invitation,
+    InvitationMethod,
     MemberWithUser,
     Organization,
     OrganizationMember,
@@ -12,10 +13,14 @@ from ..graphql_types.auth import (
 )
 from ..graphql_types.house import House
 from ..src.auth.permissions import require_org_admin
+from ..src.auth.service import accept_invitation_by_id as service_accept_invitation
 from ..src.auth.service import create_invitation as service_create_invitation
 from ..src.auth.service import create_organization as service_create_org
 from ..src.auth.service import get_organization_members as service_get_members
+from ..src.auth.service import get_pending_invitations as service_get_pending
 from ..src.auth.service import get_user_with_memberships
+from ..src.auth.service import resend_invitation as service_resend_invitation
+from ..src.auth.service import revoke_invitation as service_revoke_invitation
 from ..src.auth.service import update_member_role as service_update_role
 
 
@@ -27,6 +32,22 @@ def _mongo_house_to_graphql(h: dict) -> House:
         organization_id=h["organization_id"],
         created_at=h["created_at"],
         updated_at=h["updated_at"],
+    )
+
+
+def _mongo_invitation_to_graphql(inv: dict) -> Invitation:
+    """Convert a MongoDB invitation doc to GraphQL Invitation type."""
+    method_val = inv.get("method", "EMAIL")
+    return Invitation(
+        id=str(inv["_id"]),
+        email=inv["email"],
+        organization_id=inv["organization_id"],
+        inviter_id=inv["inviter_id"],
+        role=Role(inv["role"]),
+        method=InvitationMethod(method_val),
+        expires_at=inv["expires_at"],
+        created_at=inv["created_at"],
+        accepted_at=inv.get("accepted_at"),
     )
 
 
@@ -86,9 +107,7 @@ async def resolve_me(info: strawberry.types.Info) -> Optional[User]:
 async def resolve_create_invitation(
     info: strawberry.types.Info, email: str, organization_id: str, role: Role
 ) -> Invitation:
-    """
-    Resolver for creating an invitation.
-    """
+    """Resolver for creating an invitation."""
     user = info.context.get("user")
     await require_org_admin(user, organization_id)
 
@@ -100,17 +119,83 @@ async def resolve_create_invitation(
         role=role.value,
     )
 
-    return Invitation(
-        id=str(invitation.get("_id")),
-        email=invitation["email"],
-        token=invitation["token"],
-        organization_id=invitation["organization_id"],
-        inviter_id=invitation["inviter_id"],
-        role=Role(invitation["role"]),
-        expires_at=invitation["expires_at"],
-        created_at=invitation["created_at"],
-        accepted_at=invitation.get("accepted_at"),
-    )
+    return _mongo_invitation_to_graphql(invitation)
+
+
+async def resolve_pending_invitations(
+    info: strawberry.types.Info, organization_id: str
+) -> List[Invitation]:
+    """Resolver for listing pending invitations. Admin only."""
+    user = info.context.get("user")
+    await require_org_admin(user, organization_id)
+
+    invitations = await service_get_pending(organization_id)
+    return [_mongo_invitation_to_graphql(inv) for inv in invitations]
+
+
+async def resolve_accept_invitation(
+    info: strawberry.types.Info, invitation_id: str
+) -> Invitation:
+    """Resolver for accepting an invitation. Authenticated users only."""
+    user = info.context.get("user")
+    if not user:
+        raise Exception("Authentication required")
+
+    user_id = user.get("id") or str(user.get("_id"))
+    invitation = await service_accept_invitation(invitation_id, user_id)
+    return _mongo_invitation_to_graphql(invitation)
+
+
+async def resolve_revoke_invitation(
+    info: strawberry.types.Info, invitation_id: str
+) -> bool:
+    """Resolver for revoking a pending invitation. Admin only."""
+    user = info.context.get("user")
+    if not user:
+        raise Exception("Authentication required")
+
+    # Check admin permission before revoking
+    from ..database import db
+
+    if not db.is_connected():
+        await db.connect()
+
+    from bson import ObjectId
+
+    inv = await db.db.invitations.find_one({"_id": ObjectId(invitation_id)})
+    if not inv:
+        raise Exception("Invitation not found")
+
+    await require_org_admin(user, inv["organization_id"])
+
+    await service_revoke_invitation(invitation_id)
+    return True
+
+
+async def resolve_resend_invitation(
+    info: strawberry.types.Info, invitation_id: str
+) -> Invitation:
+    """Resolver for resending a pending invitation. Admin only."""
+    user = info.context.get("user")
+    if not user:
+        raise Exception("Authentication required")
+
+    # Get invitation to check org admin
+    from ..database import db
+
+    if not db.is_connected():
+        await db.connect()
+
+    from bson import ObjectId
+
+    inv = await db.db.invitations.find_one({"_id": ObjectId(invitation_id)})
+    if not inv:
+        raise Exception("Invitation not found")
+
+    await require_org_admin(user, inv["organization_id"])
+
+    updated = await service_resend_invitation(invitation_id)
+    return _mongo_invitation_to_graphql(updated)
 
 
 def _mongo_member_to_member_with_user(m: dict) -> MemberWithUser:

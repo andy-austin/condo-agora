@@ -1,3 +1,4 @@
+import re
 import uuid
 from datetime import datetime, timedelta
 
@@ -6,6 +7,8 @@ from fastapi import HTTPException
 
 from ...database import db
 from .clerk_utils import create_clerk_invitation
+
+EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 
 
 def _slugify(text: str) -> str:
@@ -64,16 +67,44 @@ async def create_organization(name: str, creator_user_id: str):
 
 
 async def create_invitation(
-    email: str, organization_id: str, inviter_id: str, role: str
+    email: str,
+    organization_id: str,
+    inviter_id: str,
+    role: str,
+    method: str = "EMAIL",
 ):
     """
     Creates a new invitation for a user to join an organization.
+    Validates email, prevents duplicates, and notifies existing users.
     """
+    import os
+
+    from ..notification.service import create_notification
+
     if not db.is_connected():
         await db.connect()
 
+    # Validate email format
+    if not EMAIL_REGEX.match(email):
+        raise Exception("Invalid email address format")
+
+    # Check for existing pending invitation (same email + org)
+    now = datetime.utcnow()
+    existing = await db.db.invitations.find_one(
+        {
+            "email": email,
+            "organization_id": organization_id,
+            "accepted_at": None,
+        }
+    )
+    if existing:
+        if existing.get("expires_at") and existing["expires_at"] > now:
+            raise Exception("Invitation already pending for this email")
+        # Expired — remove old one and proceed
+        await db.db.invitations.delete_one({"_id": existing["_id"]})
+
     token = str(uuid.uuid4())
-    expires_at = datetime.utcnow() + timedelta(days=7)
+    expires_at = now + timedelta(days=7)
 
     invitation_data = {
         "email": email,
@@ -81,9 +112,10 @@ async def create_invitation(
         "organization_id": organization_id,
         "inviter_id": inviter_id,
         "role": role,
+        "method": method,
         "expires_at": expires_at,
-        "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow(),
+        "created_at": now,
+        "updated_at": now,
         "accepted_at": None,
     }
 
@@ -91,10 +123,13 @@ async def create_invitation(
     invitation_data["_id"] = str(result.inserted_id)
 
     # Trigger Clerk Invitation
+    app_url = os.getenv("NEXT_PUBLIC_APP_URL", "http://localhost:3000")
+    redirect_url = f"{app_url}/dashboard"
+
     try:
         await create_clerk_invitation(
             email=email,
-            redirect_url="https://condo-agora.vercel.app/dashboard",
+            redirect_url=redirect_url,
             public_metadata={
                 "organization_id": organization_id,
                 "role": role,
@@ -104,7 +139,22 @@ async def create_invitation(
         print(f"Clerk invitation sent to {email}")
     except HTTPException as e:
         if e.status_code == 422 and "form_identifier_exists" in str(e.detail):
-            print(f"User {email} already exists in Clerk. Skipping Clerk invitation.")
+            print(f"User {email} already exists in Clerk. Sending in-app notification.")
+            # Notify existing user via in-app notification
+            existing_user = await db.db.users.find_one({"email": email})
+            if existing_user:
+                org = await db.db.organizations.find_one(
+                    {"_id": ObjectId(organization_id)}
+                )
+                org_name = org["name"] if org else "an organization"
+                await create_notification(
+                    user_id=str(existing_user["_id"]),
+                    organization_id=organization_id,
+                    notification_type="INVITATION",
+                    title="New Invitation",
+                    message=f"You have been invited to join {org_name}",
+                    reference_id=str(invitation_data["_id"]),
+                )
         else:
             print(f"Failed to send Clerk invitation: {e}")
             raise e
@@ -117,44 +167,145 @@ async def create_invitation(
     return invitation_data
 
 
-async def accept_invitation(token: str, user_id: str):
+async def accept_invitation_by_id(invitation_id: str, user_id: str):
     """
-    Accepts an invitation, adding the user to the organization.
+    Accepts an invitation by ID, adding the user to the organization.
+    Used when existing users click on invitation notifications.
     """
     if not db.is_connected():
         await db.connect()
 
-    invitation = await db.db.invitations.find_one({"token": token})
+    invitation = await db.db.invitations.find_one({"_id": ObjectId(invitation_id)})
 
     if not invitation:
-        return None, "Invalid invitation token"
+        raise Exception("Invitation not found")
 
     if invitation.get("accepted_at"):
-        return None, "Invitation already accepted"
+        raise Exception("Invitation already accepted")
 
-    if invitation.get("expires_at") < datetime.utcnow():
-        return None, "Invitation expired"
+    if invitation.get("expires_at") and invitation["expires_at"] < datetime.utcnow():
+        raise Exception("Invitation has expired")
+
+    # Verify user's email matches invitation
+    user = await db.db.users.find_one({"_id": ObjectId(user_id)})
+    if not user or user.get("email") != invitation["email"]:
+        raise Exception("This invitation is not for your account")
+
+    # Check for duplicate membership
+    existing_member = await db.db.organization_members.find_one(
+        {
+            "user_id": user_id,
+            "organization_id": invitation["organization_id"],
+        }
+    )
+    if existing_member:
+        # Already a member, just mark invitation as accepted
+        now = datetime.utcnow()
+        await db.db.invitations.update_one(
+            {"_id": invitation["_id"]},
+            {"$set": {"accepted_at": now, "updated_at": now}},
+        )
+        return await db.db.invitations.find_one({"_id": invitation["_id"]})
 
     # Add user to organization
+    now = datetime.utcnow()
     member_data = {
         "user_id": user_id,
         "organization_id": invitation["organization_id"],
         "role": invitation["role"],
         "house_id": invitation.get("house_id"),
-        "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow(),
+        "created_at": now,
+        "updated_at": now,
     }
     await db.db.organization_members.insert_one(member_data)
 
     # Mark invitation as accepted
-    now = datetime.utcnow()
     updated_invitation = await db.db.invitations.find_one_and_update(
         {"_id": invitation["_id"]},
         {"$set": {"accepted_at": now, "updated_at": now}},
         return_document=True,
     )
 
-    return updated_invitation, None
+    return updated_invitation
+
+
+async def get_pending_invitations(organization_id: str):
+    """Get all pending (not accepted, not expired) invitations for an org."""
+    if not db.is_connected():
+        await db.connect()
+
+    now = datetime.utcnow()
+    invitations = []
+    cursor = db.db.invitations.find(
+        {
+            "organization_id": organization_id,
+            "accepted_at": None,
+            "expires_at": {"$gt": now},
+        }
+    ).sort("created_at", -1)
+    async for inv in cursor:
+        invitations.append(inv)
+    return invitations
+
+
+async def revoke_invitation(invitation_id: str):
+    """Delete a pending invitation."""
+    if not db.is_connected():
+        await db.connect()
+
+    invitation = await db.db.invitations.find_one({"_id": ObjectId(invitation_id)})
+    if not invitation:
+        raise Exception("Invitation not found")
+
+    if invitation.get("accepted_at"):
+        raise Exception("Cannot revoke an already accepted invitation")
+
+    await db.db.invitations.delete_one({"_id": ObjectId(invitation_id)})
+    return invitation["organization_id"]
+
+
+async def resend_invitation(invitation_id: str):
+    """Resend a pending invitation via Clerk."""
+    import os
+
+    if not db.is_connected():
+        await db.connect()
+
+    invitation = await db.db.invitations.find_one({"_id": ObjectId(invitation_id)})
+    if not invitation:
+        raise Exception("Invitation not found")
+
+    if invitation.get("accepted_at"):
+        raise Exception("Cannot resend an already accepted invitation")
+
+    # Resend via Clerk
+    app_url = os.getenv("NEXT_PUBLIC_APP_URL", "http://localhost:3000")
+    redirect_url = f"{app_url}/dashboard"
+
+    try:
+        await create_clerk_invitation(
+            email=invitation["email"],
+            redirect_url=redirect_url,
+            public_metadata={
+                "organization_id": invitation["organization_id"],
+                "role": invitation["role"],
+                "invitation_token": invitation["token"],
+            },
+        )
+    except HTTPException as e:
+        if e.status_code == 422 and "form_identifier_exists" in str(e.detail):
+            print(f"User {invitation['email']} already exists in Clerk.")
+        else:
+            raise e
+
+    # Update timestamp
+    now = datetime.utcnow()
+    updated = await db.db.invitations.find_one_and_update(
+        {"_id": ObjectId(invitation_id)},
+        {"$set": {"updated_at": now}},
+        return_document=True,
+    )
+    return updated
 
 
 async def get_organization_members(organization_id: str):
