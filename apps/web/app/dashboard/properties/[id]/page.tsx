@@ -15,6 +15,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ErrorState } from '@/components/dashboard/states';
+import { ListSkeleton } from '@/components/dashboard/states';
 
 const ME_QUERY = `
   query Me {
@@ -111,17 +113,25 @@ export default function HouseDetailPage() {
   };
 
   if (loading) {
-    return <div className="p-8">Loading property...</div>;
+    return (
+      <div className="p-8 max-w-3xl mx-auto">
+        <div className="animate-pulse h-4 w-24 bg-muted rounded mb-6" />
+        <div className="border rounded-xl p-6 mb-6 space-y-3">
+          <div className="animate-pulse h-7 w-48 bg-muted rounded" />
+          <div className="animate-pulse h-4 w-32 bg-muted rounded" />
+        </div>
+        <ListSkeleton count={3} />
+      </div>
+    );
   }
 
   if (error || !house) {
     return (
-      <div className="p-8">
-        <p className="text-destructive mb-4">{error || 'Property not found.'}</p>
-        <Link href="/dashboard/properties" className="text-primary hover:underline">
-          Back to Properties
-        </Link>
-      </div>
+      <ErrorState
+        title="Property not found"
+        message={error || 'The property you are looking for does not exist.'}
+        onRetry={() => window.location.reload()}
+      />
     );
   }
 

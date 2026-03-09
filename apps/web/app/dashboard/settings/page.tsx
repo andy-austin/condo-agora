@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import { Button } from '@/components/ui/button';
+import { ErrorState } from '@/components/dashboard/states';
 
 const ME_QUERY = `
   query Me {
@@ -121,11 +122,25 @@ export default function SettingsPage() {
   };
 
   if (loading) {
-    return <div className="p-8">Loading settings...</div>;
+    return (
+      <div className="p-8 max-w-2xl mx-auto">
+        <div className="animate-pulse h-8 w-48 bg-muted rounded-lg mb-8" />
+        <div className="space-y-4">
+          <div className="animate-pulse h-16 w-full bg-muted rounded-lg" />
+          <div className="animate-pulse h-64 w-full bg-muted rounded-xl" />
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="p-8 text-red-500">{error}</div>;
+    return (
+      <ErrorState
+        title="Could not load settings"
+        message={error}
+        onRetry={() => window.location.reload()}
+      />
+    );
   }
 
   if (!user || user.memberships.length === 0) {
