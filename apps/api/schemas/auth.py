@@ -10,6 +10,7 @@ from ..resolvers.auth import (
     resolve_me,
     resolve_organization_members,
     resolve_pending_invitations,
+    resolve_remove_member,
     resolve_resend_invitation,
     resolve_revoke_invitation,
     resolve_update_member_role,
@@ -42,6 +43,7 @@ class AuthMutations:
     update_member_role: MemberWithUser = strawberry.mutation(
         resolver=resolve_update_member_role
     )
+    remove_member: bool = strawberry.mutation(resolver=resolve_remove_member)
     create_organization: Organization = strawberry.mutation(
         resolver=resolve_create_organization
     )
