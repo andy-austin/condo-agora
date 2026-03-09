@@ -12,6 +12,7 @@ import {
   Lightbulb,
   Vote,
   BarChart3,
+  Archive,
   Settings,
   Menu,
   X,
@@ -25,7 +26,8 @@ const navItems = [
   { href: '/dashboard/committee', label: 'Committee', icon: Users },
   { href: '/dashboard/proposals', label: 'Proposals', icon: Lightbulb },
   { href: '/dashboard/vote', label: 'Voting', icon: Vote },
-  { href: '/dashboard/reports', label: 'Reports', icon: BarChart3, disabled: true },
+  { href: '/dashboard/reports', label: 'Reports', icon: BarChart3 },
+  { href: '/dashboard/archive', label: 'Archive', icon: Archive },
 ];
 
 const bottomNavItems = [
@@ -102,26 +104,6 @@ function SidebarNav({
         {navItems.map((item) => {
           const active = isActive(item.href, item.exact);
           const Icon = item.icon;
-
-          if (item.disabled) {
-            return (
-              <div
-                key={item.href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground/50 cursor-not-allowed"
-                title="Coming soon"
-              >
-                <Icon size={20} className="shrink-0" />
-                {!collapsed && (
-                  <>
-                    <span className="text-sm">{item.label}</span>
-                    <span className="ml-auto text-[10px] bg-muted px-1.5 py-0.5 rounded-full">
-                      Soon
-                    </span>
-                  </>
-                )}
-              </div>
-            );
-          }
 
           return (
             <Link

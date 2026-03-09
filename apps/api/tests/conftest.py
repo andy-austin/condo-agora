@@ -192,6 +192,15 @@ mock_project_milestones_collection.delete_one = AsyncMock(
 mock_project_milestones_collection.count_documents = AsyncMock(return_value=0)
 mock_project_milestones_collection.create_index = AsyncMock()
 
+mock_budgets_collection = MagicMock()
+mock_budgets_collection.find = MagicMock(return_value=create_async_cursor_mock([]))
+mock_budgets_collection.find_one = AsyncMock(return_value=None)
+mock_budgets_collection.insert_one = AsyncMock(
+    return_value=MagicMock(inserted_id="mock_id")
+)
+mock_budgets_collection.find_one_and_update = AsyncMock(return_value=None)
+mock_budgets_collection.create_index = AsyncMock()
+
 # Create mock database with collections
 mock_motor_db = MagicMock()
 mock_motor_db.notes = mock_notes_collection
@@ -207,6 +216,7 @@ mock_motor_db.notifications = mock_notifications_collection
 mock_motor_db.voting_sessions = mock_voting_sessions_collection
 mock_motor_db.votes = mock_votes_collection
 mock_motor_db.documents = mock_documents_collection
+mock_motor_db.budgets = mock_budgets_collection
 mock_motor_db.project_milestones = mock_project_milestones_collection
 mock_motor_db.__getitem__ = lambda self, key: getattr(self, key)
 
@@ -230,6 +240,42 @@ sys.modules["apps.api.database"] = MagicMock()
 sys.modules["apps.api.database"].db = mock_db
 sys.modules["apps.api.database"].get_db = AsyncMock(return_value=mock_db)
 sys.modules["apps.api.database"].MongoDB = MagicMock(return_value=mock_db)
+
+
+@pytest.fixture(autouse=True)
+def _reset_mocks():
+    """Reset all mock collections before each test to avoid state leaking."""
+    all_mocks = [
+        mock_notes_collection,
+        mock_houses_collection,
+        mock_users_collection,
+        mock_organizations_collection,
+        mock_organization_members_collection,
+        mock_invitations_collection,
+        mock_proposals_collection,
+        mock_comments_collection,
+        mock_announcements_collection,
+        mock_notifications_collection,
+        mock_voting_sessions_collection,
+        mock_votes_collection,
+        mock_documents_collection,
+        mock_project_milestones_collection,
+        mock_budgets_collection,
+    ]
+    for m in all_mocks:
+        m.reset_mock(side_effect=True, return_value=True)
+        # Restore default behaviors
+        m.find = MagicMock(return_value=create_async_cursor_mock([]))
+        m.find_one = AsyncMock(return_value=None)
+        m.insert_one = AsyncMock(return_value=MagicMock(inserted_id="mock_id"))
+        m.find_one_and_update = AsyncMock(return_value=None)
+        m.delete_one = AsyncMock(return_value=MagicMock(deleted_count=1))
+        m.delete_many = AsyncMock(return_value=MagicMock(deleted_count=0))
+        m.update_one = AsyncMock()
+        m.update_many = AsyncMock(return_value=MagicMock(modified_count=0))
+        m.count_documents = AsyncMock(return_value=0)
+        m.create_index = AsyncMock()
+    yield
 
 
 @pytest.fixture
@@ -320,3 +366,9 @@ def documents_collection_mock():
 def project_milestones_collection_mock():
     """Return the mock project_milestones collection for tests"""
     return mock_project_milestones_collection
+
+
+@pytest.fixture
+def budgets_collection_mock():
+    """Return the mock budgets collection for tests"""
+    return mock_budgets_collection

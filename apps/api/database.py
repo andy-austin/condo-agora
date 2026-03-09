@@ -149,6 +149,9 @@ class MongoDB:
         )
         await self.db.project_milestones.create_index([("created_at", 1)])
 
+        # Budgets collection indexes
+        await self.db.budgets.create_index("proposal_id", unique=True)
+
 
 # Global database instance
 db = MongoDB()
