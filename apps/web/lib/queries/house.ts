@@ -4,7 +4,7 @@ export const GET_HOUSES = `
       id
       name
       organizationId
-      maxResidents
+      voterUserId
       createdAt
       updatedAt
       residents {
@@ -22,7 +22,7 @@ export const GET_HOUSE = `
       id
       name
       organizationId
-      maxResidents
+      voterUserId
       createdAt
       updatedAt
       residents {
@@ -75,7 +75,7 @@ export type House = {
   id: string;
   name: string;
   organizationId: string;
-  maxResidents: number;
+  voterUserId: string | null;
   createdAt: string;
   updatedAt: string;
   residents: HouseResident[];
@@ -137,4 +137,17 @@ export type AssignResidentResponse = {
 
 export type RemoveResidentResponse = {
   removeResidentFromHouse: HouseResident;
+};
+
+export const SET_HOUSE_VOTER = `
+  mutation SetHouseVoter($houseId: String!, $targetUserId: String!) {
+    setHouseVoter(houseId: $houseId, targetUserId: $targetUserId) {
+      id
+      voterUserId
+    }
+  }
+`;
+
+export type SetHouseVoterResponse = {
+  setHouseVoter: { id: string; voterUserId: string | null };
 };

@@ -342,7 +342,12 @@
       "email": "Email",
       "idLabel": "ID: {id}...",
       "confirmRemoveResident": "Are you sure you want to remove this resident?",
-      "settingsSection": "Settings"
+      "settingsSection": "Settings",
+      "designatedVoter": "Designated Voter",
+      "setAsVoter": "Set as Voter",
+      "voterBadge": "Voter",
+      "noVoterAssigned": "No designated voter assigned. Assign a voter so this unit can participate in voting sessions.",
+      "voterUpdated": "Designated voter updated successfully."
     },
     "committee": {
       "title": "Committee",

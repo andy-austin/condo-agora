@@ -19,6 +19,7 @@ from ..src.house.service import delete_house as service_delete_house
 from ..src.house.service import get_house as service_get_house
 from ..src.house.service import get_houses as service_get_houses
 from ..src.house.service import remove_resident_from_house as service_remove_resident
+from ..src.house.service import set_house_voter as service_set_house_voter
 from ..src.house.service import update_house as service_update_house
 
 
@@ -95,7 +96,7 @@ def _mongo_house_to_graphql(h: dict) -> House:
         id=str(h["_id"]),
         name=h["name"],
         organization_id=h["organization_id"],
-        max_residents=h.get("max_residents", 1),
+        voter_user_id=h.get("voter_user_id"),
         created_at=h["created_at"],
         updated_at=h["updated_at"],
         residents=residents,
@@ -190,3 +191,34 @@ async def resolve_remove_resident_from_house(
 
     member = await service_remove_resident(user_id, organization_id)
     return _mongo_member_to_graphql(member)
+
+
+async def resolve_set_house_voter(
+    info: strawberry.types.Info, house_id: str, target_user_id: str
+) -> House:
+    """Resolver for setting the designated voter. Admin or house resident."""
+    user = info.context.get("user")
+    if not user:
+        raise Exception("Authentication required")
+
+    org_id = await get_org_id_for_house(house_id)
+    if not org_id:
+        raise Exception("House not found")
+
+    user_id = user.get("id") or str(user.get("_id"))
+    role = await require_org_member(user, org_id)
+
+    # Allow if admin OR if caller is a resident of this house
+    if role != "ADMIN":
+        from ..database import db
+
+        caller_member = await db.db.organization_members.find_one(
+            {"user_id": user_id, "house_id": house_id}
+        )
+        if not caller_member:
+            raise Exception(
+                "Only administrators or house residents can change the voter"
+            )
+
+    house = await service_set_house_voter(house_id, target_user_id)
+    return _mongo_house_to_graphql(house)

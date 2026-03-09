@@ -56,7 +56,7 @@ async def get_house(house_id: str):
     return house
 
 
-async def create_house(organization_id: str, name: str, max_residents: int = 1):
+async def create_house(organization_id: str, name: str):
     """Create a new house within an organization."""
     await _ensure_connected()
 
@@ -64,7 +64,7 @@ async def create_house(organization_id: str, name: str, max_residents: int = 1):
     house_data = {
         "name": name,
         "organization_id": organization_id,
-        "max_residents": max_residents,
+        "voter_user_id": None,
         "created_at": now,
         "updated_at": now,
     }
@@ -133,17 +133,6 @@ async def assign_resident_to_house(user_id: str, house_id: str):
     if not house:
         raise Exception("House not found")
 
-    # Check max_residents limit (default 1 for legacy houses)
-    max_residents = house.get("max_residents", 1)
-    current_resident_count = await db.db.organization_members.count_documents(
-        {"house_id": str(house["_id"])}
-    )
-    if current_resident_count >= max_residents:
-        raise Exception(
-            f"This unit already has the maximum number of residents ({max_residents}). "
-            "Remove an existing resident before assigning a new one."
-        )
-
     member = await db.db.organization_members.find_one(
         {
             "user_id": user_id,
@@ -166,6 +155,13 @@ async def assign_resident_to_house(user_id: str, house_id: str):
         {"$set": {"house_id": house_id, "updated_at": now}},
         return_document=True,
     )
+
+    # Auto-assign as voter if house has no voter yet
+    if not house.get("voter_user_id"):
+        await db.db.houses.update_one(
+            {"_id": ObjectId(house_id)},
+            {"$set": {"voter_user_id": user_id, "updated_at": now}},
+        )
 
     # Fetch organization
     org = await db.db.organizations.find_one(
@@ -199,6 +195,14 @@ async def remove_resident_from_house(user_id: str, organization_id: str):
     if not member.get("house_id"):
         raise Exception("User is not assigned to any house")
 
+    # If this user is the designated voter, clear voter_user_id on the house
+    house = await db.db.houses.find_one({"_id": ObjectId(member["house_id"])})
+    if house and house.get("voter_user_id") == user_id:
+        await db.db.houses.update_one(
+            {"_id": house["_id"]},
+            {"$set": {"voter_user_id": None, "updated_at": datetime.utcnow()}},
+        )
+
     now = datetime.utcnow()
     updated_member = await db.db.organization_members.find_one_and_update(
         {"_id": member["_id"]},
@@ -214,6 +218,40 @@ async def remove_resident_from_house(user_id: str, organization_id: str):
     updated_member["house"] = None
 
     return updated_member
+
+
+async def set_house_voter(house_id: str, target_user_id: str):
+    """
+    Set the designated voter for a house.
+    The target user must be a resident of the house.
+    """
+    await _ensure_connected()
+
+    try:
+        house = await db.db.houses.find_one({"_id": ObjectId(house_id)})
+    except Exception:
+        house = None
+
+    if not house:
+        raise Exception("House not found")
+
+    # Verify target user is a resident of this house
+    member = await db.db.organization_members.find_one(
+        {
+            "user_id": target_user_id,
+            "house_id": house_id,
+        }
+    )
+    if not member:
+        raise Exception("Target user is not a resident of this house")
+
+    now = datetime.utcnow()
+    await db.db.houses.update_one(
+        {"_id": ObjectId(house_id)},
+        {"$set": {"voter_user_id": target_user_id, "updated_at": now}},
+    )
+
+    return await get_house(house_id)
 
 
 async def get_houses_count(organization_id: str) -> int:

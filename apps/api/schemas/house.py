@@ -11,6 +11,7 @@ from ..resolvers.house import (
     resolve_house,
     resolve_houses,
     resolve_remove_resident_from_house,
+    resolve_set_house_voter,
     resolve_update_house,
 )
 
@@ -32,3 +33,4 @@ class HouseMutations:
     remove_resident_from_house: OrganizationMember = strawberry.mutation(
         resolver=resolve_remove_resident_from_house
     )
+    set_house_voter: House = strawberry.mutation(resolver=resolve_set_house_voter)

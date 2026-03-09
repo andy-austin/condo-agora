@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, List
+from typing import TYPE_CHECKING, Annotated, List, Optional
 
 import strawberry
 
@@ -25,7 +25,7 @@ class House:
     id: str
     name: str
     organization_id: str
-    max_residents: int = 1
+    voter_user_id: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     residents: List[Annotated["OrganizationMember", strawberry.lazy(".auth")]] = (

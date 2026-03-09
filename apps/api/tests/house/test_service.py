@@ -12,6 +12,7 @@ from apps.api.src.house.service import (
     get_houses,
     get_houses_count,
     remove_resident_from_house,
+    set_house_voter,
     update_house,
 )
 
@@ -28,12 +29,14 @@ def _make_mock_house_doc(
     name="Unit 101",
     organization_id="org-1",
     residents=None,
+    voter_user_id=None,
 ):
     """Create a mock house document (MongoDB-style dict)"""
     return {
         "_id": id or ObjectId(),
         "name": name,
         "organization_id": organization_id,
+        "voter_user_id": voter_user_id,
         "created_at": datetime.now(timezone.utc),
         "updated_at": datetime.now(timezone.utc),
         "residents": residents or [],
@@ -189,12 +192,14 @@ class TestDeleteHouse:
 
 class TestAssignResidentToHouse:
     @pytest.mark.asyncio
-    async def test_assigns_resident(self):
+    async def test_assigns_resident_and_auto_sets_voter(self):
         house_id = ObjectId()
         member_id = ObjectId()
         org_id = ObjectId()
 
-        house = _make_mock_house_doc(id=house_id, organization_id=str(org_id))
+        house = _make_mock_house_doc(
+            id=house_id, organization_id=str(org_id), voter_user_id=None
+        )
         member = _make_mock_member_doc(
             id=member_id, organization_id=str(org_id), user_id="user-1"
         )
@@ -213,6 +218,40 @@ class TestAssignResidentToHouse:
 
         result = await assign_resident_to_house("user-1", str(house_id))
         assert result["house_id"] == str(house_id)
+
+        # Voter should be auto-set since house had no voter
+        mock_houses_collection.update_one.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_second_resident_does_not_change_voter(self):
+        house_id = ObjectId()
+        member_id = ObjectId()
+        org_id = ObjectId()
+
+        house = _make_mock_house_doc(
+            id=house_id, organization_id=str(org_id), voter_user_id="user-1"
+        )
+        member = _make_mock_member_doc(
+            id=member_id, organization_id=str(org_id), user_id="user-2"
+        )
+        org = _make_mock_org_doc(id=org_id)
+
+        mock_houses_collection.find_one.return_value = house
+        mock_organization_members_collection.find_one.return_value = member
+
+        updated_member = _make_mock_member_doc(
+            id=member_id, organization_id=str(org_id), house_id=str(house_id)
+        )
+        mock_organization_members_collection.find_one_and_update.return_value = (
+            updated_member
+        )
+        mock_organizations_collection.find_one.return_value = org
+
+        result = await assign_resident_to_house("user-2", str(house_id))
+        assert result["house_id"] == str(house_id)
+
+        # Voter should NOT be changed — house already has a voter
+        mock_houses_collection.update_one.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_raises_when_house_not_found(self):
@@ -233,14 +272,22 @@ class TestAssignResidentToHouse:
 
 class TestRemoveResidentFromHouse:
     @pytest.mark.asyncio
-    async def test_removes_resident(self):
+    async def test_removes_voter_and_clears_voter_user_id(self):
         member_id = ObjectId()
         org_id = ObjectId()
+        house_id = ObjectId()
 
         member = _make_mock_member_doc(
-            id=member_id, organization_id=str(org_id), house_id="house-1"
+            id=member_id,
+            organization_id=str(org_id),
+            house_id=str(house_id),
+            user_id="user-1",
+        )
+        house = _make_mock_house_doc(
+            id=house_id, organization_id=str(org_id), voter_user_id="user-1"
         )
         mock_organization_members_collection.find_one.return_value = member
+        mock_houses_collection.find_one.return_value = house
 
         updated_member = _make_mock_member_doc(
             id=member_id, organization_id=str(org_id), house_id=None
@@ -255,6 +302,43 @@ class TestRemoveResidentFromHouse:
         result = await remove_resident_from_house("user-1", str(org_id))
         assert result["house_id"] is None
 
+        # Voter was removed, so voter_user_id should be cleared
+        mock_houses_collection.update_one.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_removes_non_voter_does_not_clear_voter(self):
+        member_id = ObjectId()
+        org_id = ObjectId()
+        house_id = ObjectId()
+
+        member = _make_mock_member_doc(
+            id=member_id,
+            organization_id=str(org_id),
+            house_id=str(house_id),
+            user_id="user-2",
+        )
+        house = _make_mock_house_doc(
+            id=house_id, organization_id=str(org_id), voter_user_id="user-1"
+        )
+        mock_organization_members_collection.find_one.return_value = member
+        mock_houses_collection.find_one.return_value = house
+
+        updated_member = _make_mock_member_doc(
+            id=member_id, organization_id=str(org_id), house_id=None
+        )
+        mock_organization_members_collection.find_one_and_update.return_value = (
+            updated_member
+        )
+
+        org = _make_mock_org_doc(id=org_id)
+        mock_organizations_collection.find_one.return_value = org
+
+        result = await remove_resident_from_house("user-2", str(org_id))
+        assert result["house_id"] is None
+
+        # Non-voter removed, so voter_user_id should NOT be cleared
+        mock_houses_collection.update_one.assert_not_called()
+
     @pytest.mark.asyncio
     async def test_raises_when_user_not_member(self):
         mock_organization_members_collection.find_one.return_value = None
@@ -267,6 +351,44 @@ class TestRemoveResidentFromHouse:
         mock_organization_members_collection.find_one.return_value = member
         with pytest.raises(Exception, match="User is not assigned to any house"):
             await remove_resident_from_house("user-1", "org-1")
+
+
+class TestSetHouseVoter:
+    @pytest.mark.asyncio
+    async def test_sets_voter_for_resident(self):
+        house_id = ObjectId()
+        member_id = ObjectId()
+
+        house = _make_mock_house_doc(id=house_id, voter_user_id=None)
+        member = _make_mock_member_doc(
+            id=member_id, user_id="user-2", house_id=str(house_id)
+        )
+
+        mock_houses_collection.find_one.return_value = house
+        mock_organization_members_collection.find_one.return_value = member
+        mock_organization_members_collection.find.return_value = (
+            create_async_cursor_mock([])
+        )
+
+        result = await set_house_voter(str(house_id), "user-2")
+        mock_houses_collection.update_one.assert_called_once()
+        assert result is not None
+
+    @pytest.mark.asyncio
+    async def test_raises_when_house_not_found(self):
+        mock_houses_collection.find_one.return_value = None
+        with pytest.raises(Exception, match="House not found"):
+            await set_house_voter("507f1f77bcf86cd799439011", "user-1")
+
+    @pytest.mark.asyncio
+    async def test_raises_when_target_not_resident(self):
+        house_id = ObjectId()
+        house = _make_mock_house_doc(id=house_id)
+        mock_houses_collection.find_one.return_value = house
+        mock_organization_members_collection.find_one.return_value = None
+
+        with pytest.raises(Exception, match="not a resident"):
+            await set_house_voter(str(house_id), "user-999")
 
 
 class TestGetHousesCount:
