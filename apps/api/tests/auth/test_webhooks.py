@@ -194,9 +194,7 @@ async def test_handle_user_created_skips_duplicate_membership():
 async def test_handle_user_updated_syncs_to_db():
     data = {
         "id": "user_123",
-        "email_addresses": [
-            {"id": "email_1", "email_address": "updated@example.com"}
-        ],
+        "email_addresses": [{"id": "email_1", "email_address": "updated@example.com"}],
         "primary_email_address_id": "email_1",
         "first_name": "Updated",
         "last_name": "User",

@@ -60,9 +60,7 @@ class TestCreateInvitation:
         mock_invitations_collection.find_one.return_value = existing
 
         with pytest.raises(Exception, match="Invitation already pending"):
-            await create_invitation(
-                "user@example.com", "org-1", "inviter-1", "MEMBER"
-            )
+            await create_invitation("user@example.com", "org-1", "inviter-1", "MEMBER")
 
     @pytest.mark.asyncio
     @patch("apps.api.src.auth.service.create_clerk_invitation", new_callable=AsyncMock)
