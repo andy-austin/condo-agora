@@ -584,7 +584,10 @@
       "contactEmailPlaceholder": "admin@community.com",
       "saveChanges": "Save Changes",
       "editComingSoon": "Organization profile editing will be available in a future update.",
-      "noOrgYet": "You do not belong to any organization yet. Please ask an administrator to invite you."
+      "noOrgYet": "You do not belong to any organization yet. Please ask an administrator to invite you.",
+      "removeMember": "Remove member",
+      "removeMemberConfirm": "Are you sure you want to remove {name} from the organization? This will also delete their account.",
+      "removeMemberFailed": "Failed to remove member."
     },
     "announcements": {
       "title": "Announcements",

@@ -11,6 +11,7 @@ import { ErrorState } from '@/components/dashboard/states';
 import Breadcrumb from '@/components/dashboard/Breadcrumb';
 import {
   GET_ORGANIZATION_MEMBERS,
+  REMOVE_MEMBER,
   type Member,
   type GetMembersResponse,
 } from '@/lib/queries/members';
@@ -23,6 +24,7 @@ import {
   Search,
   UserPlus,
   Mail,
+  Trash2,
 } from 'lucide-react';
 import PendingInvitationsTable from '@/components/settings/PendingInvitationsTable';
 
@@ -266,6 +268,7 @@ function MembersTab({
   const [role, setRole] = useState('MEMBER');
   const [submitting, setSubmitting] = useState(false);
   const [inviteSuccess, setInviteSuccess] = useState(false);
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
   const filteredMembers = members.filter((m) => {
     const q = search.toLowerCase();
@@ -295,6 +298,26 @@ function MembersTab({
       alert('Failed to send invitation.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleRemoveMember = async (member: Member) => {
+    const name = member.firstName || member.lastName
+      ? [member.firstName, member.lastName].filter(Boolean).join(' ')
+      : member.email;
+    if (!confirm(t('settings.removeMemberConfirm', { name }))) return;
+
+    setRemovingId(member.id);
+    try {
+      const token = await getAuthToken();
+      const client = getApiClient(token);
+      await client.request(REMOVE_MEMBER, { memberId: member.id });
+      onMembersChange(members.filter((m) => m.id !== member.id));
+    } catch (err) {
+      console.error(err);
+      alert(t('settings.removeMemberFailed'));
+    } finally {
+      setRemovingId(null);
     }
   };
 
@@ -347,51 +370,72 @@ function MembersTab({
                 <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden lg:table-cell">
                   {t('settings.joined')}
                 </th>
+                {isAdmin && (
+                  <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider w-16">
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y">
               {filteredMembers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  <td colSpan={isAdmin ? 6 : 5} className="px-4 py-8 text-center text-sm text-muted-foreground">
                     {search ? t('settings.noMembersMatch') : t('settings.noMembersYet')}
                   </td>
                 </tr>
               ) : (
-                filteredMembers.map((member) => (
-                  <tr key={member.id} className="hover:bg-muted/30 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <span className="text-xs font-semibold text-primary">
-                            {(member.firstName?.[0] || member.email[0]).toUpperCase()}
-                          </span>
+                filteredMembers.map((member) => {
+                  const isSelf = member.userId === user.id;
+                  return (
+                    <tr key={member.id} className="hover:bg-muted/30 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                            <span className="text-xs font-semibold text-primary">
+                              {(member.firstName?.[0] || member.email[0]).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium truncate">{getMemberName(member)}</p>
+                            <p className="text-xs text-muted-foreground truncate sm:hidden">
+                              {member.email}
+                            </p>
+                          </div>
                         </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium truncate">{getMemberName(member)}</p>
-                          <p className="text-xs text-muted-foreground truncate sm:hidden">
-                            {member.email}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-muted-foreground hidden sm:table-cell">
-                      {member.email}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge
-                        variant={member.role === 'ADMIN' ? 'default' : 'secondary'}
-                      >
-                        {member.role}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-muted-foreground hidden md:table-cell">
-                      {member.houseName || '—'}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-muted-foreground hidden lg:table-cell">
-                      {new Date(member.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground hidden sm:table-cell">
+                        {member.email}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge
+                          variant={member.role === 'ADMIN' ? 'default' : 'secondary'}
+                        >
+                          {member.role}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground hidden md:table-cell">
+                        {member.houseName || '—'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground hidden lg:table-cell">
+                        {new Date(member.createdAt).toLocaleDateString()}
+                      </td>
+                      {isAdmin && (
+                        <td className="px-4 py-3">
+                          {!isSelf && (
+                            <button
+                              onClick={() => handleRemoveMember(member)}
+                              disabled={removingId === member.id}
+                              className="text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
+                              title={t('settings.removeMember')}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

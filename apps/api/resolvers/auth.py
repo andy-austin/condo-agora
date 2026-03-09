@@ -21,6 +21,9 @@ from ..src.auth.service import get_pending_invitations as service_get_pending
 from ..src.auth.service import get_user_with_memberships
 from ..src.auth.service import resend_invitation as service_resend_invitation
 from ..src.auth.service import revoke_invitation as service_revoke_invitation
+from ..src.auth.service import (
+    remove_member_from_organization as service_remove_member,
+)
 from ..src.auth.service import update_member_role as service_update_role
 
 
@@ -253,6 +256,30 @@ async def resolve_update_member_role(
     user_id = user.get("id") or str(user.get("_id"))
     updated = await service_update_role(member_id, role.value, user_id)
     return _mongo_member_to_member_with_user(updated)
+
+
+async def resolve_remove_member(info: strawberry.types.Info, member_id: str) -> bool:
+    """Resolver for removing a member from an organization. ADMIN only."""
+    user = info.context.get("user")
+    if not user:
+        raise Exception("Authentication required")
+
+    from ..database import db
+
+    if not db.is_connected():
+        await db.connect()
+
+    from bson import ObjectId
+
+    member = await db.db.organization_members.find_one({"_id": ObjectId(member_id)})
+    if not member:
+        raise Exception("Member not found")
+
+    await require_org_admin(user, member["organization_id"])
+
+    user_id = user.get("id") or str(user.get("_id"))
+    await service_remove_member(member_id, user_id)
+    return True
 
 
 async def resolve_create_organization(

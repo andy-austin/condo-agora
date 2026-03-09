@@ -49,3 +49,33 @@ async def create_clerk_invitation(
         except Exception as e:
             print(f"Error calling Clerk API: {e}")
             raise HTTPException(status_code=500, detail=str(e))
+
+
+async def delete_clerk_user(clerk_id: str):
+    """
+    Deletes a user from Clerk by their Clerk user ID.
+    """
+    if not CLERK_SECRET_KEY:
+        print("Warning: CLERK_SECRET_KEY not found. Skipping Clerk user deletion.")
+        return None
+
+    url = f"https://api.clerk.com/v1/users/{clerk_id}"
+    headers = {
+        "Authorization": f"Bearer {CLERK_SECRET_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.delete(url, headers=headers)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"Clerk API Error deleting user: {e.response.text}")
+            raise HTTPException(
+                status_code=e.response.status_code,
+                detail=f"Failed to delete Clerk user: {e.response.text}",
+            )
+        except Exception as e:
+            print(f"Error calling Clerk API: {e}")
+            raise HTTPException(status_code=500, detail=str(e))

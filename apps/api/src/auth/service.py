@@ -6,7 +6,7 @@ from bson import ObjectId
 from fastapi import HTTPException
 
 from ...database import db
-from .clerk_utils import create_clerk_invitation
+from .clerk_utils import create_clerk_invitation, delete_clerk_user
 
 EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 
@@ -448,3 +448,74 @@ async def get_user_with_memberships(user_id: str):
 
     user["memberships"] = memberships
     return user
+
+
+async def remove_member_from_organization(member_id: str, admin_user_id: str):
+    """
+    Removes a member from the organization and deletes the user from Clerk
+    and all related data. Admin only. Cannot remove yourself or the last admin.
+    """
+    if not db.is_connected():
+        await db.connect()
+
+    member = await db.db.organization_members.find_one({"_id": ObjectId(member_id)})
+    if not member:
+        raise Exception("Member not found")
+
+    org_id = member["organization_id"]
+    target_user_id = member["user_id"]
+
+    # Prevent self-removal
+    if target_user_id == admin_user_id:
+        raise Exception("You cannot remove yourself from the organization.")
+
+    # Prevent removing the last admin
+    if member["role"] == "ADMIN":
+        admin_count = await db.db.organization_members.count_documents(
+            {"organization_id": org_id, "role": "ADMIN"}
+        )
+        if admin_count <= 1:
+            raise Exception(
+                "Cannot remove the last administrator. "
+                "Promote another member to admin first."
+            )
+
+    # 1. Clear house assignments — unset voter_user_id if this user is the voter
+    if member.get("house_id"):
+        await db.db.houses.update_many(
+            {"voter_user_id": target_user_id},
+            {"$set": {"voter_user_id": None}},
+        )
+
+    # 2. Delete organization membership
+    await db.db.organization_members.delete_one({"_id": ObjectId(member_id)})
+
+    # 3. Delete notifications for this user in this org
+    await db.db.notifications.delete_many(
+        {"user_id": target_user_id, "organization_id": org_id}
+    )
+
+    # 4. Check if user has memberships in other orgs
+    other_memberships = await db.db.organization_members.count_documents(
+        {"user_id": target_user_id}
+    )
+
+    if other_memberships == 0:
+        # No other org memberships — remove user entirely
+        user = await db.db.users.find_one({"_id": ObjectId(target_user_id)})
+
+        # Delete from Clerk
+        if user and user.get("clerk_id"):
+            try:
+                await delete_clerk_user(user["clerk_id"])
+                print(f"Deleted Clerk user {user['clerk_id']}")
+            except Exception as e:
+                print(f"Warning: failed to delete Clerk user: {e}")
+
+        # Delete local user record
+        await db.db.users.delete_one({"_id": ObjectId(target_user_id)})
+
+        # Delete any remaining notifications
+        await db.db.notifications.delete_many({"user_id": target_user_id})
+
+    return org_id

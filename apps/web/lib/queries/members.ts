@@ -50,3 +50,9 @@ export type GetMembersResponse = {
 export type UpdateMemberRoleResponse = {
   updateMemberRole: Member;
 };
+
+export const REMOVE_MEMBER = `
+  mutation RemoveMember($memberId: String!) {
+    removeMember(memberId: $memberId)
+  }
+`;

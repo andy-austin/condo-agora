@@ -584,7 +584,10 @@
       "contactEmailPlaceholder": "admin@comunidad.com",
       "saveChanges": "Guardar cambios",
       "editComingSoon": "La edición del perfil de la organización estará disponible en una futura actualización.",
-      "noOrgYet": "Aún no pertenecés a ninguna organización. Por favor, pedile a un administrador que te invite."
+      "noOrgYet": "Aún no pertenecés a ninguna organización. Por favor, pedile a un administrador que te invite.",
+      "removeMember": "Eliminar miembro",
+      "removeMemberConfirm": "¿Estás seguro de que querés eliminar a {name} de la organización? Esto también eliminará su cuenta.",
+      "removeMemberFailed": "No se pudo eliminar al miembro."
     },
     "announcements": {
       "title": "Anuncios",
