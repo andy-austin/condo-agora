@@ -124,6 +124,19 @@ class MongoDB:
         await self.db.notifications.create_index([("user_id", 1), ("is_read", 1)])
         await self.db.notifications.create_index([("created_at", -1)])
 
+        # Voting sessions collection indexes
+        await self.db.voting_sessions.create_index("organization_id")
+        await self.db.voting_sessions.create_index(
+            [("organization_id", 1), ("status", 1)]
+        )
+        await self.db.voting_sessions.create_index([("created_at", -1)])
+
+        # Votes collection indexes
+        await self.db.votes.create_index(
+            [("voting_session_id", 1), ("house_id", 1)], unique=True
+        )
+        await self.db.votes.create_index("voting_session_id")
+
 
 # Global database instance
 db = MongoDB()
