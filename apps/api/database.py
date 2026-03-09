@@ -137,6 +137,18 @@ class MongoDB:
         )
         await self.db.votes.create_index("voting_session_id")
 
+        # Documents collection indexes
+        await self.db.documents.create_index("proposal_id")
+        await self.db.documents.create_index([("proposal_id", 1), ("type", 1)])
+        await self.db.documents.create_index([("created_at", -1)])
+
+        # Project milestones collection indexes
+        await self.db.project_milestones.create_index("proposal_id")
+        await self.db.project_milestones.create_index(
+            [("proposal_id", 1), ("status", 1)]
+        )
+        await self.db.project_milestones.create_index([("created_at", 1)])
+
 
 # Global database instance
 db = MongoDB()

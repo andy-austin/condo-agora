@@ -21,6 +21,8 @@ import {
 } from '@/lib/queries/proposal';
 import { GET_HOUSES, type House, type GetHousesResponse } from '@/lib/queries/house';
 import CommentSection from '@/components/proposals/CommentSection';
+import DocumentSection from '@/components/proposals/DocumentSection';
+import ProjectMilestones from '@/components/proposals/ProjectMilestones';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ErrorState } from '@/components/dashboard/states';
@@ -362,6 +364,25 @@ export default function ProposalDetailPage() {
                 <h2 className="text-base font-semibold">Rejection Reason</h2>
               </div>
               <p className="text-sm">{proposal.rejectionReason}</p>
+            </div>
+          )}
+
+          {/* Documents */}
+          <div className="border rounded-xl p-5">
+            <DocumentSection
+              proposalId={proposal.id}
+              isAdmin={isAdmin}
+              currentUserId={currentUserId ?? ''}
+            />
+          </div>
+
+          {/* Project Milestones - only for IN_PROGRESS proposals */}
+          {proposal.status === 'IN_PROGRESS' && (
+            <div className="border rounded-xl p-5">
+              <ProjectMilestones
+                proposalId={proposal.id}
+                isAdmin={isAdmin}
+              />
             </div>
           )}
 

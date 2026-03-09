@@ -21,6 +21,7 @@
     "@apollo/client": "^3.8.0",
     "@clerk/nextjs": "^6.36.10",
     "@radix-ui/react-slot": "^1.2.3",
+    "@vercel/blob": "^2.3.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "graphql": "^16.8.0",
