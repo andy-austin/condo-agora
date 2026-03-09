@@ -1,10 +1,12 @@
 import os
 from datetime import datetime
 
+from bson import ObjectId
 from fastapi import HTTPException, Request
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from ...database import db
+from ..notification.service import create_notification
 
 CLERK_WEBHOOK_SECRET = os.getenv("CLERK_WEBHOOK_SECRET")
 
@@ -91,6 +93,24 @@ async def process_pending_invitations(user: dict):
         await db.db.invitations.update_one(
             {"_id": invite["_id"]}, {"$set": {"accepted_at": now, "updated_at": now}}
         )
+
+        # Notify the user about their new membership
+        try:
+            org = await db.db.organizations.find_one(
+                {"_id": ObjectId(invite["organization_id"])}
+            )
+            org_name = org["name"] if org else "an organization"
+            await create_notification(
+                user_id=str(user["_id"]),
+                organization_id=invite["organization_id"],
+                notification_type="INVITATION",
+                title="Invitation Accepted",
+                message=f"You have been added to {org_name}",
+                reference_id=str(invite["_id"]),
+            )
+        except Exception as e:
+            print(f"Warning: failed to create notification: {e}")
+
         print(
             f"User {user.get('clerk_id', user['_id'])} auto-joined "
             f"organization {invite['organization_id']} via invitation"
