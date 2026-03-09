@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
@@ -14,8 +15,6 @@ import {
   type UpdateProposalResponse,
   type UpdateProposalStatusResponse,
   type DeleteProposalResponse,
-  PROPOSAL_STATUS_LABELS,
-  PROPOSAL_CATEGORY_LABELS,
   STATUS_COLORS,
   CATEGORIES,
 } from '@/lib/queries/proposal';
@@ -71,6 +70,7 @@ const STATUS_FLOW = [
 export default function ProposalDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const t = useTranslations('dashboard');
   const proposalId = params.id as string;
   const { getAuthToken } = useAuthToken();
 
@@ -102,7 +102,7 @@ export default function ProposalDetailPage() {
       ]);
 
       if (!proposalData.proposal) {
-        setError('Proposal not found.');
+        setError(t('proposals.notFoundMessage'));
         return;
       }
 
@@ -133,7 +133,7 @@ export default function ProposalDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [proposalId, getAuthToken]);
+  }, [proposalId, getAuthToken, t]);
 
   useEffect(() => {
     fetchData();
@@ -211,8 +211,8 @@ export default function ProposalDetailPage() {
   if (error || !proposal) {
     return (
       <ErrorState
-        title="Proposal not found"
-        message={error || 'The proposal you are looking for does not exist.'}
+        title={t('proposals.notFound')}
+        message={error || t('proposals.notFoundMessage')}
         onRetry={() => router.push('/dashboard/proposals')}
       />
     );
@@ -227,7 +227,7 @@ export default function ProposalDetailPage() {
     <div className="p-6 lg:p-8 max-w-4xl mx-auto">
       <Breadcrumb
         items={[
-          { label: 'Proposals', href: '/dashboard/proposals' },
+          { label: t('proposals.title'), href: '/dashboard/proposals' },
           { label: proposal.title },
         ]}
       />
@@ -257,7 +257,7 @@ export default function ProposalDetailPage() {
                           : 'bg-background text-muted-foreground border-border'
                       }`}
                     >
-                      {PROPOSAL_CATEGORY_LABELS[cat]}
+                      {t(`labels.category.${cat}`)}
                     </button>
                   ))}
                 </div>
@@ -268,10 +268,10 @@ export default function ProposalDetailPage() {
                   <span
                     className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[proposal.status] || 'bg-gray-100 text-gray-700'}`}
                   >
-                    {PROPOSAL_STATUS_LABELS[proposal.status] || proposal.status}
+                    {t(`labels.status.${proposal.status}`)}
                   </span>
                   <Badge variant="outline" className="text-xs">
-                    {PROPOSAL_CATEGORY_LABELS[proposal.category] || proposal.category}
+                    {t(`labels.category.${proposal.category}`)}
                   </Badge>
                 </div>
                 <h1 className="text-xl font-bold">{proposal.title}</h1>
@@ -283,7 +283,7 @@ export default function ProposalDetailPage() {
                   {proposal.responsibleHouseId && (
                     <span className="flex items-center gap-1">
                       <Building2 size={12} />
-                      Assigned unit
+                      {t('proposals.assignedUnit')}
                     </span>
                   )}
                 </div>
@@ -296,7 +296,7 @@ export default function ProposalDetailPage() {
             {editing ? (
               <>
                 <Button size="sm" onClick={handleSaveEdit} disabled={saving}>
-                  {saving ? 'Saving...' : 'Save'}
+                  {saving ? t('common.saving') : t('common.save')}
                 </Button>
                 <Button
                   size="sm"
@@ -308,7 +308,7 @@ export default function ProposalDetailPage() {
                     setEditCategory(proposal.category);
                   }}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
               </>
             ) : (
@@ -317,7 +317,7 @@ export default function ProposalDetailPage() {
                   <button
                     onClick={() => setEditing(true)}
                     className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-                    title="Edit proposal"
+                    title={t('proposals.editProposal')}
                   >
                     <Pencil size={15} />
                   </button>
@@ -326,7 +326,7 @@ export default function ProposalDetailPage() {
                   <button
                     onClick={handleDelete}
                     className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive"
-                    title="Delete proposal"
+                    title={t('proposals.deleteProposal')}
                   >
                     <Trash2 size={15} />
                   </button>
@@ -342,7 +342,7 @@ export default function ProposalDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           {/* Description */}
           <div className="border rounded-xl p-6">
-            <h2 className="text-base font-semibold mb-3">Description</h2>
+            <h2 className="text-base font-semibold mb-3">{t('proposals.description')}</h2>
             {editing ? (
               <textarea
                 value={editDescription}
@@ -362,7 +362,7 @@ export default function ProposalDetailPage() {
             <div className="border border-destructive/30 rounded-xl p-6 bg-destructive/5">
               <div className="flex items-center gap-2 mb-2 text-destructive">
                 <AlertTriangle size={16} />
-                <h2 className="text-base font-semibold">Rejection Reason</h2>
+                <h2 className="text-base font-semibold">{t('proposals.rejectionReason')}</h2>
               </div>
               <p className="text-sm">{proposal.rejectionReason}</p>
             </div>
@@ -400,8 +400,8 @@ export default function ProposalDetailPage() {
         <div className="space-y-4">
           {/* Status Timeline */}
           <div className="border rounded-xl p-5">
-            <h3 className="text-sm font-semibold mb-4">Status Timeline</h3>
-            <StatusTimeline currentStatus={proposal.status} />
+            <h3 className="text-sm font-semibold mb-4">{t('proposals.statusTimeline')}</h3>
+            <StatusTimeline currentStatus={proposal.status} t={t} />
           </div>
 
           {/* Budget - for approved, in-progress, and completed proposals */}
@@ -421,10 +421,10 @@ export default function ProposalDetailPage() {
                 onClick={() => handleStatusChange('OPEN')}
                 disabled={moderating}
               >
-                {moderating ? 'Submitting...' : 'Submit for Review'}
+                {moderating ? t('common.submitting') : t('proposals.submitForReview')}
               </Button>
               <p className="text-xs text-muted-foreground mt-2 text-center">
-                Opens the proposal for community review
+                {t('proposals.submitForReviewHint')}
               </p>
             </div>
           )}
@@ -437,6 +437,7 @@ export default function ProposalDetailPage() {
               moderating={moderating}
               onStatusChange={handleStatusChange}
               onReject={() => setShowRejectModal(true)}
+              t={t}
             />
           )}
         </div>
@@ -446,14 +447,14 @@ export default function ProposalDetailPage() {
       {showRejectModal && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
           <div className="bg-background rounded-xl p-6 w-full max-w-md shadow-xl">
-            <h3 className="text-base font-semibold mb-2">Reject Proposal</h3>
+            <h3 className="text-base font-semibold mb-2">{t('proposals.rejectProposal')}</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Please provide a reason for rejecting this proposal.
+              {t('proposals.rejectReasonPrompt')}
             </p>
             <textarea
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              placeholder="e.g. Budget constraints, outside scope of community rules..."
+              placeholder={t('proposals.rejectReasonPlaceholder')}
               className="w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none mb-4"
               rows={4}
               autoFocus
@@ -468,7 +469,7 @@ export default function ProposalDetailPage() {
                   handleStatusChange('REJECTED', { rejectionReason: rejectionReason.trim() })
                 }
               >
-                {moderating ? 'Rejecting...' : 'Reject Proposal'}
+                {moderating ? t('proposals.rejecting') : t('proposals.rejectProposal')}
               </Button>
               <Button
                 variant="outline"
@@ -478,7 +479,7 @@ export default function ProposalDetailPage() {
                   setRejectionReason('');
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
             </div>
           </div>
@@ -488,7 +489,7 @@ export default function ProposalDetailPage() {
   );
 }
 
-function StatusTimeline({ currentStatus }: { currentStatus: string }) {
+function StatusTimeline({ currentStatus, t }: { currentStatus: string; t: ReturnType<typeof useTranslations> }) {
   const isRejected = currentStatus === 'REJECTED';
   const currentIndex = STATUS_FLOW.indexOf(currentStatus as typeof STATUS_FLOW[number]);
 
@@ -532,7 +533,7 @@ function StatusTimeline({ currentStatus }: { currentStatus: string }) {
                   : 'text-muted-foreground/60'
               }`}
             >
-              {PROPOSAL_STATUS_LABELS[status]}
+              {t(`labels.status.${status}`)}
             </span>
             {active && (
               <ChevronRight size={12} className="text-primary ml-auto shrink-0" />
@@ -550,30 +551,32 @@ function AdminModerationPanel({
   moderating,
   onStatusChange,
   onReject,
+  t,
 }: {
   proposal: Proposal;
   houses: House[];
   moderating: boolean;
   onStatusChange: (status: string, opts?: { responsibleHouseId?: string }) => void;
   onReject: () => void;
+  t: ReturnType<typeof useTranslations>;
 }) {
   const [selectedHouseId, setSelectedHouseId] = useState('');
 
   const adminActions: Array<{ label: string; status: string; variant?: 'default' | 'destructive' | 'outline' }> = [];
 
   if (proposal.status === 'OPEN') {
-    adminActions.push({ label: 'Move to Voting', status: 'VOTING' });
-    adminActions.push({ label: 'Reject', status: 'REJECTED', variant: 'destructive' });
+    adminActions.push({ label: t('proposals.moveToVoting'), status: 'VOTING' });
+    adminActions.push({ label: t('proposals.reject'), status: 'REJECTED', variant: 'destructive' });
   }
   if (proposal.status === 'VOTING') {
-    adminActions.push({ label: 'Approve', status: 'APPROVED' });
-    adminActions.push({ label: 'Reject', status: 'REJECTED', variant: 'destructive' });
+    adminActions.push({ label: t('proposals.approve'), status: 'APPROVED' });
+    adminActions.push({ label: t('proposals.reject'), status: 'REJECTED', variant: 'destructive' });
   }
   if (proposal.status === 'APPROVED') {
-    adminActions.push({ label: 'Mark In Progress', status: 'IN_PROGRESS' });
+    adminActions.push({ label: t('proposals.markInProgress'), status: 'IN_PROGRESS' });
   }
   if (proposal.status === 'IN_PROGRESS') {
-    adminActions.push({ label: 'Mark Completed', status: 'COMPLETED' });
+    adminActions.push({ label: t('proposals.markCompleted'), status: 'COMPLETED' });
   }
 
   if (adminActions.length === 0 && proposal.status !== 'OPEN' && proposal.status !== 'VOTING') {
@@ -583,14 +586,14 @@ function AdminModerationPanel({
   return (
     <div className="border rounded-xl p-5 border-amber-200 bg-amber-50/50 dark:border-amber-800/50 dark:bg-amber-900/10">
       <h3 className="text-sm font-semibold mb-4 text-amber-900 dark:text-amber-100">
-        Admin Actions
+        {t('proposals.adminActions')}
       </h3>
 
       {/* Assign responsible house */}
       {houses.length > 0 && (
         <div className="mb-4">
           <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
-            Assign Responsible Unit
+            {t('proposals.assignResponsibleUnit')}
           </label>
           <div className="flex gap-2">
             <select
@@ -598,7 +601,7 @@ function AdminModerationPanel({
               onChange={(e) => setSelectedHouseId(e.target.value)}
               className="flex-1 text-xs px-2.5 py-1.5 rounded-lg border bg-background focus:outline-none"
             >
-              <option value="">Select unit...</option>
+              <option value="">{t('proposals.selectUnit')}</option>
               {houses.map((h) => (
                 <option key={h.id} value={h.id}>
                   {h.name}
@@ -614,12 +617,12 @@ function AdminModerationPanel({
                 onStatusChange(proposal.status, { responsibleHouseId: selectedHouseId })
               }
             >
-              Assign
+              {t('common.assign')}
             </Button>
           </div>
           {proposal.responsibleHouseId && (
             <p className="text-xs text-muted-foreground mt-1">
-              Currently assigned: {houses.find((h) => h.id === proposal.responsibleHouseId)?.name || proposal.responsibleHouseId}
+              {t('proposals.currentlyAssigned', { name: houses.find((h) => h.id === proposal.responsibleHouseId)?.name || proposal.responsibleHouseId })}
             </p>
           )}
         </div>

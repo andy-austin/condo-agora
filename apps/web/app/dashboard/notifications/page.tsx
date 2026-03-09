@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
@@ -10,7 +11,6 @@ import {
   MARK_ALL_NOTIFICATIONS_READ,
   type Notification,
   type GetNotificationsResponse,
-  NOTIFICATION_TYPE_LABELS,
 } from '@/lib/queries/notification';
 import { Button } from '@/components/ui/button';
 import Breadcrumb from '@/components/dashboard/Breadcrumb';
@@ -25,6 +25,7 @@ const REFERENCE_ROUTES: Record<string, (id: string) => string> = {
 };
 
 export default function NotificationsPage() {
+  const t = useTranslations('dashboard');
   const router = useRouter();
   const { getAuthToken } = useAuthToken();
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -39,11 +40,11 @@ export default function NotificationsPage() {
       });
       setNotifications(data.notifications);
     } catch (err) {
-      console.error('Failed to load notifications:', err);
+      console.error(t('notifications.failedToLoad'), err);
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken]);
+  }, [getAuthToken, t]);
 
   useEffect(() => {
     fetchNotifications();
@@ -84,24 +85,24 @@ export default function NotificationsPage() {
 
   return (
     <div className="p-6 lg:p-8 max-w-3xl mx-auto">
-      <Breadcrumb items={[{ label: 'Notifications' }]} />
+      <Breadcrumb items={[{ label: t('notifications.title') }]} />
 
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Bell size={22} />
-            Notifications
+            {t('notifications.title')}
           </h1>
           {unreadCount > 0 && (
             <p className="text-sm text-muted-foreground mt-1">
-              {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
+              {unreadCount} {unreadCount !== 1 ? t('notifications.unreadNotifications') : t('notifications.unreadNotification')}
             </p>
           )}
         </div>
         {unreadCount > 0 && (
           <Button variant="outline" size="sm" onClick={handleMarkAllRead}>
             <Check size={14} className="mr-1.5" />
-            Mark all read
+            {t('notifications.markAllRead')}
           </Button>
         )}
       </div>
@@ -117,9 +118,9 @@ export default function NotificationsPage() {
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
             <Bell size={28} className="text-primary" />
           </div>
-          <h3 className="font-semibold mb-1">No notifications</h3>
+          <h3 className="font-semibold mb-1">{t('notifications.noNotifications')}</h3>
           <p className="text-sm text-muted-foreground">
-            You&apos;ll be notified about proposals, comments, and announcements here.
+            {t('notifications.noNotificationsHint')}
           </p>
         </div>
       ) : (
@@ -139,7 +140,7 @@ export default function NotificationsPage() {
                 <div className={!notification.isRead ? '' : 'pl-5'}>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-xs font-medium bg-muted px-2 py-0.5 rounded-full">
-                      {NOTIFICATION_TYPE_LABELS[notification.type] || notification.type}
+                      {t(`labels.notificationType.${notification.type}`)}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       {new Date(notification.createdAt).toLocaleDateString()}

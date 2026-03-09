@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_PROPOSALS,
   type Proposal,
   type GetProposalsResponse,
-  PROPOSAL_STATUS_LABELS,
-  PROPOSAL_CATEGORY_LABELS,
   STATUS_COLORS,
   STATUSES,
   CATEGORIES,
@@ -40,6 +39,7 @@ type MeResponse = {
 };
 
 export default function ProposalsPage() {
+  const t = useTranslations('dashboard');
   const { getAuthToken } = useAuthToken();
 
   const [proposals, setProposals] = useState<Proposal[]>([]);
@@ -75,11 +75,11 @@ export default function ProposalsPage() {
       setProposals(data.proposals);
     } catch (err) {
       console.error('Failed to load proposals:', err);
-      setError('Failed to load proposals.');
+      setError(t('proposals.failedToLoad'));
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, statusFilter, categoryFilter]);
+  }, [getAuthToken, statusFilter, categoryFilter, t]);
 
   useEffect(() => {
     fetchProposals();
@@ -105,7 +105,7 @@ export default function ProposalsPage() {
   if (error) {
     return (
       <ErrorState
-        title="Failed to load proposals"
+        title={t('proposals.failedToLoad')}
         message={error}
         onRetry={() => window.location.reload()}
       />
@@ -114,21 +114,21 @@ export default function ProposalsPage() {
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto">
-      <Breadcrumb items={[{ label: 'Proposals' }]} />
+      <Breadcrumb items={[{ label: t('proposals.title') }]} />
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Proposals</h1>
+          <h1 className="text-2xl font-bold">{t('proposals.title')}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Community improvement ideas from residents
+            {t('proposals.subtitle')}
           </p>
         </div>
         {organizationId && (
           <Button asChild>
             <Link href="/dashboard/proposals/new">
               <Plus size={16} className="mr-2" />
-              New Proposal
+              {t('proposals.newProposal')}
             </Link>
           </Button>
         )}
@@ -142,10 +142,10 @@ export default function ProposalsPage() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="appearance-none pl-3 pr-8 py-2 text-sm border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
-            <option value="">All Statuses</option>
+            <option value="">{t('proposals.allStatuses')}</option>
             {STATUSES.map((s) => (
               <option key={s} value={s}>
-                {PROPOSAL_STATUS_LABELS[s]}
+                {t(`labels.status.${s}`)}
               </option>
             ))}
           </select>
@@ -158,10 +158,10 @@ export default function ProposalsPage() {
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="appearance-none pl-3 pr-8 py-2 text-sm border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
-            <option value="">All Categories</option>
+            <option value="">{t('proposals.allCategories')}</option>
             {CATEGORIES.map((c) => (
               <option key={c} value={c}>
-                {PROPOSAL_CATEGORY_LABELS[c]}
+                {t(`labels.category.${c}`)}
               </option>
             ))}
           </select>
@@ -174,9 +174,9 @@ export default function ProposalsPage() {
             onChange={(e) => setSortOrder(e.target.value)}
             className="appearance-none pl-3 pr-8 py-2 text-sm border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="alphabetical">Alphabetical</option>
+            <option value="newest">{t('proposals.newestFirst')}</option>
+            <option value="oldest">{t('proposals.oldestFirst')}</option>
+            <option value="alphabetical">{t('proposals.alphabetical')}</option>
           </select>
           <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
@@ -191,11 +191,12 @@ export default function ProposalsPage() {
             setCategoryFilter('');
           }}
           organizationId={organizationId}
+          t={t}
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {sortedProposals.map((proposal) => (
-            <ProposalCard key={proposal.id} proposal={proposal} />
+            <ProposalCard key={proposal.id} proposal={proposal} t={t} />
           ))}
         </div>
       )}
@@ -203,7 +204,7 @@ export default function ProposalsPage() {
   );
 }
 
-function ProposalCard({ proposal }: { proposal: Proposal }) {
+function ProposalCard({ proposal, t }: { proposal: Proposal; t: ReturnType<typeof useTranslations> }) {
   return (
     <Link
       href={`/dashboard/proposals/${proposal.id}`}
@@ -214,10 +215,10 @@ function ProposalCard({ proposal }: { proposal: Proposal }) {
         <span
           className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[proposal.status] || 'bg-gray-100 text-gray-700'}`}
         >
-          {PROPOSAL_STATUS_LABELS[proposal.status] || proposal.status}
+          {t(`labels.status.${proposal.status}`)}
         </span>
         <Badge variant="outline" className="text-xs">
-          {PROPOSAL_CATEGORY_LABELS[proposal.category] || proposal.category}
+          {t(`labels.category.${proposal.category}`)}
         </Badge>
       </div>
 
@@ -235,7 +236,7 @@ function ProposalCard({ proposal }: { proposal: Proposal }) {
       <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t">
         <span className="flex items-center gap-1">
           <User size={11} />
-          Author
+          {t('proposals.author')}
         </span>
         <span className="flex items-center gap-1">
           <Calendar size={11} />
@@ -250,10 +251,12 @@ function EmptyState({
   filtered,
   onClearFilters,
   organizationId,
+  t,
 }: {
   filtered: boolean;
   onClearFilters: () => void;
   organizationId: string | null;
+  t: ReturnType<typeof useTranslations>;
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -262,25 +265,25 @@ function EmptyState({
       </div>
       {filtered ? (
         <>
-          <h3 className="font-semibold mb-1">No proposals match your filters</h3>
+          <h3 className="font-semibold mb-1">{t('proposals.noMatch')}</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Try adjusting the filters to see more results.
+            {t('proposals.noMatchHint')}
           </p>
           <Button variant="outline" onClick={onClearFilters}>
-            Clear Filters
+            {t('proposals.clearFilters')}
           </Button>
         </>
       ) : (
         <>
-          <h3 className="font-semibold mb-1">No proposals yet</h3>
+          <h3 className="font-semibold mb-1">{t('proposals.noProposals')}</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Be the first to suggest an improvement for the community!
+            {t('proposals.noProposalsHint')}
           </p>
           {organizationId && (
             <Button asChild>
               <Link href="/dashboard/proposals/new">
                 <Plus size={16} className="mr-2" />
-                New Proposal
+                {t('proposals.newProposal')}
               </Link>
             </Button>
           )}

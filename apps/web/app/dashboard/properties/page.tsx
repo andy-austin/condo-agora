@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
@@ -44,6 +45,7 @@ type MeResponse = {
 
 export default function PropertiesPage() {
   const router = useRouter();
+  const t = useTranslations('dashboard');
   const { getAuthToken } = useAuthToken();
 
   const [organizationId, setOrganizationId] = useState<string | null>(null);
@@ -71,7 +73,7 @@ export default function PropertiesPage() {
         const meData = await client.request<MeResponse>(ME_QUERY);
 
         if (!meData.me || meData.me.memberships.length === 0) {
-          setError('You are not part of any organization.');
+          setError(t('properties.notInOrg'));
           setLoading(false);
           return;
         }
@@ -93,14 +95,14 @@ export default function PropertiesPage() {
         setHouses(houseList);
       } catch (err) {
         console.error('Failed to load properties:', err);
-        setError('Failed to load properties.');
+        setError(t('properties.failedToLoad'));
       } finally {
         setLoading(false);
       }
     };
 
     init();
-  }, [getAuthToken, fetchHouses, router]);
+  }, [getAuthToken, fetchHouses, router, t]);
 
   const handleCreate = async (name: string) => {
     if (!organizationId) return;
@@ -162,7 +164,7 @@ export default function PropertiesPage() {
     <div className="p-8 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Properties</h1>
+          <h1 className="text-3xl font-bold">{t('properties.title')}</h1>
           {organizationName && (
             <p className="text-muted-foreground mt-1">{organizationName}</p>
           )}

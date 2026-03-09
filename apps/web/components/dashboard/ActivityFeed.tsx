@@ -11,6 +11,7 @@ import {
   ACTIVITY_TYPE_ICONS,
 } from '@/lib/queries/notification';
 import { Activity } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 type Props = {
   organizationId: string;
@@ -24,6 +25,7 @@ const TYPE_ROUTES: Record<string, (id: string) => string> = {
 };
 
 export default function ActivityFeed({ organizationId }: Props) {
+  const t = useTranslations('dashboard');
   const { getAuthToken } = useAuthToken();
   const [items, setItems] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,7 +71,7 @@ export default function ActivityFeed({ organizationId }: Props) {
     <div className="border rounded-xl p-6">
       <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
         <Activity size={18} className="text-primary" />
-        Recent Activity
+        {t('activityFeed.title')}
       </h2>
       <div className="space-y-3">
         {items.map((item) => {

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
@@ -13,7 +14,6 @@ import {
   CLOSE_VOTING_SESSION,
   type VotingSession,
   type Vote,
-  SESSION_STATUS_LABELS,
   SESSION_STATUS_COLORS,
 } from '@/lib/queries/voting';
 import { GET_PROPOSALS, type Proposal } from '@/lib/queries/proposal';
@@ -53,6 +53,7 @@ type MeResponse = {
 };
 
 export default function VotingSessionPage() {
+  const t = useTranslations('dashboard');
   const { sessionId } = useParams<{ sessionId: string }>();
   const { getAuthToken } = useAuthToken();
   const router = useRouter();
@@ -79,7 +80,7 @@ export default function VotingSessionPage() {
       const meData = await client.request<MeResponse>(ME_QUERY);
       const membership = meData.me?.memberships?.[0];
       if (!membership) {
-        setError('No organization found');
+        setError(t('voting.noOrgFound'));
         return;
       }
       setIsAdmin(membership.role === 'ADMIN');
@@ -92,7 +93,7 @@ export default function VotingSessionPage() {
 
       const sess = sessionData.votingSession;
       if (!sess) {
-        setError('Voting session not found');
+        setError(t('voting.sessionNotFound'));
         return;
       }
       setSession(sess);
@@ -124,11 +125,11 @@ export default function VotingSessionPage() {
         }
       }
     } catch {
-      setError('Failed to load voting session');
+      setError(t('voting.failedToLoad'));
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, sessionId]);
+  }, [getAuthToken, sessionId, t]);
 
   useEffect(() => {
     fetchData();
@@ -221,9 +222,9 @@ export default function VotingSessionPage() {
   }
 
   if (error && !session)
-    return <ErrorState message={error || 'Session not found'} />;
+    return <ErrorState message={error || t('voting.sessionNotFound')} />;
 
-  if (!session) return <ErrorState message="Session not found" />;
+  if (!session) return <ErrorState message={t('voting.sessionNotFound')} />;
 
   const isOpen = session.status === 'OPEN';
   const isDraft = session.status === 'DRAFT';
@@ -233,7 +234,7 @@ export default function VotingSessionPage() {
     <div className="p-8 max-w-2xl mx-auto">
       <Breadcrumb
         items={[
-          { label: 'Voting', href: '/dashboard/vote' },
+          { label: t('voting.breadcrumb'), href: '/dashboard/vote' },
           { label: session.title },
         ]}
       />
@@ -247,18 +248,21 @@ export default function VotingSessionPage() {
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold">{session.title}</h1>
               <Badge className={SESSION_STATUS_COLORS[session.status]}>
-                {SESSION_STATUS_LABELS[session.status]}
+                {t(`labels.sessionStatus.${session.status}`)}
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              {proposals.length} proposal{proposals.length !== 1 ? 's' : ''}
+              {proposals.length}{' '}
+              {proposals.length !== 1
+                ? t('common.proposals')
+                : t('common.proposal')}
             </p>
           </div>
         </div>
         <Link href={`/dashboard/vote/${session.id}/results`}>
           <Button size="sm" variant="outline">
             <BarChart2 className="w-4 h-4 mr-1" />
-            Results
+            {t('voting.results')}
           </Button>
         </Link>
       </div>
@@ -273,7 +277,7 @@ export default function VotingSessionPage() {
       {isAdmin && (
         <div className="mb-6 p-4 border rounded-lg bg-amber-50 border-amber-200">
           <h3 className="text-sm font-semibold text-amber-800 mb-3">
-            Admin Controls
+            {t('voting.adminControls')}
           </h3>
           <div className="flex gap-2 flex-wrap">
             {isDraft && (
@@ -285,7 +289,7 @@ export default function VotingSessionPage() {
                 {actionLoading ? (
                   <Loader2 className="w-3 h-3 animate-spin mr-1" />
                 ) : null}
-                Open for Voting
+                {t('voting.openForVoting')}
               </Button>
             )}
             {isOpen && (
@@ -298,12 +302,12 @@ export default function VotingSessionPage() {
                 {actionLoading ? (
                   <Loader2 className="w-3 h-3 animate-spin mr-1" />
                 ) : null}
-                Close & Calculate Results
+                {t('voting.closeAndCalculate')}
               </Button>
             )}
             {isClosed && (
               <Link href={`/dashboard/vote/${session.id}/results`}>
-                <Button size="sm">View Final Results</Button>
+                <Button size="sm">{t('voting.viewFinalResults')}</Button>
               </Link>
             )}
           </div>
@@ -315,13 +319,12 @@ export default function VotingSessionPage() {
         <div>
           {!houseId ? (
             <div className="text-center py-8 text-muted-foreground border rounded-lg">
-              <p>You must be assigned to a unit to vote.</p>
+              <p>{t('voting.mustBeAssignedUnit')}</p>
             </div>
           ) : (
             <div>
               <p className="text-sm text-muted-foreground mb-4">
-                Drag or use the arrows to rank proposals from most important (#1)
-                to least important.
+                {t('voting.dragInstruction')}
               </p>
               <div className="space-y-2 mb-6">
                 {rankedProposals.map((proposal, idx) => (
@@ -370,7 +373,7 @@ export default function VotingSessionPage() {
                     Submitting...
                   </>
                 ) : (
-                  'Submit Vote'
+                  t('voting.submitVote')
                 )}
               </Button>
             </div>
@@ -383,15 +386,15 @@ export default function VotingSessionPage() {
         <div className="text-center py-12 border rounded-lg bg-green-50 border-green-200">
           <CheckCircle2 className="w-12 h-12 mx-auto mb-3 text-green-600" />
           <h3 className="text-lg font-semibold text-green-800">
-            Vote Submitted!
+            {t('voting.voteSubmitted')}
           </h3>
           <p className="text-sm text-green-700 mt-1 mb-4">
-            Your ranking has been recorded.
+            {t('voting.rankingRecorded')}
           </p>
           {myVote && (
             <div className="text-left max-w-xs mx-auto">
               <p className="text-xs font-medium text-green-800 mb-2">
-                Your ranking:
+                {t('voting.yourRanking')}
               </p>
               {myVote.rankings
                 .sort((a, b) => a.rank - b.rank)
@@ -415,7 +418,7 @@ export default function VotingSessionPage() {
             className="mt-4"
             onClick={() => setSubmitted(false)}
           >
-            Change Vote
+            {t('voting.changeVote')}
           </Button>
         </div>
       )}
@@ -424,10 +427,10 @@ export default function VotingSessionPage() {
       {isClosed && (
         <div className="text-center py-12 border rounded-lg">
           <p className="text-muted-foreground mb-4">
-            This voting session has closed.
+            {t('voting.sessionClosed')}
           </p>
           <Link href={`/dashboard/vote/${session.id}/results`}>
-            <Button>View Results</Button>
+            <Button>{t('voting.viewResults')}</Button>
           </Link>
         </div>
       )}
@@ -435,7 +438,7 @@ export default function VotingSessionPage() {
       {/* Draft state (non-admin) */}
       {isDraft && !isAdmin && (
         <div className="text-center py-12 border rounded-lg text-muted-foreground">
-          <p>This voting session is not open yet.</p>
+          <p>{t('voting.notOpenYet')}</p>
         </div>
       )}
     </div>

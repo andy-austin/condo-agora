@@ -7,6 +7,7 @@ import { getApiClient } from '@/lib/api';
 import { GET_PROPOSALS, type Proposal } from '@/lib/queries/proposal';
 import { ArrowRight, Loader2, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
 
 const GET_PROJECT_MILESTONES_COUNT = `
   query GetProjectMilestones($proposalId: String!) {
@@ -29,6 +30,7 @@ interface ActiveProjectsWidgetProps {
 export default function ActiveProjectsWidget({
   organizationId,
 }: ActiveProjectsWidgetProps) {
+  const t = useTranslations('dashboard');
   const { getAuthToken } = useAuthToken();
   const [projects, setProjects] = useState<ProjectWithProgress[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +81,7 @@ export default function ActiveProjectsWidget({
   if (loading) {
     return (
       <div className="border rounded-xl p-6">
-        <h2 className="text-lg font-semibold mb-4">Active Projects</h2>
+        <h2 className="text-lg font-semibold mb-4">{t('activeProjects.title')}</h2>
         <div className="flex justify-center py-4">
           <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
         </div>
@@ -94,11 +96,11 @@ export default function ActiveProjectsWidget({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Wrench className="w-4 h-4 text-primary" />
-          <h2 className="text-lg font-semibold">Active Projects</h2>
+          <h2 className="text-lg font-semibold">{t('activeProjects.title')}</h2>
         </div>
         <Button variant="ghost" size="sm" asChild>
           <Link href="/dashboard/proposals?status=IN_PROGRESS">
-            View all <ArrowRight size={14} className="ml-1" />
+            {t('common.viewAll')} <ArrowRight size={14} className="ml-1" />
           </Link>
         </Button>
       </div>
@@ -135,7 +137,7 @@ export default function ActiveProjectsWidget({
                 )}
                 {project.milestoneTotal === 0 && (
                   <p className="text-xs text-muted-foreground">
-                    No milestones defined
+                    {t('activeProjects.noMilestones')}
                   </p>
                 )}
               </div>

@@ -3,12 +3,12 @@
 import { useState, useEffect, useCallback, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   CREATE_PROPOSAL,
   type CreateProposalResponse,
-  PROPOSAL_CATEGORY_LABELS,
   CATEGORIES,
 } from '@/lib/queries/proposal';
 import { Button } from '@/components/ui/button';
@@ -37,6 +37,7 @@ type MeResponse = {
 
 export default function NewProposalPage() {
   const router = useRouter();
+  const t = useTranslations('dashboard');
   const { getAuthToken } = useAuthToken();
 
   const [organizationId, setOrganizationId] = useState<string | null>(null);
@@ -56,7 +57,7 @@ export default function NewProposalPage() {
       const data = await client.request<MeResponse>(ME_QUERY);
 
       if (!data.me || data.me.memberships.length === 0) {
-        setOrgError('You must be a member of an organization to create proposals.');
+        setOrgError(t('proposals.mustBeInOrg'));
         return;
       }
       setOrganizationId(data.me.memberships[0].organization.id);
@@ -66,7 +67,7 @@ export default function NewProposalPage() {
     } finally {
       setLoadingOrg(false);
     }
-  }, [getAuthToken]);
+  }, [getAuthToken, t]);
 
   useEffect(() => {
     fetchOrg();
@@ -76,11 +77,11 @@ export default function NewProposalPage() {
     e.preventDefault();
     if (!organizationId) return;
     if (!title.trim()) {
-      setFormError('Title is required.');
+      setFormError(t('proposals.titleRequired'));
       return;
     }
     if (description.trim().length < 10) {
-      setFormError('Description must be at least 10 characters.');
+      setFormError(t('proposals.descriptionMinLength'));
       return;
     }
 
@@ -102,7 +103,7 @@ export default function NewProposalPage() {
     } catch (err) {
       console.error('Failed to create proposal:', err);
       const message =
-        err instanceof Error ? err.message : 'Failed to create proposal.';
+        err instanceof Error ? err.message : t('proposals.failedToCreate');
       setFormError(message);
     } finally {
       setSubmitting(false);
@@ -121,7 +122,7 @@ export default function NewProposalPage() {
   if (orgError) {
     return (
       <ErrorState
-        title="Cannot create proposal"
+        title={t('proposals.cannotCreate')}
         message={orgError}
         onRetry={() => router.push('/dashboard')}
       />
@@ -132,8 +133,8 @@ export default function NewProposalPage() {
     <div className="p-6 lg:p-8 max-w-2xl mx-auto">
       <Breadcrumb
         items={[
-          { label: 'Proposals', href: '/dashboard/proposals' },
-          { label: 'New Proposal' },
+          { label: t('proposals.title'), href: '/dashboard/proposals' },
+          { label: t('proposals.newProposalTitle') },
         ]}
       />
 
@@ -142,11 +143,10 @@ export default function NewProposalPage() {
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
             <FileText size={20} className="text-primary" />
           </div>
-          <h1 className="text-2xl font-bold">New Proposal</h1>
+          <h1 className="text-2xl font-bold">{t('proposals.newProposalTitle')}</h1>
         </div>
         <p className="text-muted-foreground text-sm">
-          Submit a community improvement idea. Save as draft to continue editing later,
-          or submit for review to open it for community discussion.
+          {t('proposals.newProposalDescription')}
         </p>
       </div>
 
@@ -155,27 +155,27 @@ export default function NewProposalPage() {
           {/* Title */}
           <div>
             <label className="block text-sm font-medium mb-2" htmlFor="title">
-              Title <span className="text-destructive">*</span>
+              {t('proposals.titleLabel')}
             </label>
             <input
               id="title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Replace lobby lighting with LED fixtures"
+              placeholder={t('proposals.titlePlaceholder')}
               className="w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
               maxLength={200}
               required
             />
             <p className="text-xs text-muted-foreground mt-1">
-              {title.length}/200 characters
+              {t('proposals.titleCharCount', { count: title.length })}
             </p>
           </div>
 
           {/* Category */}
           <div>
             <label className="block text-sm font-medium mb-2" htmlFor="category">
-              Category <span className="text-destructive">*</span>
+              {t('proposals.categoryLabel')}
             </label>
             <div className="flex flex-wrap gap-2">
               {CATEGORIES.map((cat) => (
@@ -189,7 +189,7 @@ export default function NewProposalPage() {
                       : 'bg-background text-muted-foreground border-border hover:border-primary/50'
                   }`}
                 >
-                  {PROPOSAL_CATEGORY_LABELS[cat]}
+                  {t(`labels.category.${cat}`)}
                 </button>
               ))}
             </div>
@@ -198,18 +198,18 @@ export default function NewProposalPage() {
           {/* Description */}
           <div>
             <label className="block text-sm font-medium mb-2" htmlFor="description">
-              Description <span className="text-destructive">*</span>
+              {t('proposals.descriptionLabel')}
             </label>
             <textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe the problem you're trying to solve, the proposed solution, and the expected benefits for the community..."
+              placeholder={t('proposals.descriptionPlaceholder')}
               className="w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
               rows={8}
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Minimum 10 characters. Be specific about the issue and proposed solution.
+              {t('proposals.descriptionHint')}
             </p>
           </div>
 
@@ -229,7 +229,7 @@ export default function NewProposalPage() {
               disabled={submitting}
               className="flex-1"
             >
-              {submitting ? 'Saving...' : 'Save as Draft'}
+              {submitting ? t('common.saving') : t('proposals.saveAsDraft')}
             </Button>
             <Button
               type="button"
@@ -237,7 +237,7 @@ export default function NewProposalPage() {
               disabled={submitting}
               className="flex-1"
             >
-              {submitting ? 'Submitting...' : 'Submit for Review'}
+              {submitting ? t('common.submitting') : t('proposals.submitForReviewBtn')}
             </Button>
             <Button
               type="button"
@@ -245,7 +245,7 @@ export default function NewProposalPage() {
               asChild
               disabled={submitting}
             >
-              <Link href="/dashboard/proposals">Cancel</Link>
+              <Link href="/dashboard/proposals">{t('common.cancel')}</Link>
             </Button>
           </div>
         </form>

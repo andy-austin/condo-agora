@@ -15,6 +15,7 @@ import {
 } from '@/lib/queries/notification';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 const REFERENCE_ROUTES: Record<string, string> = {
   NEW_PROPOSAL: '/dashboard/proposals',
@@ -25,6 +26,7 @@ const REFERENCE_ROUTES: Record<string, string> = {
 };
 
 export default function NotificationBell() {
+  const t = useTranslations('dashboard');
   const router = useRouter();
   const { getAuthToken } = useAuthToken();
   const [open, setOpen] = useState(false);
@@ -119,7 +121,7 @@ export default function NotificationBell() {
       <button
         onClick={() => setOpen(!open)}
         className="relative p-2 rounded-lg hover:bg-sidebar-accent transition-colors text-muted-foreground hover:text-foreground"
-        aria-label="Notifications"
+        aria-label={t('notifications.title')}
       >
         <Bell size={20} />
         {unreadCount > 0 && (
@@ -132,13 +134,13 @@ export default function NotificationBell() {
       {open && (
         <div className="absolute right-0 top-full mt-2 w-80 bg-background border rounded-xl shadow-xl z-50 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b">
-            <h3 className="text-sm font-semibold">Notifications</h3>
+            <h3 className="text-sm font-semibold">{t('notifications.title')}</h3>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
                 className="text-xs text-primary hover:underline"
               >
-                Mark all read
+                {t('notifications.markAllRead')}
               </button>
             )}
           </div>
@@ -146,7 +148,7 @@ export default function NotificationBell() {
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">
-                No notifications yet
+                {t('notifications.noNotificationsYet')}
               </p>
             ) : (
               notifications.map((notification) => (
@@ -182,7 +184,7 @@ export default function NotificationBell() {
               onClick={() => setOpen(false)}
               className="text-xs text-primary hover:underline"
             >
-              View all notifications →
+              {t('notifications.viewAll')} →
             </Link>
           </div>
         </div>

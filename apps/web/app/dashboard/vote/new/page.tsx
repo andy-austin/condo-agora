@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import { CREATE_VOTING_SESSION } from '@/lib/queries/voting';
@@ -31,6 +32,7 @@ type MeResponse = {
 };
 
 export default function NewVotingSessionPage() {
+  const t = useTranslations('dashboard');
   const { getAuthToken } = useAuthToken();
   const router = useRouter();
 
@@ -65,11 +67,11 @@ export default function NewVotingSessionPage() {
       );
       setProposals(data.proposals || []);
     } catch {
-      setError('Failed to load proposals');
+      setError(t('voting.failedToLoadProposals'));
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, router]);
+  }, [getAuthToken, router, t]);
 
   useEffect(() => {
     fetchData();
@@ -104,7 +106,7 @@ export default function NewVotingSessionPage() {
       });
       router.push('/dashboard/vote');
     } catch {
-      setError('Failed to create voting session');
+      setError(t('voting.failedToCreateSession'));
     } finally {
       setSubmitting(false);
     }
@@ -126,8 +128,8 @@ export default function NewVotingSessionPage() {
     <div className="p-8 max-w-2xl mx-auto">
       <Breadcrumb
         items={[
-          { label: 'Voting', href: '/dashboard/vote' },
-          { label: 'New Session' },
+          { label: t('voting.breadcrumb'), href: '/dashboard/vote' },
+          { label: t('voting.newSession') },
         ]}
       />
 
@@ -135,7 +137,7 @@ export default function NewVotingSessionPage() {
         <div className="p-2 bg-primary/10 rounded-lg">
           <Vote className="w-6 h-6 text-primary" />
         </div>
-        <h1 className="text-2xl font-bold">New Voting Session</h1>
+        <h1 className="text-2xl font-bold">{t('voting.newSessionTitle')}</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -147,7 +149,7 @@ export default function NewVotingSessionPage() {
 
         <div>
           <label className="block text-sm font-medium mb-1" htmlFor="title">
-            Session Title <span className="text-red-500">*</span>
+            {t('voting.sessionTitleLabel')} <span className="text-red-500">*</span>
           </label>
           <input
             id="title"
@@ -155,7 +157,7 @@ export default function NewVotingSessionPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-            placeholder="e.g. 2024 Annual Priority Vote"
+            placeholder={t('voting.sessionTitlePlaceholder')}
             required
           />
         </div>
@@ -166,7 +168,7 @@ export default function NewVotingSessionPage() {
               className="block text-sm font-medium mb-1"
               htmlFor="startDate"
             >
-              Start Date
+              {t('voting.startDate')}
             </label>
             <input
               id="startDate"
@@ -178,7 +180,7 @@ export default function NewVotingSessionPage() {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="endDate">
-              End Date
+              {t('voting.endDate')}
             </label>
             <input
               id="endDate"
@@ -192,14 +194,11 @@ export default function NewVotingSessionPage() {
 
         <div>
           <label className="block text-sm font-medium mb-2">
-            Proposals to Vote On <span className="text-red-500">*</span>
-            <span className="text-muted-foreground font-normal ml-1">
-              (select from VOTING status proposals)
-            </span>
+            {t('voting.proposalsToVote')} <span className="text-red-500">*</span>
           </label>
           {proposals.length === 0 ? (
             <div className="border rounded-lg p-6 text-center text-sm text-muted-foreground">
-              No proposals in VOTING status.{' '}
+              {t('voting.noVotingProposals')}{' '}
               <Link href="/dashboard/proposals" className="text-primary underline">
                 Move proposals to VOTING
               </Link>{' '}
@@ -230,8 +229,11 @@ export default function NewVotingSessionPage() {
           )}
           {selectedIds.size > 0 && (
             <p className="text-xs text-muted-foreground mt-1">
-              {selectedIds.size} proposal{selectedIds.size !== 1 ? 's' : ''}{' '}
-              selected
+              {selectedIds.size}{' '}
+              {selectedIds.size !== 1
+                ? t('common.proposals')
+                : t('common.proposal')}{' '}
+              {t('voting.selected')}
             </p>
           )}
         </div>
@@ -239,7 +241,7 @@ export default function NewVotingSessionPage() {
         <div className="flex gap-3 justify-end">
           <Link href="/dashboard/vote">
             <Button type="button" variant="outline">
-              Cancel
+              {t('common.cancel')}
             </Button>
           </Link>
           <Button
@@ -250,7 +252,7 @@ export default function NewVotingSessionPage() {
               selectedIds.size === 0
             }
           >
-            {submitting ? 'Creating...' : 'Create Session'}
+            {submitting ? t('common.creating') : t('voting.createSession')}
           </Button>
         </div>
       </form>

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { UserButton } from '@clerk/nextjs';
+import { useTranslations } from 'next-intl';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
   LayoutDashboard,
   Building2,
@@ -21,17 +23,17 @@ import {
 import NotificationBell from './NotificationBell';
 
 const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
-  { href: '/dashboard/properties', label: 'Properties', icon: Building2 },
-  { href: '/dashboard/committee', label: 'Committee', icon: Users },
-  { href: '/dashboard/proposals', label: 'Proposals', icon: Lightbulb },
-  { href: '/dashboard/vote', label: 'Voting', icon: Vote },
-  { href: '/dashboard/reports', label: 'Reports', icon: BarChart3 },
-  { href: '/dashboard/archive', label: 'Archive', icon: Archive },
+  { href: '/dashboard', key: 'overview', icon: LayoutDashboard, exact: true },
+  { href: '/dashboard/properties', key: 'properties', icon: Building2 },
+  { href: '/dashboard/committee', key: 'committee', icon: Users },
+  { href: '/dashboard/proposals', key: 'proposals', icon: Lightbulb },
+  { href: '/dashboard/vote', key: 'voting', icon: Vote },
+  { href: '/dashboard/reports', key: 'reports', icon: BarChart3 },
+  { href: '/dashboard/archive', key: 'archive', icon: Archive },
 ];
 
 const bottomNavItems = [
-  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
+  { href: '/dashboard/settings', key: 'settings', icon: Settings },
 ];
 
 const SidebarContext = createContext({ collapsed: false });
@@ -69,6 +71,7 @@ function SidebarNav({
   const pathname = usePathname();
   const { user } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const t = useTranslations('dashboard');
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) return pathname === href;
@@ -90,7 +93,7 @@ function SidebarNav({
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="hidden lg:flex items-center justify-center w-6 h-6 rounded-md hover:bg-sidebar-accent transition-colors text-muted-foreground"
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={collapsed ? t('sidebar.expandSidebar') : t('sidebar.collapseSidebar')}
         >
           <ChevronLeft
             size={16}
@@ -120,7 +123,7 @@ function SidebarNav({
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full" />
               )}
               <Icon size={20} className="shrink-0" />
-              {!collapsed && <span className="text-sm">{item.label}</span>}
+              {!collapsed && <span className="text-sm">{t(`sidebar.${item.key}`)}</span>}
             </Link>
           );
         })}
@@ -147,10 +150,15 @@ function SidebarNav({
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full" />
               )}
               <Icon size={20} className="shrink-0" />
-              {!collapsed && <span className="text-sm">{item.label}</span>}
+              {!collapsed && <span className="text-sm">{t(`sidebar.${item.key}`)}</span>}
             </Link>
           );
         })}
+
+        {/* Language Switcher */}
+        <div className={`px-3 ${collapsed ? 'flex justify-center' : ''}`}>
+          <LanguageSwitcher />
+        </div>
 
         {/* User profile */}
         <div className="flex items-center gap-3 px-3 py-3 mt-2 rounded-lg bg-sidebar-accent/50">
@@ -184,7 +192,7 @@ function SidebarNav({
         <button
           onClick={() => setMobileOpen(true)}
           className="p-2 -ml-2 rounded-lg hover:bg-muted transition-colors"
-          aria-label="Open menu"
+          aria-label={t('sidebar.openMenu')}
         >
           <Menu size={20} />
         </button>
@@ -209,7 +217,7 @@ function SidebarNav({
             <button
               onClick={() => setMobileOpen(false)}
               className="absolute top-4 right-4 p-1 rounded-lg hover:bg-muted transition-colors"
-              aria-label="Close menu"
+              aria-label={t('sidebar.closeMenu')}
             >
               <X size={18} />
             </button>

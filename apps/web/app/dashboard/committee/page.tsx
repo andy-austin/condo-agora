@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
@@ -34,6 +35,7 @@ type MeResponse = {
 };
 
 export default function CommitteePage() {
+  const t = useTranslations('dashboard');
   const { getAuthToken } = useAuthToken();
 
   const [members, setMembers] = useState<Member[]>([]);
@@ -64,7 +66,7 @@ export default function CommitteePage() {
         const meData = await client.request<MeResponse>(ME_QUERY);
 
         if (!meData.me || meData.me.memberships.length === 0) {
-          setError('You are not part of any organization.');
+          setError(t('committee.notInOrg'));
           setLoading(false);
           return;
         }
@@ -78,14 +80,14 @@ export default function CommitteePage() {
         setMembers(memberList);
       } catch (err) {
         console.error('Failed to load members:', err);
-        setError('Failed to load committee members.');
+        setError(t('committee.failedToLoad'));
       } finally {
         setLoading(false);
       }
     };
 
     init();
-  }, [getAuthToken, fetchMembers]);
+  }, [getAuthToken, fetchMembers, t]);
 
   const handleRoleChange = async (memberId: string, newRole: string) => {
     setUpdatingId(memberId);
@@ -157,10 +159,10 @@ export default function CommitteePage() {
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Committee</h1>
+        <h1 className="text-3xl font-bold">{t('committee.title')}</h1>
         {organizationName && (
           <p className="text-muted-foreground mt-1">
-            Board members & residents of {organizationName}
+            {t('committee.subtitle', { orgName: organizationName })}
           </p>
         )}
       </div>
@@ -169,13 +171,13 @@ export default function CommitteePage() {
       <Card className="mb-6">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Board Members (Admins)</CardTitle>
+            <CardTitle className="text-lg">{t('committee.boardMembers')}</CardTitle>
             <Badge>{admins.length}</Badge>
           </div>
         </CardHeader>
         <CardContent>
           {admins.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No administrators found.</p>
+            <p className="text-sm text-muted-foreground">{t('committee.noAdmins')}</p>
           ) : (
             <div className="space-y-3">
               {admins.map((member) => (
@@ -187,6 +189,7 @@ export default function CommitteePage() {
                   isAdmin={isAdmin}
                   isUpdating={updatingId === member.id}
                   onRoleChange={handleRoleChange}
+                  t={t}
                 />
               ))}
             </div>
@@ -198,14 +201,14 @@ export default function CommitteePage() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Members & Residents</CardTitle>
+            <CardTitle className="text-lg">{t('committee.membersAndResidents')}</CardTitle>
             <Badge variant="secondary">{others.length}</Badge>
           </div>
         </CardHeader>
         <CardContent>
           {others.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No other members yet. Invite users from the Settings page.
+              {t('committee.noOtherMembers')}
             </p>
           ) : (
             <div className="space-y-3">
@@ -218,6 +221,7 @@ export default function CommitteePage() {
                   isAdmin={isAdmin}
                   isUpdating={updatingId === member.id}
                   onRoleChange={handleRoleChange}
+                  t={t}
                 />
               ))}
             </div>
@@ -235,6 +239,7 @@ function MemberRow({
   isAdmin,
   isUpdating,
   onRoleChange,
+  t,
 }: {
   member: Member;
   displayName: string;
@@ -242,6 +247,7 @@ function MemberRow({
   isAdmin: boolean;
   isUpdating: boolean;
   onRoleChange: (memberId: string, newRole: string) => void;
+  t: ReturnType<typeof useTranslations>;
 }) {
   return (
     <div className="flex items-center justify-between p-3 rounded-lg border">
@@ -250,7 +256,7 @@ function MemberRow({
         <p className="text-xs text-muted-foreground">{member.email}</p>
         {member.houseName && (
           <p className="text-xs text-muted-foreground mt-0.5">
-            Unit: {member.houseName}
+            {t('overview.unitLabel', { name: member.houseName })}
           </p>
         )}
       </div>
@@ -264,9 +270,9 @@ function MemberRow({
             disabled={isUpdating}
             aria-label={`Change role for ${displayName}`}
           >
-            <option value="ADMIN">Admin</option>
-            <option value="RESIDENT">Resident</option>
-            <option value="MEMBER">Member</option>
+            <option value="ADMIN">{t('labels.roles.admin')}</option>
+            <option value="RESIDENT">{t('labels.roles.resident')}</option>
+            <option value="MEMBER">{t('labels.roles.member')}</option>
           </select>
         )}
       </div>

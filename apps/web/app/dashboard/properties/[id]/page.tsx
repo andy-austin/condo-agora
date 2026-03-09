@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
@@ -55,17 +56,18 @@ type MeResponse = {
 };
 
 const detailTabs = [
-  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'residents', label: 'Residents', icon: Users },
-  { id: 'proposals', label: 'Proposals', icon: Lightbulb, disabled: true },
-  { id: 'documents', label: 'Documents', icon: FileText, disabled: true },
-  { id: 'history', label: 'History', icon: History, disabled: true },
+  { id: 'overview', labelKey: 'properties.overview' as const, icon: LayoutDashboard },
+  { id: 'residents', labelKey: 'properties.residentsTab' as const, icon: Users },
+  { id: 'proposals', labelKey: 'properties.proposalsTab' as const, icon: Lightbulb, disabled: true },
+  { id: 'documents', labelKey: 'properties.documentsTab' as const, icon: FileText, disabled: true },
+  { id: 'history', labelKey: 'properties.historyTab' as const, icon: History, disabled: true },
 ];
 
 export default function HouseDetailPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const t = useTranslations('dashboard');
   const houseId = params.id as string;
   const activeTab = searchParams.get('tab') || 'overview';
   const { getAuthToken } = useAuthToken();
@@ -148,20 +150,20 @@ export default function HouseDetailPage() {
   if (error || !house) {
     return (
       <ErrorState
-        title="Property not found"
-        message={error || 'The property you are looking for does not exist.'}
+        title={t('properties.notFound')}
+        message={error || t('properties.notFoundMessage')}
         onRetry={() => window.location.reload()}
       />
     );
   }
 
-  const occupancyStatus = house.residents.length > 0 ? 'Occupied' : 'Vacant';
+  const occupancyStatus = house.residents.length > 0 ? t('properties.occupied') : t('properties.vacant');
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
       <Breadcrumb
         items={[
-          { label: 'Properties', href: '/dashboard/properties' },
+          { label: t('properties.title'), href: '/dashboard/properties' },
           { label: house.name },
         ]}
       />
@@ -185,7 +187,7 @@ export default function HouseDetailPage() {
                     autoFocus
                   />
                   <Button size="sm" onClick={handleSave} disabled={saving}>
-                    {saving ? 'Saving...' : 'Save'}
+                    {saving ? t('common.saving') : t('common.save')}
                   </Button>
                   <Button
                     size="sm"
@@ -195,7 +197,7 @@ export default function HouseDetailPage() {
                       setEditName(house.name);
                     }}
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </Button>
                 </div>
               ) : (
@@ -205,7 +207,7 @@ export default function HouseDetailPage() {
                     <button
                       onClick={() => setEditing(true)}
                       className="p-1 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-                      aria-label="Edit property name"
+                      aria-label={t('properties.editPropertyName')}
                     >
                       <Pencil size={14} />
                     </button>
@@ -218,11 +220,11 @@ export default function HouseDetailPage() {
                 </Badge>
                 <span className="flex items-center gap-1">
                   <Users size={14} />
-                  {house.residents.length} {house.residents.length === 1 ? 'resident' : 'residents'}
+                  {house.residents.length} {house.residents.length === 1 ? t('common.resident') : t('common.residents')}
                 </span>
                 <span className="flex items-center gap-1">
                   <Calendar size={14} />
-                  Created {new Date(house.createdAt).toLocaleDateString()}
+                  {t('properties.created')} {new Date(house.createdAt).toLocaleDateString()}
                 </span>
               </div>
             </div>
@@ -244,8 +246,8 @@ export default function HouseDetailPage() {
                   className="flex items-center gap-1.5 px-4 py-3 text-sm text-muted-foreground/50 cursor-not-allowed whitespace-nowrap border-b-2 border-transparent"
                 >
                   <Icon size={16} />
-                  <span>{tab.label}</span>
-                  <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full">Soon</span>
+                  <span>{t(tab.labelKey)}</span>
+                  <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full">{t('common.soon')}</span>
                 </div>
               );
             }
@@ -261,7 +263,7 @@ export default function HouseDetailPage() {
                 }`}
               >
                 <Icon size={16} />
-                <span>{tab.label}</span>
+                <span>{t(tab.labelKey)}</span>
               </button>
             );
           })}
@@ -285,15 +287,16 @@ export default function HouseDetailPage() {
 // ---------- Overview Tab ----------
 
 function OverviewTab({ house }: { house: House }) {
+  const t = useTranslations('dashboard');
   const stats = [
-    { label: 'Total Residents', value: house.residents.length, icon: Users },
+    { label: t('properties.totalResidents'), value: house.residents.length, icon: Users },
     {
-      label: 'Status',
-      value: house.residents.length > 0 ? 'Occupied' : 'Vacant',
+      label: t('properties.status'),
+      value: house.residents.length > 0 ? t('properties.occupied') : t('properties.vacant'),
       icon: Building2,
     },
     {
-      label: 'Created',
+      label: t('properties.created'),
       value: new Date(house.createdAt).toLocaleDateString(),
       icon: Calendar,
     },
@@ -319,14 +322,13 @@ function OverviewTab({ house }: { house: House }) {
 
       {/* Residents Quick View */}
       <div className="border rounded-xl p-6">
-        <h3 className="text-base font-semibold mb-3">Residents</h3>
+        <h3 className="text-base font-semibold mb-3">{t('properties.residentsTab')}</h3>
         {house.residents.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No residents assigned yet. Invite members from the{' '}
+            {t('properties.noResidentsYet')}{' '}
             <Link href="/dashboard/settings" className="text-primary hover:underline">
-              Settings
-            </Link>{' '}
-            page.
+              {t('properties.settingsSection')}
+            </Link>
           </p>
         ) : (
           <div className="space-y-2">
@@ -340,9 +342,9 @@ function OverviewTab({ house }: { house: House }) {
                     <Users size={14} className="text-primary" />
                   </div>
                   <div className="text-sm">
-                    <span className="font-medium">Member</span>
+                    <span className="font-medium">{t('common.member')}</span>
                     <span className="text-muted-foreground ml-2">
-                      ID: {resident.userId.slice(0, 8)}...
+                      {t('properties.idLabel', { id: resident.userId.slice(0, 8) })}
                     </span>
                   </div>
                 </div>
@@ -374,6 +376,7 @@ function ResidentsTab({
   getAuthToken: () => Promise<string | null>;
   onRefresh: () => void;
 }) {
+  const t = useTranslations('dashboard');
   const [members, setMembers] = useState<Member[]>([]);
   const [removing, setRemoving] = useState<string | null>(null);
 
@@ -399,13 +402,13 @@ function ResidentsTab({
 
   const getMemberDisplay = (userId: string) => {
     const member = memberMap.get(userId);
-    if (!member) return { name: 'Member', detail: userId.slice(0, 12) + '...' };
-    const name = [member.firstName, member.lastName].filter(Boolean).join(' ') || 'Member';
+    if (!member) return { name: t('common.member'), detail: userId.slice(0, 12) + '...' };
+    const name = [member.firstName, member.lastName].filter(Boolean).join(' ') || t('common.member');
     return { name, detail: member.email };
   };
 
   const handleRemove = async (userId: string) => {
-    if (!confirm('Are you sure you want to remove this resident?')) return;
+    if (!confirm(t('properties.confirmRemoveResident'))) return;
 
     setRemoving(userId);
     try {
@@ -432,7 +435,7 @@ function ResidentsTab({
     <div className="border rounded-xl overflow-hidden">
       <div className="p-4 border-b flex items-center justify-between">
         <h2 className="text-base font-semibold">
-          All Residents ({house.residents.length})
+          {t('properties.allResidents', { count: house.residents.length })}
         </h2>
         {isAdmin && (
           <AssignResidentDialog
@@ -451,7 +454,7 @@ function ResidentsTab({
             <Users size={24} className="text-primary" />
           </div>
           <p className="text-muted-foreground text-sm mb-3">
-            No residents assigned to this property yet.
+            {t('properties.noResidentsAssigned')}
           </p>
           {isAdmin && (
             <AssignResidentDialog
@@ -468,17 +471,17 @@ function ResidentsTab({
           <thead>
             <tr className="border-b bg-muted/30">
               <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Member
+                {t('common.member')}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Role
+                {t('properties.role')}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">
-                Email
+                {t('properties.email')}
               </th>
               {isAdmin && (
                 <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Actions
+                  {t('properties.actions')}
                 </th>
               )}
             </tr>
@@ -511,7 +514,7 @@ function ResidentsTab({
                         onClick={() => handleRemove(resident.userId)}
                         disabled={removing === resident.userId}
                       >
-                        {removing === resident.userId ? 'Removing...' : 'Remove'}
+                        {removing === resident.userId ? t('common.removing') : t('common.remove')}
                       </Button>
                     </td>
                   )}

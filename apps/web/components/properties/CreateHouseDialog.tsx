@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -10,6 +11,7 @@ type CreateHouseDialogProps = {
 };
 
 export default function CreateHouseDialog({ onSubmit }: CreateHouseDialogProps) {
+  const t = useTranslations('dashboard');
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -33,7 +35,7 @@ export default function CreateHouseDialog({ onSubmit }: CreateHouseDialogProps) 
   if (!open) {
     return (
       <Button onClick={() => setOpen(true)}>
-        + Add Property
+        {t('properties.addProperty')}
       </Button>
     );
   }
@@ -41,18 +43,18 @@ export default function CreateHouseDialog({ onSubmit }: CreateHouseDialogProps) 
   return (
     <Card className="max-w-md">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg">New Property</CardTitle>
+        <CardTitle className="text-lg">{t('properties.newProperty')}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="house-name" className="block text-sm font-medium mb-2">
-              Property Name
+              {t('properties.propertyName')}
             </label>
             <input
               id="house-name"
               type="text"
-              placeholder="e.g. Unit 101, Block A - 404"
+              placeholder={t('properties.propertyPlaceholder')}
               className="w-full p-2.5 rounded-lg border bg-background"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -62,7 +64,7 @@ export default function CreateHouseDialog({ onSubmit }: CreateHouseDialogProps) 
           </div>
           <div className="flex gap-2">
             <Button type="submit" disabled={submitting || !name.trim()}>
-              {submitting ? 'Creating...' : 'Create'}
+              {submitting ? t('common.creating') : t('common.create')}
             </Button>
             <Button
               type="button"
@@ -72,7 +74,7 @@ export default function CreateHouseDialog({ onSubmit }: CreateHouseDialogProps) 
                 setName('');
               }}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </div>
         </form>
