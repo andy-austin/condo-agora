@@ -269,3 +269,6 @@ apps/web/.clerk/
 apps/api/prisma_client/
 apps/api/bin/
 apps/web/package-lock.json
+
+# Git worktrees
+.worktrees/

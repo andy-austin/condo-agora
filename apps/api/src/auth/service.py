@@ -94,6 +94,7 @@ async def create_invitation(
     try:
         await create_clerk_invitation(
             email=email,
+            redirect_url="https://condo-agora.vercel.app/dashboard",
             public_metadata={
                 "organization_id": organization_id,
                 "role": role,

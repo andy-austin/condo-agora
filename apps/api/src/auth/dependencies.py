@@ -64,6 +64,45 @@ async def _provision_user_from_clerk(clerk_id: str) -> Optional[dict]:
     result = await db.db.users.insert_one(user_data)
     user = await db.db.users.find_one({"_id": result.inserted_id})
     print(f"JIT provisioned user {clerk_id} in local DB")
+
+    # Check for pending invitations matching this email (mirrors webhooks.py logic)
+    inv_cursor = db.db.invitations.find(
+        {
+            "email": primary_email,
+            "accepted_at": None,
+            "expires_at": {"$gt": now},
+        }
+    )
+    async for invite in inv_cursor:
+        # Guard against duplicates if webhook also fires
+        existing_member = await db.db.organization_members.find_one(
+            {
+                "user_id": str(user["_id"]),
+                "organization_id": invite["organization_id"],
+            }
+        )
+        if existing_member:
+            continue
+
+        member_data = {
+            "user_id": str(user["_id"]),
+            "organization_id": invite["organization_id"],
+            "role": invite["role"],
+            "house_id": invite.get("house_id"),
+            "created_at": now,
+            "updated_at": now,
+        }
+        await db.db.organization_members.insert_one(member_data)
+
+        await db.db.invitations.update_one(
+            {"_id": invite["_id"]},
+            {"$set": {"accepted_at": now, "updated_at": now}},
+        )
+        print(
+            f"JIT: User {clerk_id} auto-joined org "
+            f"{invite['organization_id']} via invitation"
+        )
+
     return user
 
 
