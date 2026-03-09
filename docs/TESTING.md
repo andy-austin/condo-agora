@@ -410,9 +410,9 @@ npx playwright install firefox webkit
 ```
 apps/web/e2e/
 ├── fixtures/
-│   ├── auth.ts              # Clerk auth mocking + real login helpers
+│   ├── auth.ts              # Clerk auth mocking + real login + multi-role fixtures
 │   └── graphql.ts           # GraphQL route interception + API client
-├── .auth/                   # Saved auth state (gitignored)
+├── .auth/                   # Saved auth state per role (gitignored)
 ├── auth.spec.ts             # Authentication flow tests
 ├── dashboard.spec.ts        # Dashboard page tests
 ├── health.spec.ts           # Health check page tests
@@ -420,7 +420,10 @@ apps/web/e2e/
 ├── landing.spec.ts          # Landing page tests (desktop + mobile)
 ├── notes-api.spec.ts        # Notes CRUD API-level tests
 ├── properties.spec.ts       # Properties CRUD tests
-└── residents.spec.ts        # Residents management tests
+├── real-auth.spec.ts        # Real Clerk login per role (admin, resident, member)
+├── real-rbac.spec.ts        # Backend authorization enforcement tests
+├── residents.spec.ts        # Residents management tests
+└── rbac.spec.ts             # Role-based UI visibility tests (mocked)
 ```
 
 ### Test Fixtures
@@ -447,13 +450,16 @@ Handlers match by `operationName` or by substring in the `query` body.
 
 #### Auth Fixtures (`fixtures/auth.ts`)
 
-Two authentication strategies:
+Three authentication strategies:
 
-1. **Mock Clerk Auth** — Intercepts Clerk API calls client-side. Used for isolated UI tests with GraphQL mocking.
-2. **Real Clerk Login** — Logs in through the actual Clerk sign-in page using test credentials. Session is cached in `.auth/user.json` for reuse.
+1. **Mock Clerk Auth** (`authedPage`) — Intercepts Clerk API calls client-side. Used for isolated UI tests with GraphQL mocking.
+2. **Real Clerk Login** (`realAuthedPage`) — Logs in through the actual Clerk sign-in page using test credentials. Session is cached in `.auth/user.json` for reuse.
+3. **Role-specific Login** (`adminPage`, `residentPage`, `memberPage`) — Logs in as a specific role with separate cached auth state per role. Used for real backend authorization tests.
 
 Test credentials are configured via environment variables:
-- `E2E_USER_EMAIL` (default: `tests@agora.com`)
+- `E2E_ADMIN_EMAIL` (default: `admin@agora.com`)
+- `E2E_RESIDENT_EMAIL` (default: `resident@agora.com`)
+- `E2E_MEMBER_EMAIL` (default: `member@agora.com`)
 - `E2E_USER_PASSWORD` (default: `3AgF…XrXqBX0Qa`)
 
 #### API-Level Tests (`fixtures/graphql.ts`)
