@@ -11,7 +11,6 @@ from apps.api.src.auth.service import (
     resend_invitation,
     revoke_invitation,
 )
-
 from apps.api.tests.conftest import (
     create_async_cursor_mock,
     mock_invitations_collection,
