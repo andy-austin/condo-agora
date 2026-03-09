@@ -49,8 +49,10 @@ export function SidebarLayout({ children }: { children: ReactNode }) {
     <SidebarContext.Provider value={{ collapsed }}>
       <div className="min-h-screen bg-background">
         <SidebarNav collapsed={collapsed} setCollapsed={setCollapsed} />
+        {/* Desktop top bar */}
+        <TopBar collapsed={collapsed} />
         <main
-          className={`pt-14 lg:pt-0 min-h-screen transition-all duration-300 ${
+          className={`pt-14 lg:pt-14 min-h-screen transition-all duration-300 ${
             collapsed ? 'lg:pl-[68px]' : 'lg:pl-60'
           }`}
         >
@@ -58,6 +60,24 @@ export function SidebarLayout({ children }: { children: ReactNode }) {
         </main>
       </div>
     </SidebarContext.Provider>
+  );
+}
+
+function TopBar({ collapsed }: { collapsed: boolean }) {
+  return (
+    <header
+      className={`hidden lg:flex fixed top-0 right-0 h-14 z-30 items-center justify-end gap-3 px-6 border-b border-border bg-background transition-all duration-300 ${
+        collapsed ? 'left-[68px]' : 'left-60'
+      }`}
+    >
+      <LanguageSwitcher />
+      <NotificationBell />
+      <UserButton
+        appearance={{
+          elements: { avatarBox: 'w-8 h-8' },
+        }}
+      />
+    </header>
   );
 }
 
@@ -78,7 +98,8 @@ function SidebarNav({
     return pathname === href || pathname.startsWith(href + '/');
   };
 
-  const sidebarContent = (
+  /* Sidebar content shared between desktop and mobile */
+  const navigationContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border">
@@ -155,31 +176,27 @@ function SidebarNav({
           );
         })}
 
-        {/* Language Switcher */}
-        <div className={`px-3 ${collapsed ? 'flex justify-center' : ''}`}>
-          <LanguageSwitcher />
-        </div>
-
-        {/* User profile */}
-        <div className="flex items-center gap-3 px-3 py-3 mt-2 rounded-lg bg-sidebar-accent/50">
-          <UserButton
-            appearance={{
-              elements: { avatarBox: 'w-8 h-8' },
-            }}
-          />
-          {!collapsed && (
-            <>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium truncate">
-                  {user?.firstName} {user?.lastName}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {user?.primaryEmailAddress?.emailAddress}
-                </p>
-              </div>
-              <NotificationBell />
-            </>
-          )}
+        {/* User profile — mobile drawer only */}
+        <div className="lg:hidden">
+          <div className="px-3 mt-2">
+            <LanguageSwitcher />
+          </div>
+          <div className="flex items-center gap-3 px-3 py-3 mt-2 rounded-lg bg-sidebar-accent/50">
+            <UserButton
+              appearance={{
+                elements: { avatarBox: 'w-8 h-8' },
+              }}
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium truncate">
+                {user?.firstName} {user?.lastName}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.primaryEmailAddress?.emailAddress}
+              </p>
+            </div>
+            <NotificationBell />
+          </div>
         </div>
       </div>
     </div>
@@ -188,7 +205,7 @@ function SidebarNav({
   return (
     <>
       {/* Mobile header bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-background/80 backdrop-blur-lg border-b border-border flex items-center px-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-background border-b border-border flex items-center px-4">
         <button
           onClick={() => setMobileOpen(true)}
           className="p-2 -ml-2 rounded-lg hover:bg-muted transition-colors"
@@ -221,7 +238,7 @@ function SidebarNav({
             >
               <X size={18} />
             </button>
-            {sidebarContent}
+            {navigationContent}
           </div>
         </div>
       )}
@@ -232,7 +249,7 @@ function SidebarNav({
           collapsed ? 'w-[68px]' : 'w-60'
         }`}
       >
-        {sidebarContent}
+        {navigationContent}
       </aside>
     </>
   );
