@@ -101,6 +101,12 @@ class MongoDB:
         # Notes collection indexes
         await self.db.notes.create_index("created_at")
 
+        # Proposals collection indexes
+        await self.db.proposals.create_index("organization_id")
+        await self.db.proposals.create_index("author_id")
+        await self.db.proposals.create_index("status")
+        await self.db.proposals.create_index([("created_at", -1)])
+
 
 # Global database instance
 db = MongoDB()

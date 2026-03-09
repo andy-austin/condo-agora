@@ -86,6 +86,19 @@ mock_invitations_collection.find_one_and_update = AsyncMock(return_value=None)
 mock_invitations_collection.update_one = AsyncMock()
 mock_invitations_collection.create_index = AsyncMock()
 
+mock_proposals_collection = MagicMock()
+mock_proposals_collection.find = MagicMock(return_value=create_async_cursor_mock([]))
+mock_proposals_collection.find_one = AsyncMock(return_value=None)
+mock_proposals_collection.insert_one = AsyncMock(
+    return_value=MagicMock(inserted_id="mock_id")
+)
+mock_proposals_collection.find_one_and_update = AsyncMock(return_value=None)
+mock_proposals_collection.delete_one = AsyncMock(
+    return_value=MagicMock(deleted_count=1)
+)
+mock_proposals_collection.count_documents = AsyncMock(return_value=0)
+mock_proposals_collection.create_index = AsyncMock()
+
 # Create mock database with collections
 mock_motor_db = MagicMock()
 mock_motor_db.notes = mock_notes_collection
@@ -94,6 +107,7 @@ mock_motor_db.users = mock_users_collection
 mock_motor_db.organizations = mock_organizations_collection
 mock_motor_db.organization_members = mock_organization_members_collection
 mock_motor_db.invitations = mock_invitations_collection
+mock_motor_db.proposals = mock_proposals_collection
 mock_motor_db.__getitem__ = lambda self, key: getattr(self, key)
 
 # Create mock MongoDB client
@@ -158,3 +172,9 @@ def organization_members_collection_mock():
 def invitations_collection_mock():
     """Return the mock invitations collection for tests that need to configure it"""
     return mock_invitations_collection
+
+
+@pytest.fixture
+def proposals_collection_mock():
+    """Return the mock proposals collection for tests that need to configure it"""
+    return mock_proposals_collection

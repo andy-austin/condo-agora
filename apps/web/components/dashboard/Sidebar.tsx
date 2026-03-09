@@ -22,7 +22,7 @@ const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
   { href: '/dashboard/properties', label: 'Properties', icon: Building2 },
   { href: '/dashboard/committee', label: 'Committee', icon: Users },
-  { href: '/dashboard/proposals', label: 'Proposals', icon: Lightbulb, disabled: true },
+  { href: '/dashboard/proposals', label: 'Proposals', icon: Lightbulb },
   { href: '/dashboard/voting', label: 'Voting', icon: Vote, disabled: true },
   { href: '/dashboard/reports', label: 'Reports', icon: BarChart3, disabled: true },
 ];
