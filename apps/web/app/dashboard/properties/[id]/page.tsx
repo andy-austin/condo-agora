@@ -15,11 +15,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ErrorState } from '@/components/dashboard/states';
+import Breadcrumb from '@/components/dashboard/Breadcrumb';
 import {
   Building2,
   Users,
   Calendar,
-  ChevronRight,
   Pencil,
   FileText,
   Lightbulb,
@@ -151,14 +151,12 @@ export default function HouseDetailPage() {
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
-      {/* Breadcrumbs */}
-      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-6">
-        <Link href="/dashboard/properties" className="hover:text-foreground transition-colors">
-          Properties
-        </Link>
-        <ChevronRight size={14} />
-        <span className="text-foreground font-medium truncate">{house.name}</span>
-      </nav>
+      <Breadcrumb
+        items={[
+          { label: 'Properties', href: '/dashboard/properties' },
+          { label: house.name },
+        ]}
+      />
 
       {/* Property Header */}
       <div className="border rounded-xl p-6 mb-6">

@@ -19,7 +19,7 @@
     "headline4": "improvements",
     "description": "The platform that transforms your building management. Propose, vote, and decide transparently and democratically.",
     "ctaPrimary": "Request Free Demo",
-    "ctaSecondary": "Watch Video",
+    "ctaSecondary": "Learn More",
     "mockupUrl": "app.condoagora.com.uy",
     "mockupAlt": "Condo Ágora Dashboard",
     "stats": {
@@ -192,7 +192,7 @@
       "terms": "Terms",
       "cookies": "Cookies"
     },
-    "copyright": "© 2024 Condo Ágora. All rights reserved.",
+    "copyright": "© {year} Condo Ágora. All rights reserved.",
     "tagline": "Made with ❤️ for more united communities"
   },
   "health": {

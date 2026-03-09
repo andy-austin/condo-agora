@@ -19,7 +19,7 @@
     "headline4": "reales",
     "description": "La plataforma que transforma la gestión de tu edificio. Proponé, votá y decidí de forma transparente y democrática.",
     "ctaPrimary": "Solicitar Demo Gratuita",
-    "ctaSecondary": "Ver Video",
+    "ctaSecondary": "Conocé más",
     "mockupUrl": "app.condoagora.com.uy",
     "mockupAlt": "Condo Ágora Dashboard",
     "stats": {
@@ -192,7 +192,7 @@
       "terms": "Términos",
       "cookies": "Cookies"
     },
-    "copyright": "© 2024 Condo Ágora. Todos los derechos reservados.",
+    "copyright": "© {year} Condo Ágora. Todos los derechos reservados.",
     "tagline": "Hecho con ❤️ para comunidades más unidas"
   },
   "health": {

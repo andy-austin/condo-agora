@@ -97,7 +97,7 @@ export function Footer() {
         <div className="divider my-12" />
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <p>{t('copyright')}</p>
+          <p>{t('copyright', { year: new Date().getFullYear() })}</p>
           <p>{t('tagline')}</p>
         </div>
       </div>
