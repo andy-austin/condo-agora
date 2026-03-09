@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Menu } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
@@ -47,6 +48,11 @@ export function Header() {
               </Button>
             </SignedOut>
             <SignedIn>
+              <Link href="/dashboard">
+                <Button className="btn-primary text-sm py-2.5 px-6">
+                  {t('dashboard')}
+                </Button>
+              </Link>
               <UserButton afterSignOutUrl="/" />
             </SignedIn>
           </div>
@@ -84,6 +90,11 @@ export function Header() {
                   </Button>
                 </SignedOut>
                 <SignedIn>
+                  <Link href="/dashboard">
+                    <Button className="btn-primary">
+                      {t('dashboard')}
+                    </Button>
+                  </Link>
                   <UserButton afterSignOutUrl="/" />
                 </SignedIn>
               </div>
