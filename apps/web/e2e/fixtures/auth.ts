@@ -16,24 +16,30 @@ import path from 'path';
 
 export type UserRole = 'admin' | 'resident' | 'member';
 
+function getRequiredEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`${name} environment variable is required`);
+  }
+  return value;
+}
+
+const E2E_PASSWORD = getRequiredEnv('E2E_USER_PASSWORD');
+
 export const TEST_USERS: Record<UserRole, { email: string; password: string }> = {
   admin: {
     email: process.env.E2E_ADMIN_EMAIL || 'admin@agora.com',
-    password: process.env.E2E_USER_PASSWORD || '3AgF…XrXqBX0Qa',
+    password: E2E_PASSWORD,
   },
   resident: {
     email: process.env.E2E_RESIDENT_EMAIL || 'resident@agora.com',
-    password: process.env.E2E_USER_PASSWORD || '3AgF…XrXqBX0Qa',
+    password: E2E_PASSWORD,
   },
   member: {
     email: process.env.E2E_MEMBER_EMAIL || 'member@agora.com',
-    password: process.env.E2E_USER_PASSWORD || '3AgF…XrXqBX0Qa',
+    password: E2E_PASSWORD,
   },
 };
-
-// Legacy single-user credentials (backward compat)
-const E2E_EMAIL = process.env.E2E_USER_EMAIL || 'tests@agora.com';
-const E2E_PASSWORD = process.env.E2E_USER_PASSWORD || '3AgF…XrXqBX0Qa';
 
 // Auth state paths — one per role + legacy
 export const AUTH_STATE_PATH = path.join(__dirname, '../.auth/user.json');
@@ -49,7 +55,7 @@ export const TEST_USER = {
   id: 'user_test_123',
   firstName: 'Test',
   lastName: 'User',
-  email: E2E_EMAIL,
+  email: TEST_USERS.admin.email,
   clerkId: 'user_test_123',
 };
 
@@ -72,7 +78,7 @@ export const TEST_MEMBERSHIP = {
  * Log in through Clerk's sign-in page with specific credentials.
  */
 export async function clerkLogin(page: Page, email?: string, password?: string) {
-  const loginEmail = email || E2E_EMAIL;
+  const loginEmail = email || TEST_USERS.admin.email;
   const loginPassword = password || E2E_PASSWORD;
 
   await page.goto('/sign-in');
