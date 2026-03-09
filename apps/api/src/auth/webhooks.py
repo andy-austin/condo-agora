@@ -46,6 +46,57 @@ async def verify_clerk_webhook(request: Request):
         )
 
 
+async def process_pending_invitations(user: dict):
+    """
+    Finds pending invitations matching the user's email and creates
+    organization memberships.  Idempotent — safe to call multiple times.
+    """
+    email = user.get("email")
+    if not email:
+        return
+
+    if not db.is_connected():
+        await db.connect()
+
+    now = datetime.utcnow()
+    cursor = db.db.invitations.find(
+        {
+            "email": email,
+            "accepted_at": None,
+            "expires_at": {"$gt": now},
+        }
+    )
+
+    async for invite in cursor:
+        # Guard against duplicates (webhook + JIT race condition)
+        existing_member = await db.db.organization_members.find_one(
+            {
+                "user_id": str(user["_id"]),
+                "organization_id": invite["organization_id"],
+            }
+        )
+        if existing_member:
+            continue
+
+        member_data = {
+            "user_id": str(user["_id"]),
+            "organization_id": invite["organization_id"],
+            "role": invite["role"],
+            "house_id": invite.get("house_id"),
+            "created_at": now,
+            "updated_at": now,
+        }
+        await db.db.organization_members.insert_one(member_data)
+
+        await db.db.invitations.update_one(
+            {"_id": invite["_id"]}, {"$set": {"accepted_at": now, "updated_at": now}}
+        )
+        print(
+            f"User {user.get('clerk_id', user['_id'])} auto-joined "
+            f"organization {invite['organization_id']} via invitation"
+        )
+
+
 async def handle_user_created(data: dict):
     """
     Syncs a newly created Clerk user to our local database.
@@ -104,44 +155,7 @@ async def handle_user_created(data: dict):
 
     print(f"User {clerk_id} created/synced in local DB")
 
-    # Check for pending invitations matching this email
-    cursor = db.db.invitations.find(
-        {
-            "email": primary_email,
-            "accepted_at": None,
-            "expires_at": {"$gt": now},
-        }
-    )
-
-    async for invite in cursor:
-        # Guard against duplicates (webhook + JIT race condition)
-        existing_member = await db.db.organization_members.find_one(
-            {
-                "user_id": str(user["_id"]),
-                "organization_id": invite["organization_id"],
-            }
-        )
-        if existing_member:
-            continue
-
-        # Add user to organization
-        member_data = {
-            "user_id": str(user["_id"]),
-            "organization_id": invite["organization_id"],
-            "role": invite["role"],
-            "house_id": invite.get("house_id"),
-            "created_at": now,
-            "updated_at": now,
-        }
-        await db.db.organization_members.insert_one(member_data)
-
-        # Mark invitation as accepted
-        await db.db.invitations.update_one(
-            {"_id": invite["_id"]}, {"$set": {"accepted_at": now, "updated_at": now}}
-        )
-        print(
-            f"User {clerk_id} auto-joined organization {invite['organization_id']} via invitation"
-        )
+    await process_pending_invitations(user)
 
 
 async def handle_user_updated(data: dict):
