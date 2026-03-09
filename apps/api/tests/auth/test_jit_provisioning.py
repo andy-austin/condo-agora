@@ -11,7 +11,6 @@ from apps.api.src.auth.dependencies import (
 )
 from apps.api.tests.conftest import mock_users_collection
 
-
 MOCK_CLERK_USER_RESPONSE = {
     "id": "user_new123",
     "email_addresses": [
