@@ -7,6 +7,7 @@ import { getApiClient } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ErrorState } from '@/components/dashboard/states';
+import Breadcrumb from '@/components/dashboard/Breadcrumb';
 import {
   GET_ORGANIZATION_MEMBERS,
   type Member,
@@ -157,6 +158,12 @@ export default function SettingsPage() {
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
+      <Breadcrumb
+        items={[
+          { label: 'Settings', href: '/dashboard/settings' },
+          { label: tabs.find((t) => t.id === activeTab)?.label || 'Settings' },
+        ]}
+      />
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Settings</h1>
         <p className="text-muted-foreground text-sm mt-1">

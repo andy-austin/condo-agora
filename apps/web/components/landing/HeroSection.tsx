@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Play, Building2, Users, Vote } from "lucide-react";
+import { ArrowRight, Building2, Users, Vote } from "lucide-react";
 import Image from 'next/image';
 import { useTranslations } from "next-intl";
 
@@ -39,10 +39,10 @@ export function HeroSection() {
               {t('ctaPrimary')}
               <ArrowRight className="ml-2 w-5 h-5" />
             </button>
-            <button className="btn-outline">
-              <Play className="mr-2 w-5 h-5" />
+            <a href="#features" className="btn-outline">
               {t('ctaSecondary')}
-            </button>
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </a>
           </div>
 
           {/* Stats Section */}

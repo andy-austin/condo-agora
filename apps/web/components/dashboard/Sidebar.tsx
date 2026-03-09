@@ -81,7 +81,7 @@ function SidebarNav({
             <span className="text-primary-foreground font-bold text-sm">C</span>
           </div>
           {!collapsed && (
-            <span className="text-lg font-bold truncate">Condo Agora</span>
+            <span className="text-lg font-bold truncate">Condo Ágora</span>
           )}
         </Link>
         <button
@@ -206,7 +206,7 @@ function SidebarNav({
           <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-xs">C</span>
           </div>
-          <span className="text-lg font-bold">Condo Agora</span>
+          <span className="text-lg font-bold">Condo Ágora</span>
         </Link>
       </div>
 
