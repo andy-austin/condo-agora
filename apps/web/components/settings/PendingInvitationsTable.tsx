@@ -18,6 +18,7 @@ type PendingInvitationsTableProps = {
   getAuthToken: () => Promise<string | null>;
   t: (key: string, values?: Record<string, string | number>) => string;
   refreshTrigger?: number;
+  lastCreatedInvitation?: Invitation | null;
 };
 
 export default function PendingInvitationsTable({
@@ -25,6 +26,7 @@ export default function PendingInvitationsTable({
   getAuthToken,
   t,
   refreshTrigger,
+  lastCreatedInvitation,
 }: PendingInvitationsTableProps) {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,6 +51,16 @@ export default function PendingInvitationsTable({
   useEffect(() => {
     fetchInvitations();
   }, [fetchInvitations, refreshTrigger]);
+
+  // Optimistically add newly created invitation to the list
+  useEffect(() => {
+    if (lastCreatedInvitation) {
+      setInvitations((prev) => {
+        if (prev.some((inv) => inv.id === lastCreatedInvitation.id)) return prev;
+        return [lastCreatedInvitation, ...prev];
+      });
+    }
+  }, [lastCreatedInvitation]);
 
   const handleRevoke = async (invitationId: string) => {
     setActionLoading(invitationId);

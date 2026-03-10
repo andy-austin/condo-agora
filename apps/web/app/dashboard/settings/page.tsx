@@ -27,6 +27,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import PendingInvitationsTable from '@/components/settings/PendingInvitationsTable';
+import type { Invitation } from '@/lib/queries/invitation';
 
 const ME_QUERY = `
   query Me {
@@ -49,6 +50,10 @@ const CREATE_INVITATION = `
     createInvitation(email: $email, organizationId: $organizationId, role: $role) {
       id
       email
+      role
+      method
+      expiresAt
+      createdAt
     }
   }
 `;
@@ -270,6 +275,7 @@ function MembersTab({
   const [inviteSuccess, setInviteSuccess] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [inviteRefresh, setInviteRefresh] = useState(0);
+  const [lastCreatedInvitation, setLastCreatedInvitation] = useState<Invitation | null>(null);
 
   const filteredMembers = members.filter((m) => {
     const q = search.toLowerCase();
@@ -290,9 +296,12 @@ function MembersTab({
     try {
       const token = await getAuthToken();
       const client = getApiClient(token);
-      await client.request(CREATE_INVITATION, { email, organizationId, role });
+      const result = await client.request<{ createInvitation: Invitation }>(
+        CREATE_INVITATION, { email, organizationId, role }
+      );
       setEmail('');
       setInviteSuccess(true);
+      setLastCreatedInvitation(result.createInvitation);
       setInviteRefresh((n) => n + 1);
       setTimeout(() => setInviteSuccess(false), 3000);
     } catch (err: unknown) {
@@ -499,6 +508,7 @@ function MembersTab({
           getAuthToken={getAuthToken}
           t={t}
           refreshTrigger={inviteRefresh}
+          lastCreatedInvitation={lastCreatedInvitation}
         />
       )}
     </div>
