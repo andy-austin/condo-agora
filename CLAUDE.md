@@ -144,3 +144,4 @@ For comprehensive documentation, see the `docs/` folder:
 | [docs/TESTING.md](docs/TESTING.md)       | Jest, Pytest, and Playwright E2E testing |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel deployment configuration          |
 | [docs/PATTERNS.md](docs/PATTERNS.md)     | Code patterns for extending the codebase |
+| [docs/VOTING.md](docs/VOTING.md)         | Voting system: sessions, Borda count, permissions |
