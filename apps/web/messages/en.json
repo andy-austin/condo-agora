@@ -521,6 +521,8 @@
       "proposalsToVote": "Proposals to Vote On * (select from VOTING status proposals)",
       "noVotingProposals": "No proposals in VOTING status. Move proposals to VOTING first.",
       "selected": "selected",
+      "selectedSingular": "selected",
+      "selectedPlural": "selected",
       "failedToLoadProposals": "Failed to load proposals",
       "createSession": "Create Session",
       "failedToCreateSession": "Failed to create voting session"
