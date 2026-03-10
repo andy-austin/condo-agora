@@ -8,8 +8,11 @@ from fastapi import HTTPException
 from ...database import db
 from .clerk_utils import (
     create_clerk_invitation,
+    create_clerk_org_invitation,
+    create_clerk_organization,
     delete_clerk_user,
     revoke_clerk_invitations_for_email,
+    revoke_clerk_org_invitations_for_email,
 )
 
 EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
@@ -41,6 +44,129 @@ def _slugify(text: str) -> str:
     text = re.sub(r"[^\w\s-]", "", text)
     text = re.sub(r"[-\s]+", "-", text)
     return text.strip("-")
+
+
+async def _send_clerk_invitation(
+    email: str,
+    organization_id: str,
+    redirect_url: str,
+    token: str,
+    role: str,
+    invitation_data: dict,
+    create_notification,
+):
+    """
+    Send a Clerk invitation, preferring organization invitations (which include
+    the org name in the email) with fallback to generic invitations.
+    """
+    clerk_org_id = await _get_or_create_clerk_org_id(organization_id)
+
+    if clerk_org_id:
+        # Use Clerk Organization invitation — email shows the org name
+        await revoke_clerk_org_invitations_for_email(clerk_org_id, email)
+        try:
+            await create_clerk_org_invitation(
+                clerk_org_id=clerk_org_id,
+                email=email,
+                redirect_url=redirect_url,
+            )
+            print(f"Clerk org invitation sent to {email}")
+            return
+        except HTTPException as e:
+            detail = str(e.detail)
+            is_existing_user = (
+                e.status_code == 422 and "form_identifier_exists" in detail
+            )
+            is_duplicate = "duplicate" in detail.lower()
+            is_already_member = "already" in detail.lower()
+
+            if is_existing_user or is_duplicate or is_already_member:
+                print(
+                    f"User {email} already exists or is already a member. "
+                    "Sending in-app notification."
+                )
+                await _notify_existing_user(
+                    email, organization_id, invitation_data, create_notification
+                )
+                return
+            # For other errors, fall through to generic invitation
+            print(f"Clerk org invitation failed, falling back to generic: {e}")
+        except Exception as e:
+            print(f"Clerk org invitation failed, falling back to generic: {e}")
+
+    # Fallback: generic Clerk invitation
+    await revoke_clerk_invitations_for_email(email)
+    try:
+        await create_clerk_invitation(
+            email=email,
+            redirect_url=redirect_url,
+            public_metadata={
+                "organization_id": organization_id,
+                "role": role,
+                "invitation_token": token,
+            },
+        )
+        print(f"Clerk generic invitation sent to {email}")
+    except HTTPException as e:
+        detail = str(e.detail)
+        is_existing_user = e.status_code == 422 and "form_identifier_exists" in detail
+        is_duplicate = "duplicate" in detail.lower()
+
+        if is_existing_user or is_duplicate:
+            print(
+                f"User {email} already exists in Clerk or has prior invitation. "
+                "Sending in-app notification."
+            )
+            await _notify_existing_user(
+                email, organization_id, invitation_data, create_notification
+            )
+        else:
+            print(f"Failed to send Clerk invitation: {e}")
+            raise e
+    except Exception as e:
+        print(f"Failed to send Clerk invitation: {e}")
+        raise e
+
+
+async def _notify_existing_user(
+    email: str, organization_id: str, invitation_data: dict, create_notification
+):
+    """Send an in-app notification to an existing user about a new invitation."""
+    existing_user = await db.db.users.find_one({"email": email})
+    if existing_user:
+        org = await db.db.organizations.find_one({"_id": ObjectId(organization_id)})
+        org_name = org["name"] if org else "an organization"
+        await create_notification(
+            user_id=str(existing_user["_id"]),
+            organization_id=organization_id,
+            notification_type="INVITATION",
+            title="New Invitation",
+            message=f"You have been invited to join {org_name}",
+            reference_id=str(invitation_data["_id"]),
+        )
+
+
+async def _get_or_create_clerk_org_id(organization_id: str):
+    """
+    Get the Clerk organization ID for an app organization.
+    Lazily creates a Clerk organization if one doesn't exist yet.
+    """
+    org = await db.db.organizations.find_one({"_id": ObjectId(organization_id)})
+    if not org:
+        return None
+
+    clerk_org_id = org.get("clerk_org_id")
+    if clerk_org_id:
+        return clerk_org_id
+
+    # Create Clerk organization and store the ID
+    clerk_org_id = await create_clerk_organization(org["name"])
+    if clerk_org_id:
+        await db.db.organizations.update_one(
+            {"_id": ObjectId(organization_id)},
+            {"$set": {"clerk_org_id": clerk_org_id}},
+        )
+    return clerk_org_id
 
 
 async def create_organization(name: str, creator_user_id: str):
@@ -137,54 +263,17 @@ async def create_invitation(
     result = await db.db.invitations.insert_one(invitation_data)
     invitation_data["_id"] = str(result.inserted_id)
 
-    # Revoke any existing Clerk invitations for this email before creating a new one
-    await revoke_clerk_invitations_for_email(email)
-
-    # Trigger Clerk Invitation
     redirect_url = f"{_get_app_url()}/dashboard"
 
-    try:
-        await create_clerk_invitation(
-            email=email,
-            redirect_url=redirect_url,
-            public_metadata={
-                "organization_id": organization_id,
-                "role": role,
-                "invitation_token": token,
-            },
-        )
-        print(f"Clerk invitation sent to {email}")
-    except HTTPException as e:
-        detail = str(e.detail)
-        is_existing_user = e.status_code == 422 and "form_identifier_exists" in detail
-        is_duplicate = "duplicate" in detail.lower()
-
-        if is_existing_user or is_duplicate:
-            print(
-                f"User {email} already exists in Clerk or has prior invitation. "
-                "Sending in-app notification."
-            )
-            # Notify existing user via in-app notification
-            existing_user = await db.db.users.find_one({"email": email})
-            if existing_user:
-                org = await db.db.organizations.find_one(
-                    {"_id": ObjectId(organization_id)}
-                )
-                org_name = org["name"] if org else "an organization"
-                await create_notification(
-                    user_id=str(existing_user["_id"]),
-                    organization_id=organization_id,
-                    notification_type="INVITATION",
-                    title="New Invitation",
-                    message=f"You have been invited to join {org_name}",
-                    reference_id=str(invitation_data["_id"]),
-                )
-        else:
-            print(f"Failed to send Clerk invitation: {e}")
-            raise e
-    except Exception as e:
-        print(f"Failed to send Clerk invitation: {e}")
-        raise e
+    await _send_clerk_invitation(
+        email=email,
+        organization_id=organization_id,
+        redirect_url=redirect_url,
+        token=token,
+        role=role,
+        invitation_data=invitation_data,
+        create_notification=create_notification,
+    )
 
     print(f"Invitation created locally for {email} to join org {organization_id}")
 
@@ -285,6 +374,9 @@ async def revoke_invitation(invitation_id: str):
         raise Exception("Cannot revoke an already accepted invitation")
 
     # Revoke in Clerk so the email can be re-invited later
+    clerk_org_id = await _get_or_create_clerk_org_id(invitation["organization_id"])
+    if clerk_org_id:
+        await revoke_clerk_org_invitations_for_email(clerk_org_id, invitation["email"])
     await revoke_clerk_invitations_for_email(invitation["email"])
 
     await db.db.invitations.delete_one({"_id": ObjectId(invitation_id)})
@@ -303,27 +395,43 @@ async def resend_invitation(invitation_id: str):
     if invitation.get("accepted_at"):
         raise Exception("Cannot resend an already accepted invitation")
 
-    # Revoke old Clerk invitation before creating a new one
-    await revoke_clerk_invitations_for_email(invitation["email"])
-
-    # Resend via Clerk
+    # Resend via Clerk (prefer org invitation for proper email branding)
     redirect_url = f"{_get_app_url()}/dashboard"
+    clerk_org_id = await _get_or_create_clerk_org_id(invitation["organization_id"])
 
-    try:
-        await create_clerk_invitation(
-            email=invitation["email"],
-            redirect_url=redirect_url,
-            public_metadata={
-                "organization_id": invitation["organization_id"],
-                "role": invitation["role"],
-                "invitation_token": invitation["token"],
-            },
-        )
-    except HTTPException as e:
-        if e.status_code == 422 and "form_identifier_exists" in str(e.detail):
+    if clerk_org_id:
+        await revoke_clerk_org_invitations_for_email(clerk_org_id, invitation["email"])
+        try:
+            await create_clerk_org_invitation(
+                clerk_org_id=clerk_org_id,
+                email=invitation["email"],
+                redirect_url=redirect_url,
+            )
+        except HTTPException as e:
+            detail = str(e.detail)
+            if not (
+                e.status_code == 422
+                and ("form_identifier_exists" in detail or "already" in detail.lower())
+            ):
+                raise e
+            print(f"User {invitation['email']} already exists or is a member.")
+    else:
+        # Fallback to generic invitation
+        await revoke_clerk_invitations_for_email(invitation["email"])
+        try:
+            await create_clerk_invitation(
+                email=invitation["email"],
+                redirect_url=redirect_url,
+                public_metadata={
+                    "organization_id": invitation["organization_id"],
+                    "role": invitation["role"],
+                    "invitation_token": invitation["token"],
+                },
+            )
+        except HTTPException as e:
+            if not (e.status_code == 422 and "form_identifier_exists" in str(e.detail)):
+                raise e
             print(f"User {invitation['email']} already exists in Clerk.")
-        else:
-            raise e
 
     # Update timestamp
     now = datetime.utcnow()
