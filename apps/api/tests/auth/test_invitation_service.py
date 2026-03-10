@@ -21,10 +21,14 @@ from apps.api.tests.conftest import (
 )
 
 
+@patch(
+    "apps.api.src.auth.service.revoke_clerk_invitations_for_email",
+    new_callable=AsyncMock,
+)
 class TestCreateInvitation:
     @pytest.mark.asyncio
     @patch("apps.api.src.auth.service.create_clerk_invitation", new_callable=AsyncMock)
-    async def test_creates_invitation_successfully(self, mock_clerk):
+    async def test_creates_invitation_successfully(self, mock_clerk, _mock_revoke):
         mock_clerk.return_value = {"id": "clerk_inv_1"}
         inv_id = ObjectId()
         mock_invitations_collection.find_one.return_value = None
@@ -43,12 +47,12 @@ class TestCreateInvitation:
         mock_clerk.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_rejects_invalid_email(self):
+    async def test_rejects_invalid_email(self, _mock_revoke):
         with pytest.raises(Exception, match="Invalid email address format"):
             await create_invitation("not-an-email", "org-1", "inviter-1", "MEMBER")
 
     @pytest.mark.asyncio
-    async def test_rejects_duplicate_pending_invitation(self):
+    async def test_rejects_duplicate_pending_invitation(self, _mock_revoke):
         existing = {
             "_id": ObjectId(),
             "email": "user@example.com",
@@ -63,7 +67,7 @@ class TestCreateInvitation:
 
     @pytest.mark.asyncio
     @patch("apps.api.src.auth.service.create_clerk_invitation", new_callable=AsyncMock)
-    async def test_replaces_expired_invitation(self, mock_clerk):
+    async def test_replaces_expired_invitation(self, mock_clerk, _mock_revoke):
         mock_clerk.return_value = {"id": "clerk_inv_1"}
         expired = {
             "_id": ObjectId(),
@@ -86,7 +90,7 @@ class TestCreateInvitation:
 
     @pytest.mark.asyncio
     @patch("apps.api.src.auth.service.create_clerk_invitation", new_callable=AsyncMock)
-    async def test_notifies_existing_clerk_user(self, mock_clerk):
+    async def test_notifies_existing_clerk_user(self, mock_clerk, _mock_revoke):
         from fastapi import HTTPException
 
         mock_clerk.side_effect = HTTPException(
@@ -217,10 +221,15 @@ class TestAcceptInvitationById:
 
 class TestRevokeInvitation:
     @pytest.mark.asyncio
-    async def test_revokes_pending_invitation(self):
+    @patch(
+        "apps.api.src.auth.service.revoke_clerk_invitations_for_email",
+        new_callable=AsyncMock,
+    )
+    async def test_revokes_pending_invitation(self, mock_revoke_clerk):
         inv_id = ObjectId()
         invitation = {
             "_id": inv_id,
+            "email": "user@example.com",
             "organization_id": "org-1",
             "accepted_at": None,
         }
@@ -229,6 +238,7 @@ class TestRevokeInvitation:
         org_id = await revoke_invitation(str(inv_id))
 
         assert org_id == "org-1"
+        mock_revoke_clerk.assert_called_once_with("user@example.com")
         mock_invitations_collection.delete_one.assert_called_once()
 
     @pytest.mark.asyncio
@@ -254,8 +264,12 @@ class TestRevokeInvitation:
 
 class TestResendInvitation:
     @pytest.mark.asyncio
+    @patch(
+        "apps.api.src.auth.service.revoke_clerk_invitations_for_email",
+        new_callable=AsyncMock,
+    )
     @patch("apps.api.src.auth.service.create_clerk_invitation", new_callable=AsyncMock)
-    async def test_resends_invitation(self, mock_clerk):
+    async def test_resends_invitation(self, mock_clerk, _mock_revoke):
         mock_clerk.return_value = {"id": "clerk_inv_1"}
         inv_id = ObjectId()
         invitation = {
