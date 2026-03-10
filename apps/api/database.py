@@ -152,6 +152,12 @@ class MongoDB:
         # Budgets collection indexes
         await self.db.budgets.create_index("proposal_id", unique=True)
 
+        # Proposal votes collection indexes
+        await self.db.proposal_votes.create_index(
+            [("proposal_id", 1), ("house_id", 1)], unique=True
+        )
+        await self.db.proposal_votes.create_index("proposal_id")
+
 
 # Global database instance
 db = MongoDB()

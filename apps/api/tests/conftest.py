@@ -201,6 +201,18 @@ mock_budgets_collection.insert_one = AsyncMock(
 mock_budgets_collection.find_one_and_update = AsyncMock(return_value=None)
 mock_budgets_collection.create_index = AsyncMock()
 
+mock_proposal_votes_collection = MagicMock()
+mock_proposal_votes_collection.find = MagicMock(
+    return_value=create_async_cursor_mock([])
+)
+mock_proposal_votes_collection.find_one = AsyncMock(return_value=None)
+mock_proposal_votes_collection.insert_one = AsyncMock(
+    return_value=MagicMock(inserted_id="mock_id")
+)
+mock_proposal_votes_collection.find_one_and_update = AsyncMock(return_value=None)
+mock_proposal_votes_collection.count_documents = AsyncMock(return_value=0)
+mock_proposal_votes_collection.create_index = AsyncMock()
+
 # Create mock database with collections
 mock_motor_db = MagicMock()
 mock_motor_db.notes = mock_notes_collection
@@ -218,6 +230,7 @@ mock_motor_db.votes = mock_votes_collection
 mock_motor_db.documents = mock_documents_collection
 mock_motor_db.budgets = mock_budgets_collection
 mock_motor_db.project_milestones = mock_project_milestones_collection
+mock_motor_db.proposal_votes = mock_proposal_votes_collection
 mock_motor_db.__getitem__ = lambda self, key: getattr(self, key)
 
 # Create mock MongoDB client
@@ -261,6 +274,7 @@ def _reset_mocks():
         mock_documents_collection,
         mock_project_milestones_collection,
         mock_budgets_collection,
+        mock_proposal_votes_collection,
     ]
     for m in all_mocks:
         m.reset_mock(side_effect=True, return_value=True)
@@ -372,3 +386,9 @@ def project_milestones_collection_mock():
 def budgets_collection_mock():
     """Return the mock budgets collection for tests"""
     return mock_budgets_collection
+
+
+@pytest.fixture
+def proposal_votes_collection_mock():
+    """Return the mock proposal_votes collection for tests"""
+    return mock_proposal_votes_collection

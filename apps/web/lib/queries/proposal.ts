@@ -10,6 +10,10 @@ export const GET_PROPOSALS = `
       organizationId
       responsibleHouseId
       rejectionReason
+      voteStatus
+      voteThreshold
+      voteStartedAt
+      voteEndedAt
       createdAt
       updatedAt
     }
@@ -28,6 +32,10 @@ export const GET_PROPOSAL = `
       organizationId
       responsibleHouseId
       rejectionReason
+      voteStatus
+      voteThreshold
+      voteStartedAt
+      voteEndedAt
       createdAt
       updatedAt
     }
@@ -128,6 +136,10 @@ export type Proposal = {
   organizationId: string;
   responsibleHouseId: string | null;
   rejectionReason: string | null;
+  voteStatus: string | null;
+  voteThreshold: number | null;
+  voteStartedAt: string | null;
+  voteEndedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };

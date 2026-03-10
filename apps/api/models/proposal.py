@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from typing import Optional
 
@@ -39,6 +40,21 @@ class Proposal(BaseDocument):
     )
     rejection_reason: Optional[str] = Field(
         default=None, description="Reason for rejection"
+    )
+    vote_status: Optional[str] = Field(
+        default=None, description="Yes/No vote status: ACTIVE or CLOSED"
+    )
+    vote_threshold: Optional[int] = Field(
+        default=None, description="Approval threshold percentage"
+    )
+    vote_started_at: Optional[datetime] = Field(
+        default=None, description="When the vote was started"
+    )
+    vote_ended_at: Optional[datetime] = Field(
+        default=None, description="When the vote was closed"
+    )
+    vote_started_by: Optional[str] = Field(
+        default=None, description="User ID who started the vote"
     )
 
     @classmethod
