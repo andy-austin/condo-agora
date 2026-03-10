@@ -293,9 +293,16 @@ function MembersTab({
       setEmail('');
       setInviteSuccess(true);
       setTimeout(() => setInviteSuccess(false), 3000);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
-      alert('Failed to send invitation.');
+      const message = err instanceof Error ? err.message : '';
+      if (message.toLowerCase().includes('already pending')) {
+        alert(t('settings.duplicateInvitation'));
+      } else if (message.toLowerCase().includes('already exists')) {
+        alert(t('settings.existingUserNotified'));
+      } else {
+        alert(t('settings.inviteFailed'));
+      }
     } finally {
       setSubmitting(false);
     }

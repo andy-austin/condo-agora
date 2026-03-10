@@ -560,6 +560,7 @@
       "emailPlaceholder": "colleague@example.com",
       "sendInvite": "Send Invite",
       "inviteSent": "Invitation sent successfully!",
+      "inviteFailed": "Failed to send invitation.",
       "pendingInvitations": "Pending Invitations",
       "noPendingInvitations": "No pending invitations.",
       "resendInvite": "Resend",

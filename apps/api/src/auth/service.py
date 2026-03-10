@@ -150,7 +150,8 @@ async def create_invitation(
         )
         print(f"Clerk invitation sent to {email}")
     except HTTPException as e:
-        if e.status_code == 422 and "form_identifier_exists" in str(e.detail):
+        detail = str(e.detail)
+        if e.status_code == 422 and "form_identifier_exists" in detail:
             print(f"User {email} already exists in Clerk. Sending in-app notification.")
             # Notify existing user via in-app notification
             existing_user = await db.db.users.find_one({"email": email})
@@ -167,6 +168,10 @@ async def create_invitation(
                     message=f"You have been invited to join {org_name}",
                     reference_id=str(invitation_data["_id"]),
                 )
+        elif "duplicate" in detail.lower():
+            print(
+                f"Duplicate Clerk invitation for {email}, continuing with local record."
+            )
         else:
             print(f"Failed to send Clerk invitation: {e}")
             raise e
