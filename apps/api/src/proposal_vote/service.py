@@ -195,9 +195,7 @@ async def get_proposal_vote_results(proposal_id: str) -> dict:
     }
 
 
-async def get_my_proposal_vote(
-    proposal_id: str, house_id: str
-) -> Optional[dict]:
+async def get_my_proposal_vote(proposal_id: str, house_id: str) -> Optional[dict]:
     """Get the vote cast by a specific house on a proposal."""
     await _ensure_connected()
     return await db.db.proposal_votes.find_one(

@@ -74,9 +74,7 @@ class TestStartProposalVote:
         proposal = _make_proposal()
         mock_proposals_collection.find_one = AsyncMock(return_value=proposal)
         updated = {**proposal, "vote_status": "ACTIVE", "vote_threshold": 66}
-        mock_proposals_collection.find_one_and_update = AsyncMock(
-            return_value=updated
-        )
+        mock_proposals_collection.find_one_and_update = AsyncMock(return_value=updated)
 
         result = await start_proposal_vote(PROPOSAL_ID, 66, ADMIN_ID)
         assert result["vote_status"] == "ACTIVE"
@@ -149,9 +147,7 @@ class TestCastProposalVote:
 
         mock_proposals_collection.find_one = AsyncMock(return_value=proposal)
         mock_houses_collection.find_one = AsyncMock(return_value=house)
-        mock_proposal_votes_collection.find_one = AsyncMock(
-            return_value=existing_vote
-        )
+        mock_proposal_votes_collection.find_one = AsyncMock(return_value=existing_vote)
         mock_proposal_votes_collection.find_one_and_update = AsyncMock(
             return_value=updated_vote
         )
@@ -221,9 +217,7 @@ class TestCloseProposalVote:
         )
         closed = {**proposal, "vote_status": "CLOSED", "status": "REJECTED"}
         mock_proposals_collection.find_one = AsyncMock(return_value=proposal)
-        mock_proposals_collection.find_one_and_update = AsyncMock(
-            return_value=closed
-        )
+        mock_proposals_collection.find_one_and_update = AsyncMock(return_value=closed)
 
         result = await close_proposal_vote(PROPOSAL_ID, ADMIN_ID)
         assert result["vote_status"] == "CLOSED"
@@ -236,9 +230,7 @@ class TestCloseProposalVote:
         )
         closed = {**proposal, "vote_status": "CLOSED"}
         mock_proposals_collection.find_one = AsyncMock(return_value=proposal)
-        mock_proposals_collection.find_one_and_update = AsyncMock(
-            return_value=closed
-        )
+        mock_proposals_collection.find_one_and_update = AsyncMock(return_value=closed)
 
         result = await close_proposal_vote(PROPOSAL_ID, ADMIN_ID)
         assert result["vote_status"] == "CLOSED"
@@ -265,9 +257,7 @@ class TestGetProposalVoteResults:
         mock_proposals_collection.find_one = AsyncMock(return_value=proposal)
         mock_houses_collection.count_documents = AsyncMock(return_value=3)
         # yes_count=2, no_count=1
-        mock_proposal_votes_collection.count_documents = AsyncMock(
-            side_effect=[2, 1]
-        )
+        mock_proposal_votes_collection.count_documents = AsyncMock(side_effect=[2, 1])
 
         result = await get_proposal_vote_results(PROPOSAL_ID)
         assert result["yes_count"] == 2
