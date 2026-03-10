@@ -25,6 +25,7 @@ import CommentSection from '@/components/proposals/CommentSection';
 import DocumentSection from '@/components/proposals/DocumentSection';
 import ProjectMilestones from '@/components/proposals/ProjectMilestones';
 import BudgetSection from '@/components/proposals/BudgetSection';
+import ProposalVoteSection from '@/components/proposals/ProposalVoteSection';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ErrorState } from '@/components/dashboard/states';
@@ -48,6 +49,7 @@ const ME_QUERY = `
       memberships {
         organization { id }
         role
+        houseId
       }
     }
   }
@@ -56,7 +58,7 @@ const ME_QUERY = `
 type MeResponse = {
   me: {
     id: string;
-    memberships: { organization: { id: string }; role: string }[];
+    memberships: { organization: { id: string }; role: string; houseId: string | null }[];
   } | null;
 };
 
@@ -81,6 +83,7 @@ export default function ProposalDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userHouseId, setUserHouseId] = useState<string | null>(null);
   const [houses, setHouses] = useState<House[]>([]);
 
   const [editing, setEditing] = useState(false);
@@ -121,8 +124,10 @@ export default function ProposalDetailPage() {
         );
         const adminUser = membership?.role === 'ADMIN';
         setIsAdmin(adminUser);
+        setUserHouseId(membership?.houseId || null);
 
-        if (adminUser) {
+        // Fetch houses for admin actions, or when proposal is in VOTING status (for vote section)
+        if (adminUser || p.status === 'VOTING' || p.voteStatus) {
           const housesData = await client.request<GetHousesResponse>(GET_HOUSES, {
             organizationId: p.organizationId,
           });
@@ -388,6 +393,20 @@ export default function ProposalDetailPage() {
               </div>
               <p className="text-sm">{proposal.rejectionReason}</p>
             </div>
+          )}
+
+          {/* Yes/No Proposal Vote */}
+          {(proposal.status === 'VOTING' || proposal.voteStatus) && (
+            <ProposalVoteSection
+              proposalId={proposal.id}
+              organizationId={proposal.organizationId}
+              voteStatus={proposal.voteStatus}
+              voteThreshold={proposal.voteThreshold}
+              isAdmin={isAdmin}
+              houseId={userHouseId}
+              getAuthToken={getAuthToken}
+              onProposalUpdate={fetchData}
+            />
           )}
 
           {/* Documents */}

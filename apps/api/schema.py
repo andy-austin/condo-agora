@@ -15,6 +15,7 @@ from .schemas.project_milestone import (
     ProjectMilestoneQueries,
 )
 from .schemas.proposal import ProposalMutations, ProposalQueries
+from .schemas.proposal_vote import ProposalVoteMutations, ProposalVoteQueries
 from .schemas.voting import VotingMutations, VotingQueries
 
 
@@ -29,6 +30,7 @@ class Query(
     AnnouncementQueries,
     NotificationQueries,
     VotingQueries,
+    ProposalVoteQueries,
     DocumentQueries,
     ProjectMilestoneQueries,
     BudgetQueries,
@@ -47,6 +49,7 @@ class Mutation(
     AnnouncementMutations,
     NotificationMutations,
     VotingMutations,
+    ProposalVoteMutations,
     DocumentMutations,
     ProjectMilestoneMutations,
     BudgetMutations,

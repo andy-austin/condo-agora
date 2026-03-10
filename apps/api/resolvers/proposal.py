@@ -27,6 +27,10 @@ def _mongo_proposal_to_graphql(p: dict) -> Proposal:
         organization_id=p["organization_id"],
         responsible_house_id=p.get("responsible_house_id"),
         rejection_reason=p.get("rejection_reason"),
+        vote_status=p.get("vote_status"),
+        vote_threshold=p.get("vote_threshold"),
+        vote_started_at=p.get("vote_started_at"),
+        vote_ended_at=p.get("vote_ended_at"),
         created_at=p["created_at"],
         updated_at=p["updated_at"],
     )
