@@ -52,7 +52,11 @@ class TestCreateInvitation:
             await create_invitation("not-an-email", "org-1", "inviter-1", "MEMBER")
 
     @pytest.mark.asyncio
-    async def test_rejects_duplicate_pending_invitation(self, _mock_revoke):
+    @patch("apps.api.src.auth.service.create_clerk_invitation", new_callable=AsyncMock)
+    async def test_resends_duplicate_pending_invitation(
+        self, mock_clerk, _mock_revoke
+    ):
+        mock_clerk.return_value = {"id": "clerk_inv_2"}
         existing = {
             "_id": ObjectId(),
             "email": "user@example.com",
@@ -61,9 +65,17 @@ class TestCreateInvitation:
             "expires_at": datetime.utcnow() + timedelta(days=3),
         }
         mock_invitations_collection.find_one.return_value = existing
+        mock_invitations_collection.insert_one.return_value = MagicMock(
+            inserted_id=ObjectId()
+        )
 
-        with pytest.raises(Exception, match="Invitation already pending"):
-            await create_invitation("user@example.com", "org-1", "inviter-1", "MEMBER")
+        result = await create_invitation(
+            "user@example.com", "org-1", "inviter-1", "MEMBER"
+        )
+
+        assert result["email"] == "user@example.com"
+        mock_invitations_collection.delete_one.assert_called_once()
+        mock_clerk.assert_called_once()
 
     @pytest.mark.asyncio
     @patch("apps.api.src.auth.service.create_clerk_invitation", new_callable=AsyncMock)

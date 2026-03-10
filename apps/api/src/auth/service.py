@@ -115,9 +115,7 @@ async def create_invitation(
         }
     )
     if existing:
-        if existing.get("expires_at") and existing["expires_at"] > now:
-            raise Exception("Invitation already pending for this email")
-        # Expired — remove old one and proceed
+        # Remove old invitation (pending or expired) and resend
         await db.db.invitations.delete_one({"_id": existing["_id"]})
 
     token = str(uuid.uuid4())
