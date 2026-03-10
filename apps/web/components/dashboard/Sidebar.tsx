@@ -74,7 +74,7 @@ function TopBar({ collapsed }: { collapsed: boolean }) {
       <NotificationBell />
       <UserButton
         appearance={{
-          elements: { avatarBox: 'w-8 h-8' },
+          elements: { avatarBox: 'w-8 h-8 ring-2 ring-border' },
         }}
       />
     </header>
@@ -184,7 +184,7 @@ function SidebarNav({
           <div className="flex items-center gap-3 px-3 py-3 mt-2 rounded-lg bg-sidebar-accent/50">
             <UserButton
               appearance={{
-                elements: { avatarBox: 'w-8 h-8' },
+                elements: { avatarBox: 'w-8 h-8 ring-2 ring-border' },
               }}
             />
             <div className="min-w-0 flex-1">
