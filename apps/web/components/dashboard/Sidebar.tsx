@@ -189,7 +189,9 @@ function SidebarNav({
             />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium truncate">
-                {user?.firstName} {user?.lastName}
+                {user?.firstName || user?.lastName
+                  ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim()
+                  : user?.primaryEmailAddress?.emailAddress}
               </p>
               <p className="text-xs text-muted-foreground truncate">
                 {user?.primaryEmailAddress?.emailAddress}

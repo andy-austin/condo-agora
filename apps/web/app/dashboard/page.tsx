@@ -205,7 +205,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl lg:text-3xl font-bold">
-          {t('overview.welcomeBack', { name: user?.firstName || 'User' })}
+          {t('overview.welcomeBack', { name: user?.firstName || user?.primaryEmailAddress?.emailAddress?.split('@')[0] || 'User' })}
         </h1>
         {data?.organizationName && (
           <p className="text-muted-foreground mt-1">
