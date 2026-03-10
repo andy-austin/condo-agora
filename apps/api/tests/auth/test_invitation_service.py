@@ -31,13 +31,18 @@ class TestCreateInvitation:
     async def test_creates_invitation_successfully(self, mock_clerk, _mock_revoke):
         mock_clerk.return_value = {"id": "clerk_inv_1"}
         inv_id = ObjectId()
+        org_id = ObjectId()
         mock_invitations_collection.find_one.return_value = None
         mock_invitations_collection.insert_one.return_value = MagicMock(
             inserted_id=inv_id
         )
+        mock_organizations_collection.find_one.return_value = {
+            "_id": org_id,
+            "name": "Test Org",
+        }
 
         result = await create_invitation(
-            "user@example.com", "org-1", "inviter-1", "MEMBER"
+            "user@example.com", str(org_id), "inviter-1", "MEMBER"
         )
 
         assert result["email"] == "user@example.com"
@@ -45,20 +50,29 @@ class TestCreateInvitation:
         assert result["method"] == "EMAIL"
         mock_invitations_collection.insert_one.assert_called_once()
         mock_clerk.assert_called_once()
+        # Verify organization_name is in public_metadata
+        call_kwargs = mock_clerk.call_args
+        metadata = call_kwargs.kwargs.get(
+            "public_metadata", call_kwargs[1].get("public_metadata", {})
+        )
+        assert metadata["organization_name"] == "Test Org"
 
     @pytest.mark.asyncio
     async def test_rejects_invalid_email(self, _mock_revoke):
         with pytest.raises(Exception, match="Invalid email address format"):
-            await create_invitation("not-an-email", "org-1", "inviter-1", "MEMBER")
+            await create_invitation(
+                "not-an-email", str(ObjectId()), "inviter-1", "MEMBER"
+            )
 
     @pytest.mark.asyncio
     @patch("apps.api.src.auth.service.create_clerk_invitation", new_callable=AsyncMock)
     async def test_resends_duplicate_pending_invitation(self, mock_clerk, _mock_revoke):
         mock_clerk.return_value = {"id": "clerk_inv_2"}
+        org_id = ObjectId()
         existing = {
             "_id": ObjectId(),
             "email": "user@example.com",
-            "organization_id": "org-1",
+            "organization_id": str(org_id),
             "accepted_at": None,
             "expires_at": datetime.utcnow() + timedelta(days=3),
         }
@@ -66,9 +80,13 @@ class TestCreateInvitation:
         mock_invitations_collection.insert_one.return_value = MagicMock(
             inserted_id=ObjectId()
         )
+        mock_organizations_collection.find_one.return_value = {
+            "_id": org_id,
+            "name": "Test Org",
+        }
 
         result = await create_invitation(
-            "user@example.com", "org-1", "inviter-1", "MEMBER"
+            "user@example.com", str(org_id), "inviter-1", "MEMBER"
         )
 
         assert result["email"] == "user@example.com"
@@ -79,10 +97,11 @@ class TestCreateInvitation:
     @patch("apps.api.src.auth.service.create_clerk_invitation", new_callable=AsyncMock)
     async def test_replaces_expired_invitation(self, mock_clerk, _mock_revoke):
         mock_clerk.return_value = {"id": "clerk_inv_1"}
+        org_id = ObjectId()
         expired = {
             "_id": ObjectId(),
             "email": "user@example.com",
-            "organization_id": "org-1",
+            "organization_id": str(org_id),
             "accepted_at": None,
             "expires_at": datetime.utcnow() - timedelta(days=1),
         }
@@ -90,9 +109,13 @@ class TestCreateInvitation:
         mock_invitations_collection.insert_one.return_value = MagicMock(
             inserted_id=ObjectId()
         )
+        mock_organizations_collection.find_one.return_value = {
+            "_id": org_id,
+            "name": "Test Org",
+        }
 
         result = await create_invitation(
-            "user@example.com", "org-1", "inviter-1", "MEMBER"
+            "user@example.com", str(org_id), "inviter-1", "MEMBER"
         )
 
         assert result["email"] == "user@example.com"
@@ -282,10 +305,11 @@ class TestResendInvitation:
     async def test_resends_invitation(self, mock_clerk, _mock_revoke):
         mock_clerk.return_value = {"id": "clerk_inv_1"}
         inv_id = ObjectId()
+        org_id = ObjectId()
         invitation = {
             "_id": inv_id,
             "email": "user@example.com",
-            "organization_id": "org-1",
+            "organization_id": str(org_id),
             "role": "MEMBER",
             "token": "tok-123",
             "accepted_at": None,
@@ -296,11 +320,21 @@ class TestResendInvitation:
         }
         mock_invitations_collection.find_one.return_value = invitation
         mock_invitations_collection.find_one_and_update.return_value = invitation
+        mock_organizations_collection.find_one.return_value = {
+            "_id": org_id,
+            "name": "Test Org",
+        }
 
         result = await resend_invitation(str(inv_id))
 
         assert result is not None
         mock_clerk.assert_called_once()
+        # Verify organization_name is in public_metadata
+        call_kwargs = mock_clerk.call_args
+        metadata = call_kwargs.kwargs.get(
+            "public_metadata", call_kwargs[1].get("public_metadata", {})
+        )
+        assert metadata["organization_name"] == "Test Org"
 
     @pytest.mark.asyncio
     async def test_raises_when_not_found(self):
