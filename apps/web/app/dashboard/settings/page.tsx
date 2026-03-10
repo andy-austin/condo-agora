@@ -298,9 +298,7 @@ function MembersTab({
     } catch (err: unknown) {
       console.error(err);
       const message = err instanceof Error ? err.message : '';
-      if (message.toLowerCase().includes('already pending')) {
-        alert(t('settings.duplicateInvitation'));
-      } else if (message.toLowerCase().includes('already exists')) {
+      if (message.toLowerCase().includes('already exists')) {
         alert(t('settings.existingUserNotified'));
       } else {
         alert(t('settings.inviteFailed'));
