@@ -8,18 +8,10 @@ from ..resolvers.proposal import _mongo_proposal_to_graphql
 from ..src.auth.permissions import require_org_admin, require_org_member
 from ..src.proposal.service import get_proposal as service_get_proposal
 from ..src.proposal_vote.service import cast_proposal_vote as service_cast_vote
-from ..src.proposal_vote.service import (
-    close_proposal_vote as service_close_vote,
-)
-from ..src.proposal_vote.service import (
-    get_my_proposal_vote as service_get_my_vote,
-)
-from ..src.proposal_vote.service import (
-    get_proposal_vote_results as service_get_results,
-)
-from ..src.proposal_vote.service import (
-    start_proposal_vote as service_start_vote,
-)
+from ..src.proposal_vote.service import close_proposal_vote as service_close_vote
+from ..src.proposal_vote.service import get_my_proposal_vote as service_get_my_vote
+from ..src.proposal_vote.service import get_proposal_vote_results as service_get_results
+from ..src.proposal_vote.service import start_proposal_vote as service_start_vote
 
 
 def _vote_to_graphql(v: dict) -> ProposalVote:

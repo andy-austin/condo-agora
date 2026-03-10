@@ -4,12 +4,6 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from bson import ObjectId
 
-from ..conftest import (
-    mock_houses_collection,
-    mock_proposal_votes_collection,
-    mock_proposals_collection,
-)
-
 # Import after conftest has patched the database module
 from apps.api.src.proposal_vote.service import (
     _check_auto_approval,
@@ -18,6 +12,12 @@ from apps.api.src.proposal_vote.service import (
     get_my_proposal_vote,
     get_proposal_vote_results,
     start_proposal_vote,
+)
+
+from ..conftest import (
+    mock_houses_collection,
+    mock_proposal_votes_collection,
+    mock_proposals_collection,
 )
 
 PROPOSAL_ID = str(ObjectId())
