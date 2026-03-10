@@ -5,7 +5,6 @@ import pytest
 from bson import ObjectId
 
 from ..conftest import (
-    create_async_cursor_mock,
     mock_houses_collection,
     mock_proposal_votes_collection,
     mock_proposals_collection,
