@@ -560,6 +560,7 @@
       "emailPlaceholder": "colega@ejemplo.com",
       "sendInvite": "Enviar invitación",
       "inviteSent": "¡Invitación enviada con éxito!",
+      "inviteFailed": "No se pudo enviar la invitación.",
       "pendingInvitations": "Invitaciones Pendientes",
       "noPendingInvitations": "No hay invitaciones pendientes.",
       "resendInvite": "Reenviar",
