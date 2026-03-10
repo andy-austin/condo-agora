@@ -53,7 +53,7 @@ export function Header() {
                   {t('dashboard')}
                 </Button>
               </Link>
-              <UserButton afterSignOutUrl="/" />
+              <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: 'ring-2 ring-border' } }} />
             </SignedIn>
           </div>
 
@@ -95,7 +95,7 @@ export function Header() {
                       {t('dashboard')}
                     </Button>
                   </Link>
-                  <UserButton afterSignOutUrl="/" />
+                  <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: 'ring-2 ring-border' } }} />
                 </SignedIn>
               </div>
             </nav>
