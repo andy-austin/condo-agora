@@ -53,9 +53,7 @@ class TestCreateInvitation:
 
     @pytest.mark.asyncio
     @patch("apps.api.src.auth.service.create_clerk_invitation", new_callable=AsyncMock)
-    async def test_resends_duplicate_pending_invitation(
-        self, mock_clerk, _mock_revoke
-    ):
+    async def test_resends_duplicate_pending_invitation(self, mock_clerk, _mock_revoke):
         mock_clerk.return_value = {"id": "clerk_inv_2"}
         existing = {
             "_id": ObjectId(),
