@@ -6,7 +6,11 @@ from bson import ObjectId
 from fastapi import HTTPException
 
 from ...database import db
-from .clerk_utils import create_clerk_invitation, delete_clerk_user
+from .clerk_utils import (
+    create_clerk_invitation,
+    delete_clerk_user,
+    revoke_clerk_invitations_for_email,
+)
 
 EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 
@@ -135,6 +139,9 @@ async def create_invitation(
     result = await db.db.invitations.insert_one(invitation_data)
     invitation_data["_id"] = str(result.inserted_id)
 
+    # Revoke any existing Clerk invitations for this email before creating a new one
+    await revoke_clerk_invitations_for_email(email)
+
     # Trigger Clerk Invitation
     redirect_url = f"{_get_app_url()}/dashboard"
 
@@ -168,10 +175,6 @@ async def create_invitation(
                     message=f"You have been invited to join {org_name}",
                     reference_id=str(invitation_data["_id"]),
                 )
-        elif "duplicate" in detail.lower():
-            print(
-                f"Duplicate Clerk invitation for {email}, continuing with local record."
-            )
         else:
             print(f"Failed to send Clerk invitation: {e}")
             raise e
@@ -277,6 +280,9 @@ async def revoke_invitation(invitation_id: str):
     if invitation.get("accepted_at"):
         raise Exception("Cannot revoke an already accepted invitation")
 
+    # Revoke in Clerk so the email can be re-invited later
+    await revoke_clerk_invitations_for_email(invitation["email"])
+
     await db.db.invitations.delete_one({"_id": ObjectId(invitation_id)})
     return invitation["organization_id"]
 
@@ -292,6 +298,9 @@ async def resend_invitation(invitation_id: str):
 
     if invitation.get("accepted_at"):
         raise Exception("Cannot resend an already accepted invitation")
+
+    # Revoke old Clerk invitation before creating a new one
+    await revoke_clerk_invitations_for_email(invitation["email"])
 
     # Resend via Clerk
     redirect_url = f"{_get_app_url()}/dashboard"
