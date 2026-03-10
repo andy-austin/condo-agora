@@ -220,7 +220,7 @@ export default function NewVotingSessionPage() {
                   <div>
                     <div className="text-sm font-medium">{proposal.title}</div>
                     <div className="text-xs text-muted-foreground">
-                      {proposal.category}
+                      {t(`labels.category.${proposal.category}`)}
                     </div>
                   </div>
                 </label>

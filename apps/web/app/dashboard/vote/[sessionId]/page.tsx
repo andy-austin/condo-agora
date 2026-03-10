@@ -341,7 +341,7 @@ export default function VotingSessionPage() {
                     <div className="flex-1">
                       <div className="font-medium text-sm">{proposal.title}</div>
                       <div className="text-xs text-muted-foreground">
-                        {proposal.category}
+                        {t(`labels.category.${proposal.category}`)}
                       </div>
                     </div>
                     <div className="flex gap-1">
