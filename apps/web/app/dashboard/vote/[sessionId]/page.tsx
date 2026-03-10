@@ -38,8 +38,8 @@ const ME_QUERY = `
       memberships {
         organization { id, name }
         role
+        houseId
       }
-      houses { id, unitNumber }
     }
   }
 `;
@@ -47,8 +47,11 @@ const ME_QUERY = `
 type MeResponse = {
   me: {
     id: string;
-    memberships: { organization: { id: string; name: string }; role: string }[];
-    houses: { id: string; unitNumber: string }[];
+    memberships: {
+      organization: { id: string; name: string };
+      role: string;
+      houseId: string | null;
+    }[];
   } | null;
 };
 
@@ -84,8 +87,7 @@ export default function VotingSessionPage() {
         return;
       }
       setIsAdmin(membership.role === 'ADMIN');
-      const house = meData.me?.houses?.[0];
-      if (house) setHouseId(house.id);
+      if (membership.houseId) setHouseId(membership.houseId);
 
       const sessionData = await client.request<{
         votingSession: VotingSession;
@@ -110,11 +112,11 @@ export default function VotingSessionPage() {
         setRankedProposals([...inSession]);
       }
 
-      if (house && sess.status === 'OPEN') {
+      if (membership.houseId && sess.status === 'OPEN') {
         try {
           const voteData = await client.request<{ myVote: Vote | null }>(
             GET_MY_VOTE,
-            { sessionId, houseId: house.id }
+            { sessionId, houseId: membership.houseId }
           );
           if (voteData.myVote) {
             setMyVote(voteData.myVote);
