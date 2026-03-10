@@ -17,12 +17,14 @@ type PendingInvitationsTableProps = {
   organizationId: string;
   getAuthToken: () => Promise<string | null>;
   t: (key: string, values?: Record<string, string | number>) => string;
+  refreshTrigger?: number;
 };
 
 export default function PendingInvitationsTable({
   organizationId,
   getAuthToken,
   t,
+  refreshTrigger,
 }: PendingInvitationsTableProps) {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +48,7 @@ export default function PendingInvitationsTable({
 
   useEffect(() => {
     fetchInvitations();
-  }, [fetchInvitations]);
+  }, [fetchInvitations, refreshTrigger]);
 
   const handleRevoke = async (invitationId: string) => {
     setActionLoading(invitationId);
