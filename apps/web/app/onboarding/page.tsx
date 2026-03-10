@@ -68,7 +68,7 @@ export default function OnboardingPage() {
       name: name.trim(),
     });
 
-    setHouses([...houses, { id: data.createHouse.id, name: data.createHouse.name }]);
+    setHouses((prev) => [...prev, { id: data.createHouse.id, name: data.createHouse.name }]);
   };
 
   const handleAddSingleHouse = async (e: FormEvent) => {
