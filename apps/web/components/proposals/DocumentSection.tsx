@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
@@ -38,6 +39,7 @@ export default function DocumentSection({
   currentUserId,
 }: DocumentSectionProps) {
   const { getAuthToken } = useAuthToken();
+  const t = useTranslations('dashboard.proposals');
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -162,7 +164,7 @@ export default function DocumentSection({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FileText className="w-4 h-4 text-muted-foreground" />
-          <h3 className="font-semibold">Documents</h3>
+          <h3 className="font-semibold">{t('documents')}</h3>
           {documents.length > 0 && (
             <Badge variant="secondary">{documents.length}</Badge>
           )}
@@ -190,7 +192,7 @@ export default function DocumentSection({
             ) : (
               <Upload className="w-3 h-3 mr-1" />
             )}
-            {uploading ? 'Uploading...' : 'Upload'}
+            {uploading ? t('uploading') : t('upload')}
           </Button>
           <input
             ref={fileInputRef}
@@ -218,9 +220,9 @@ export default function DocumentSection({
       {documents.length === 0 ? (
         <div className="text-center py-8 border-2 border-dashed rounded-lg text-muted-foreground">
           <FileText className="w-8 h-8 mx-auto mb-2 opacity-30" />
-          <p className="text-sm">No documents attached yet</p>
+          <p className="text-sm">{t('noDocuments')}</p>
           <p className="text-xs mt-1">
-            Upload quotes, designs, warranties, or receipts
+            {t('noDocumentsHint')}
           </p>
         </div>
       ) : (
@@ -242,6 +244,7 @@ export default function DocumentSection({
                       onMarkSelected={
                         type === 'QUOTE' ? handleMarkSelected : undefined
                       }
+                      t={t}
                     />
                   ))}
                 </div>
@@ -253,7 +256,7 @@ export default function DocumentSection({
 
       {/* Quote comparison - show when 2+ quotes */}
       {quotes.length >= 2 && (
-        <QuoteComparison quotes={quotes} isAdmin={isAdmin} onSelect={handleMarkSelected} />
+        <QuoteComparison quotes={quotes} isAdmin={isAdmin} onSelect={handleMarkSelected} t={t} />
       )}
     </div>
   );
@@ -265,12 +268,14 @@ function DocumentRow({
   currentUserId,
   onDelete,
   onMarkSelected,
+  t,
 }: {
   doc: Document;
   isAdmin: boolean;
   currentUserId: string;
   onDelete: (id: string) => void;
   onMarkSelected?: (id: string) => void;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }) {
   const canDelete = isAdmin || doc.uploadedBy === currentUserId;
 
@@ -286,7 +291,7 @@ function DocumentRow({
           <span className="font-medium truncate">{doc.fileName}</span>
           {doc.selected && (
             <Badge className="bg-green-100 text-green-700 text-[10px]">
-              Selected
+              {t('selected')}
             </Badge>
           )}
         </div>
@@ -299,7 +304,7 @@ function DocumentRow({
           <button
             onClick={() => onMarkSelected(doc.id)}
             className="p-1 rounded hover:bg-gray-100 text-muted-foreground"
-            title="Mark as selected"
+            title={t('markAsSelected')}
           >
             <Star className="w-4 h-4" />
           </button>
@@ -309,7 +314,7 @@ function DocumentRow({
           target="_blank"
           rel="noopener noreferrer"
           className="p-1 rounded hover:bg-gray-100 text-muted-foreground"
-          title="Download"
+          title={t('download')}
         >
           <Download className="w-4 h-4" />
         </a>
@@ -317,7 +322,7 @@ function DocumentRow({
           <button
             onClick={() => onDelete(doc.id)}
             className="p-1 rounded hover:bg-red-50 text-muted-foreground hover:text-red-600"
-            title="Delete"
+            title={t('deleteComment')}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -331,15 +336,17 @@ function QuoteComparison({
   quotes,
   isAdmin,
   onSelect,
+  t,
 }: {
   quotes: Document[];
   isAdmin: boolean;
   onSelect: (id: string) => void;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }) {
   return (
     <div className="mt-4 border rounded-lg p-4 bg-blue-50/50 border-blue-200">
       <h4 className="text-sm font-semibold text-blue-800 mb-3">
-        Quote Comparison ({quotes.length} quotes)
+        {t('quoteComparison', { count: quotes.length })}
       </h4>
       <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${Math.min(quotes.length, 3)}, 1fr)` }}>
         {quotes.map((quote) => (
@@ -361,7 +368,7 @@ function QuoteComparison({
                 className="text-xs text-blue-600 hover:underline flex items-center gap-1"
               >
                 <Download className="w-3 h-3" />
-                View
+                {t('view')}
               </a>
               {isAdmin && !quote.selected && (
                 <button
@@ -369,13 +376,13 @@ function QuoteComparison({
                   className="text-xs text-green-700 hover:underline flex items-center gap-1"
                 >
                   <CheckCircle2 className="w-3 h-3" />
-                  Select
+                  {t('select')}
                 </button>
               )}
               {quote.selected && (
                 <span className="text-xs text-green-700 flex items-center gap-1 font-medium">
                   <CheckCircle2 className="w-3 h-3" />
-                  Selected
+                  {t('selected')}
                 </span>
               )}
             </div>

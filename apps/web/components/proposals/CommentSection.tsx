@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { getApiClient } from '@/lib/api';
 import {
   GET_COMMENTS,
@@ -29,6 +30,7 @@ export default function CommentSection({
   isAdmin,
   getAuthToken,
 }: CommentSectionProps) {
+  const t = useTranslations('dashboard.proposals');
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [newContent, setNewContent] = useState('');
@@ -65,14 +67,14 @@ export default function CommentSection({
       setNewContent('');
     } catch (err) {
       console.error('Failed to post comment:', err);
-      alert('Failed to post comment.');
+      alert(t('failedToPost'));
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (commentId: string) => {
-    if (!confirm('Delete this comment?')) return;
+    if (!confirm(t('deleteConfirm'))) return;
     try {
       const token = await getAuthToken();
       const client = getApiClient(token);
@@ -133,13 +135,13 @@ export default function CommentSection({
     <div className="border rounded-xl p-6">
       <h2 className="text-base font-semibold mb-5 flex items-center gap-2">
         <MessageSquare size={18} />
-        Comments ({comments.length})
+        {t('commentsCount', { count: comments.length })}
       </h2>
 
       {/* Comment list */}
       {comments.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-6">
-          No comments yet — start the discussion!
+          {t('noComments')}
         </p>
       ) : (
         <div className="space-y-4 mb-6">
@@ -152,6 +154,7 @@ export default function CommentSection({
               onDelete={handleDelete}
               onReply={handleReply}
               onUpdate={handleUpdate}
+              t={t}
             />
           ))}
         </div>
@@ -162,7 +165,7 @@ export default function CommentSection({
         <textarea
           value={newContent}
           onChange={(e) => setNewContent(e.target.value)}
-          placeholder="Write a comment..."
+          placeholder={t('writeComment')}
           className="w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
           rows={3}
         />
@@ -172,7 +175,7 @@ export default function CommentSection({
             onClick={handleSubmit}
             disabled={submitting || !newContent.trim()}
           >
-            {submitting ? 'Posting...' : 'Post Comment'}
+            {submitting ? t('posting') : t('postComment')}
           </Button>
         </div>
       </div>
@@ -187,6 +190,7 @@ function CommentItem({
   onDelete,
   onReply,
   onUpdate,
+  t,
   depth = 0,
 }: {
   comment: Comment;
@@ -195,6 +199,7 @@ function CommentItem({
   onDelete: (id: string) => void;
   onReply: (parentId: string, content: string) => Promise<void>;
   onUpdate: (id: string, content: string) => Promise<void>;
+  t: (key: string, values?: Record<string, string | number>) => string;
   depth?: number;
 }) {
   const [editing, setEditing] = useState(false);
@@ -215,7 +220,7 @@ function CommentItem({
       await onUpdate(comment.id, editContent.trim());
       setEditing(false);
     } catch {
-      alert('Failed to update comment.');
+      alert(t('failedToUpdate'));
     } finally {
       setSaving(false);
     }
@@ -229,7 +234,7 @@ function CommentItem({
       setReplyContent('');
       setShowReply(false);
     } catch {
-      alert('Failed to post reply.');
+      alert(t('failedToReply'));
     } finally {
       setReplying(false);
     }
@@ -264,7 +269,7 @@ function CommentItem({
               />
               <div className="flex gap-2">
                 <Button size="sm" onClick={handleSave} disabled={saving}>
-                  {saving ? 'Saving...' : 'Save'}
+                  {saving ? t('saving') : t('save')}
                 </Button>
                 <Button
                   size="sm"
@@ -274,7 +279,7 @@ function CommentItem({
                     setEditContent(comment.content);
                   }}
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
               </div>
             </div>
@@ -291,7 +296,7 @@ function CommentItem({
                   className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
                 >
                   <CornerDownRight size={12} />
-                  Reply
+                  {t('reply')}
                 </button>
               )}
               {canEdit && (
@@ -300,7 +305,7 @@ function CommentItem({
                   className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
                 >
                   <Pencil size={12} />
-                  Edit
+                  {t('edit')}
                 </button>
               )}
               {canDelete && (
@@ -309,7 +314,7 @@ function CommentItem({
                   className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors"
                 >
                   <Trash2 size={12} />
-                  Delete
+                  {t('deleteComment')}
                 </button>
               )}
             </div>
@@ -321,17 +326,17 @@ function CommentItem({
               <textarea
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
-                placeholder="Write a reply..."
+                placeholder={t('writeReply')}
                 className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
                 rows={2}
                 autoFocus
               />
               <div className="flex gap-2">
                 <Button size="sm" onClick={handleReplySubmit} disabled={replying || !replyContent.trim()}>
-                  {replying ? 'Posting...' : 'Reply'}
+                  {replying ? t('posting') : t('reply')}
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => setShowReply(false)}>
-                  Cancel
+                  {t('cancel')}
                 </Button>
               </div>
             </div>
@@ -351,6 +356,7 @@ function CommentItem({
               onDelete={onDelete}
               onReply={onReply}
               onUpdate={onUpdate}
+              t={t}
               depth={depth + 1}
             />
           ))}
