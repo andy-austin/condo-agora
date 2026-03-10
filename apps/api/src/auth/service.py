@@ -143,12 +143,17 @@ async def create_invitation(
     # Trigger Clerk Invitation
     redirect_url = f"{_get_app_url()}/dashboard"
 
+    # Look up org name so Clerk email template can reference it
+    org = await db.db.organizations.find_one({"_id": ObjectId(organization_id)})
+    org_name = org["name"] if org else "Condo Agora"
+
     try:
         await create_clerk_invitation(
             email=email,
             redirect_url=redirect_url,
             public_metadata={
                 "organization_id": organization_id,
+                "organization_name": org_name,
                 "role": role,
                 "invitation_token": token,
             },
@@ -309,12 +314,19 @@ async def resend_invitation(invitation_id: str):
     # Resend via Clerk
     redirect_url = f"{_get_app_url()}/dashboard"
 
+    # Look up org name for Clerk email template
+    org = await db.db.organizations.find_one(
+        {"_id": ObjectId(invitation["organization_id"])}
+    )
+    org_name = org["name"] if org else "Condo Agora"
+
     try:
         await create_clerk_invitation(
             email=invitation["email"],
             redirect_url=redirect_url,
             public_metadata={
                 "organization_id": invitation["organization_id"],
+                "organization_name": org_name,
                 "role": invitation["role"],
                 "invitation_token": invitation["token"],
             },
