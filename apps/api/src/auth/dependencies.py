@@ -71,6 +71,51 @@ async def _provision_user_from_clerk(clerk_id: str) -> Optional[dict]:
     return user
 
 
+async def _sync_user_profile_from_clerk(
+    clerk_id: str, existing_user: dict
+) -> Optional[dict]:
+    """
+    Re-fetch profile data from Clerk and update the local user record
+    if Clerk now has a name that we're missing locally.
+    """
+    if not CLERK_SECRET_KEY:
+        return None
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"https://api.clerk.com/v1/users/{clerk_id}",
+                headers={
+                    "Authorization": f"Bearer {CLERK_SECRET_KEY}",
+                    "Content-Type": "application/json",
+                },
+            )
+            response.raise_for_status()
+            data = response.json()
+    except Exception as e:
+        print(f"Failed to sync profile for {clerk_id}: {e}")
+        return None
+
+    first_name = data.get("first_name")
+    last_name = data.get("last_name")
+    image_url = data.get("image_url")
+
+    # Only update if Clerk actually has a name now
+    if not first_name and not last_name:
+        return None
+
+    update_fields = {"updated_at": datetime.utcnow()}
+    if first_name:
+        update_fields["first_name"] = first_name
+    if last_name:
+        update_fields["last_name"] = last_name
+    if image_url:
+        update_fields["avatar_url"] = image_url
+
+    await db.db.users.update_one({"_id": existing_user["_id"]}, {"$set": update_fields})
+    return await db.db.users.find_one({"_id": existing_user["_id"]})
+
+
 async def get_current_user(auth: HTTPAuthorizationCredentials = Security(security)):
     """
     Dependency to get the current authenticated user by validating the Clerk JWT.
@@ -103,6 +148,13 @@ async def get_current_user(auth: HTTPAuthorizationCredentials = Security(securit
         # webhook call may have missed (e.g. serverless function killed
         # before background task completed).
         await process_pending_invitations(user)
+
+        # Re-sync profile from Clerk if name is missing (e.g. user signed
+        # up via invitation and the webhook fired before name was set).
+        if not user.get("first_name"):
+            updated = await _sync_user_profile_from_clerk(clerk_id, user)
+            if updated:
+                user = updated
 
     # Convert ObjectId to string for the id field
     user["id"] = str(user["_id"])
