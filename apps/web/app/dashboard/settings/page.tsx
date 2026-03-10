@@ -269,6 +269,7 @@ function MembersTab({
   const [submitting, setSubmitting] = useState(false);
   const [inviteSuccess, setInviteSuccess] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [inviteRefresh, setInviteRefresh] = useState(0);
 
   const filteredMembers = members.filter((m) => {
     const q = search.toLowerCase();
@@ -292,6 +293,7 @@ function MembersTab({
       await client.request(CREATE_INVITATION, { email, organizationId, role });
       setEmail('');
       setInviteSuccess(true);
+      setInviteRefresh((n) => n + 1);
       setTimeout(() => setInviteSuccess(false), 3000);
     } catch (err: unknown) {
       console.error(err);
@@ -498,6 +500,7 @@ function MembersTab({
           organizationId={organizationId}
           getAuthToken={getAuthToken}
           t={t}
+          refreshTrigger={inviteRefresh}
         />
       )}
     </div>
