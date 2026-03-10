@@ -233,7 +233,9 @@ export default function NewVotingSessionPage() {
               {selectedIds.size !== 1
                 ? t('common.proposals')
                 : t('common.proposal')}{' '}
-              {t('voting.selected')}
+              {selectedIds.size !== 1
+                ? t('voting.selectedPlural')
+                : t('voting.selectedSingular')}
             </p>
           )}
         </div>

@@ -521,6 +521,8 @@
       "proposalsToVote": "Propuestas a votar * (seleccioná de las propuestas en estado VOTACIÓN)",
       "noVotingProposals": "No hay propuestas en estado VOTACIÓN. Pasá propuestas a VOTACIÓN primero.",
       "selected": "seleccionadas",
+      "selectedSingular": "seleccionada",
+      "selectedPlural": "seleccionadas",
       "failedToLoadProposals": "No se pudieron cargar las propuestas",
       "createSession": "Crear sesión",
       "failedToCreateSession": "No se pudo crear la sesión de votación"
