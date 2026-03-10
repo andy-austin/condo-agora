@@ -156,8 +156,14 @@ async def create_invitation(
         print(f"Clerk invitation sent to {email}")
     except HTTPException as e:
         detail = str(e.detail)
-        if e.status_code == 422 and "form_identifier_exists" in detail:
-            print(f"User {email} already exists in Clerk. Sending in-app notification.")
+        is_existing_user = e.status_code == 422 and "form_identifier_exists" in detail
+        is_duplicate = "duplicate" in detail.lower()
+
+        if is_existing_user or is_duplicate:
+            print(
+                f"User {email} already exists in Clerk or has prior invitation. "
+                "Sending in-app notification."
+            )
             # Notify existing user via in-app notification
             existing_user = await db.db.users.find_one({"email": email})
             if existing_user:
