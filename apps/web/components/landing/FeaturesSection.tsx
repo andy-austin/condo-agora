@@ -17,7 +17,7 @@ export function FeaturesSection() {
   const { ref, isVisible } = useScrollReveal<HTMLElement>();
 
   return (
-    <section id="features" className="section-padding" ref={ref}>
+    <section id="features" className="section-padding bg-[hsl(35,30%,96%)]" ref={ref}>
       <div className="container-tight">
         <div className={`text-center max-w-2xl mx-auto mb-16 scroll-reveal ${isVisible ? 'visible' : ''}`}>
           <span className="text-sm font-medium text-primary mb-4 block">{t('label')}</span>

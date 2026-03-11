@@ -20,7 +20,7 @@ export function TestimonialsSection() {
   return (
     <section
       id="testimonials"
-      className="section-padding"
+      className="section-padding bg-gradient-to-br from-amber-50/80 to-orange-50/50"
       ref={ref}
     >
       <div className="container-tight">
