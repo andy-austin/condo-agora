@@ -266,3 +266,96 @@ def test_verify_otp_connects_db_if_not_connected():
 
     assert response.status_code == 200
     mock_db.connect.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# POST /otp/google-link
+# ---------------------------------------------------------------------------
+
+
+def test_google_link_creates_new_user():
+    with patch("apps.api.src.auth.otp_router.db") as mock_db:
+        mock_db.is_connected.return_value = True
+        mock_db.db.users.find_one = AsyncMock(return_value=None)
+        mock_db.db.users.insert_one = AsyncMock()
+        mock_db.db.users.insert_one.return_value.inserted_id = "507f1f77bcf86cd799439011"
+
+        response = client.post(
+            "/otp/google-link",
+            json={"email": "newuser@example.com", "name": "Jane Doe", "image": "https://example.com/avatar.jpg"},
+            headers={"X-Internal-Secret": "test-secret"},
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["email"] == "newuser@example.com"
+    assert data["first_name"] == "Jane"
+    assert data["last_name"] == "Doe"
+    assert data["auth_provider"] == "google"
+    assert data["avatar_url"] == "https://example.com/avatar.jpg"
+    assert isinstance(data["_id"], str)
+
+
+def test_google_link_links_existing_user():
+    existing_user = {
+        "_id": "507f1f77bcf86cd799439011",
+        "email": "existing@example.com",
+        "first_name": "Existing",
+        "last_name": "User",
+        "auth_provider": "google",
+        "avatar_url": "https://example.com/existing.jpg",
+    }
+    with patch("apps.api.src.auth.otp_router.db") as mock_db:
+        mock_db.is_connected.return_value = True
+        mock_db.db.users.find_one = AsyncMock(return_value=dict(existing_user))
+
+        response = client.post(
+            "/otp/google-link",
+            json={"email": "existing@example.com"},
+            headers={"X-Internal-Secret": "test-secret"},
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["email"] == "existing@example.com"
+    assert data["_id"] == "507f1f77bcf86cd799439011"
+
+
+def test_google_link_updates_avatar_if_missing():
+    existing_user = {
+        "_id": "507f1f77bcf86cd799439011",
+        "email": "existing@example.com",
+        "avatar_url": None,
+    }
+    with patch("apps.api.src.auth.otp_router.db") as mock_db:
+        mock_db.is_connected.return_value = True
+        mock_db.db.users.find_one = AsyncMock(return_value=dict(existing_user))
+        mock_db.db.users.update_one = AsyncMock()
+
+        response = client.post(
+            "/otp/google-link",
+            json={"email": "existing@example.com", "image": "https://example.com/new.jpg"},
+            headers={"X-Internal-Secret": "test-secret"},
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["avatar_url"] == "https://example.com/new.jpg"
+    mock_db.db.users.update_one.assert_called_once()
+
+
+def test_google_link_requires_internal_secret():
+    response = client.post(
+        "/otp/google-link",
+        json={"email": "user@example.com"},
+    )
+    assert response.status_code == 403
+
+
+def test_google_link_wrong_secret_returns_403():
+    response = client.post(
+        "/otp/google-link",
+        json={"email": "user@example.com"},
+        headers={"X-Internal-Secret": "wrong-secret"},
+    )
+    assert response.status_code == 403

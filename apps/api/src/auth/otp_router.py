@@ -1,5 +1,7 @@
 # apps/api/src/auth/otp_router.py
 import os
+import uuid
+from datetime import datetime, timezone
 from typing import Literal
 
 from fastapi import APIRouter, Header, HTTPException, Request
@@ -79,4 +81,52 @@ async def verify_otp_endpoint(
     if "_id" in user:
         user["_id"] = str(user["_id"])
 
+    return user
+
+
+class GoogleLinkBody(BaseModel):
+    email: str
+    name: str | None = None
+    image: str | None = None
+
+
+@router.post("/google-link")
+async def handle_google_link(body: GoogleLinkBody, request: Request):
+    """Server-to-server: find or create user for Google sign-in."""
+    secret = request.headers.get("X-Internal-Secret", "")
+    if secret != INTERNAL_API_SECRET:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    if not db.is_connected():
+        await db.connect()
+
+    user = await db.db.users.find_one({"email": body.email})
+
+    if user:
+        # Update avatar if missing
+        updates = {}
+        if not user.get("avatar_url") and body.image:
+            updates["avatar_url"] = body.image
+        if updates:
+            await db.db.users.update_one({"_id": user["_id"]}, {"$set": updates})
+            user.update(updates)
+    else:
+        now = datetime.now(timezone.utc)
+        name_parts = (body.name or "").split(" ", 1)
+        new_user = {
+            "nextauth_id": str(uuid.uuid4()),
+            "email": body.email,
+            "phone": None,
+            "first_name": name_parts[0] if name_parts else None,
+            "last_name": name_parts[1] if len(name_parts) > 1 else None,
+            "avatar_url": body.image,
+            "auth_provider": "google",
+            "created_at": now,
+            "updated_at": now,
+        }
+        result = await db.db.users.insert_one(new_user)
+        new_user["_id"] = result.inserted_id
+        user = new_user
+
+    user["_id"] = str(user["_id"])
     return user
