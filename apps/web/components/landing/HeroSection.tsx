@@ -34,7 +34,7 @@ export function HeroSection() {
       <div className="absolute bottom-20 -right-32 w-96 h-96 bg-amber-300/10 rounded-full blur-3xl -z-10" />
 
       <div className="container-tight">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-4xl mx-auto text-center hero-stagger">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 backdrop-blur-sm border border-white/40 text-primary text-sm font-medium mb-8 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             {t('badge')}
