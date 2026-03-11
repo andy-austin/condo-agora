@@ -1,6 +1,7 @@
-import pytest
 from datetime import datetime
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 
 @pytest.mark.asyncio
@@ -22,10 +23,13 @@ async def test_bulk_setup_creates_org_and_properties():
         {"row_id": "r1", "property_name": "Apto 101"},
         {"row_id": "r2", "property_name": "Apto 102"},
     ]
-    with patch(
-        "apps.api.src.onboarding.service.create_organization",
-        new=AsyncMock(return_value=mock_org),
-    ), patch("apps.api.src.onboarding.service.db", mock_db):
+    with (
+        patch(
+            "apps.api.src.onboarding.service.create_organization",
+            new=AsyncMock(return_value=mock_org),
+        ),
+        patch("apps.api.src.onboarding.service.db", mock_db),
+    ):
         from apps.api.src.onboarding.service import bulk_setup_organization
 
         result = await bulk_setup_organization("Test Condo", rows, "user_creator")
@@ -69,14 +73,16 @@ async def test_bulk_setup_creates_clerk_users_for_phone_rows():
             "phone": "+584121234567",
         }
     ]
-    with patch(
-        "apps.api.src.onboarding.service.create_organization",
-        new=AsyncMock(return_value=mock_org),
-    ), patch(
-        "apps.api.src.onboarding.service.create_phone_user",
-        new=AsyncMock(return_value=mock_clerk_result),
-    ), patch(
-        "apps.api.src.onboarding.service.db", mock_db
+    with (
+        patch(
+            "apps.api.src.onboarding.service.create_organization",
+            new=AsyncMock(return_value=mock_org),
+        ),
+        patch(
+            "apps.api.src.onboarding.service.create_phone_user",
+            new=AsyncMock(return_value=mock_clerk_result),
+        ),
+        patch("apps.api.src.onboarding.service.db", mock_db),
     ):
         from apps.api.src.onboarding.service import bulk_setup_organization
 
@@ -88,9 +94,7 @@ async def test_bulk_setup_creates_clerk_users_for_phone_rows():
 
 @pytest.mark.asyncio
 async def test_bulk_setup_rejects_over_200_rows():
-    rows = [
-        {"row_id": f"r{i}", "property_name": f"Apto {i}"} for i in range(201)
-    ]
+    rows = [{"row_id": f"r{i}", "property_name": f"Apto {i}"} for i in range(201)]
     with pytest.raises(Exception, match="Maximum 200"):
         from apps.api.src.onboarding.service import bulk_setup_organization
 
@@ -128,14 +132,16 @@ async def test_bulk_setup_handles_clerk_error_per_row():
         {"row_id": "r1", "property_name": "Apto 101", "phone": "+584121111111"},
         {"row_id": "r2", "property_name": "Apto 102", "phone": "+584122222222"},
     ]
-    with patch(
-        "apps.api.src.onboarding.service.create_organization",
-        new=AsyncMock(return_value=mock_org),
-    ), patch(
-        "apps.api.src.onboarding.service.create_phone_user",
-        new=AsyncMock(side_effect=[clerk_error, clerk_success]),
-    ), patch(
-        "apps.api.src.onboarding.service.db", mock_db
+    with (
+        patch(
+            "apps.api.src.onboarding.service.create_organization",
+            new=AsyncMock(return_value=mock_org),
+        ),
+        patch(
+            "apps.api.src.onboarding.service.create_phone_user",
+            new=AsyncMock(side_effect=[clerk_error, clerk_success]),
+        ),
+        patch("apps.api.src.onboarding.service.db", mock_db),
     ):
         from apps.api.src.onboarding.service import bulk_setup_organization
 

@@ -48,6 +48,4 @@ class AuthMutations:
     create_organization: Organization = strawberry.mutation(
         resolver=resolve_create_organization
     )
-    complete_profile: User = strawberry.mutation(
-        resolver=resolve_complete_profile
-    )
+    complete_profile: User = strawberry.mutation(resolver=resolve_complete_profile)

@@ -139,9 +139,7 @@ async def handle_user_created(data: dict):
         email_addresses[0]["email_address"] if email_addresses else None,
     )
 
-    primary_phone = (
-        phone_numbers[0].get("phone_number") if phone_numbers else None
-    )
+    primary_phone = phone_numbers[0].get("phone_number") if phone_numbers else None
 
     if not primary_email and not primary_phone:
         print(f"Warning: No email or phone found for Clerk user {clerk_id}")
@@ -214,9 +212,7 @@ async def handle_user_updated(data: dict):
         email_addresses[0]["email_address"] if email_addresses else None,
     )
 
-    primary_phone = (
-        phone_numbers[0].get("phone_number") if phone_numbers else None
-    )
+    primary_phone = phone_numbers[0].get("phone_number") if phone_numbers else None
 
     first_name = data.get("first_name")
     last_name = data.get("last_name")

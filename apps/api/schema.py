@@ -13,13 +13,13 @@ from .schemas.document import DocumentMutations, DocumentQueries
 from .schemas.health import HealthQueries
 from .schemas.house import HouseMutations, HouseQueries
 from .schemas.notification import NotificationMutations, NotificationQueries
+from .schemas.onboarding import OnboardingMutations
 from .schemas.project_milestone import (
     ProjectMilestoneMutations,
     ProjectMilestoneQueries,
 )
 from .schemas.proposal import ProposalMutations, ProposalQueries
 from .schemas.proposal_vote import ProposalVoteMutations, ProposalVoteQueries
-from .schemas.onboarding import OnboardingMutations
 from .schemas.voting import VotingMutations, VotingQueries
 
 

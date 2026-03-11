@@ -84,17 +84,13 @@ async def bulk_setup_organization(
 
                     if clerk_result.get("error"):
                         row_result["status"] = "ERROR"
-                        row_result["error"] = clerk_result.get(
-                            "detail", "Clerk error"
-                        )
+                        row_result["error"] = clerk_result.get("detail", "Clerk error")
                         results.append(row_result)
                         continue
 
                     clerk_id = clerk_result["id"]
 
-                    local_user = await db.db.users.find_one(
-                        {"clerk_id": clerk_id}
-                    )
+                    local_user = await db.db.users.find_one({"clerk_id": clerk_id})
                     if local_user:
                         user_id = str(local_user["_id"])
                     else:

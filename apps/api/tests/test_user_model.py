@@ -1,5 +1,6 @@
-from apps.api.models.user import User
 from datetime import datetime
+
+from apps.api.models.user import User
 
 
 def test_user_without_email():
