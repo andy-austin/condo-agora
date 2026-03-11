@@ -233,7 +233,7 @@
     "sidebar": {
       "overview": "Overview",
       "properties": "Properties",
-      "committee": "Committee",
+      "committee": "Management",
       "proposals": "Proposals",
       "voting": "Voting",
       "reports": "Reports",
@@ -350,7 +350,7 @@
       "voterUpdated": "Designated voter updated successfully."
     },
     "committee": {
-      "title": "Committee",
+      "title": "Management",
       "subtitle": "Board members & residents of {orgName}",
       "notInOrg": "You are not part of any organization.",
       "failedToLoad": "Failed to load committee members.",
