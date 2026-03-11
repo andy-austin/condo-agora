@@ -1,18 +1,21 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { useAuth, RedirectToSignIn } from '@clerk/nextjs';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { SidebarLayout } from '@/components/dashboard/Sidebar';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { status } = useSession();
+  const router = useRouter();
 
-  if (!isLoaded) {
+  if (status === 'loading') {
     return null;
   }
 
-  if (!isSignedIn) {
-    return <RedirectToSignIn />;
+  if (status === 'unauthenticated') {
+    router.push('/login');
+    return null;
   }
 
   return <SidebarLayout>{children}</SidebarLayout>;
