@@ -14,6 +14,7 @@ from ..conftest import (
     mock_comments_collection,
     mock_houses_collection,
     mock_proposals_collection,
+    mock_users_collection,
     mock_votes_collection,
     mock_voting_sessions_collection,
 )
@@ -65,6 +66,13 @@ class TestGetCommunityAnalytics:
         ]
         mock_comments_collection.find.return_value = create_async_cursor_mock([])
 
+        mock_users_collection.find.return_value = create_async_cursor_mock(
+            [
+                {"clerk_id": "user-1", "first_name": "Alice", "last_name": "Smith"},
+                {"clerk_id": "user-2", "first_name": "Bob", "last_name": "Jones"},
+            ]
+        )
+
         cursor_mock = create_async_cursor_mock([])
         cursor_mock.sort = MagicMock(return_value=cursor_mock)
         cursor_mock.limit = MagicMock(return_value=create_async_cursor_mock([]))
@@ -75,6 +83,13 @@ class TestGetCommunityAnalytics:
         assert result["approved_proposals"] == 1
         assert result["rejected_proposals"] == 1
         assert len(result["category_breakdown"]) == 2
+
+        # Verify user names are resolved
+        contributors = result["top_contributors"]
+        assert len(contributors) == 2
+        names = {c["user_id"]: c["first_name"] for c in contributors}
+        assert names["user-1"] == "Alice"
+        assert names["user-2"] == "Bob"
 
 
 class TestGetParticipationReport:
