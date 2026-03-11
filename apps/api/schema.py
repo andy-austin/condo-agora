@@ -8,7 +8,6 @@ from .schemas.comment import CommentMutations, CommentQueries
 from .schemas.document import DocumentMutations, DocumentQueries
 from .schemas.health import HealthQueries
 from .schemas.house import HouseMutations, HouseQueries
-from .schemas.note import NoteMutations, NoteQueries
 from .schemas.notification import NotificationMutations, NotificationQueries
 from .schemas.project_milestone import (
     ProjectMilestoneMutations,
@@ -21,7 +20,6 @@ from .schemas.voting import VotingMutations, VotingQueries
 
 @strawberry.type
 class Query(
-    NoteQueries,
     HealthQueries,
     AuthQueries,
     HouseQueries,
@@ -41,7 +39,6 @@ class Query(
 
 @strawberry.type
 class Mutation(
-    NoteMutations,
     AuthMutations,
     HouseMutations,
     ProposalMutations,
