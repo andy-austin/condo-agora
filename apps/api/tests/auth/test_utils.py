@@ -18,9 +18,7 @@ async def test_verify_token_valid():
             "sub": "uuid-1",
             "email": "user@example.com",
             "iat": datetime.now(timezone.utc).timestamp(),
-            "exp": (
-                datetime.now(timezone.utc) + timedelta(days=30)
-            ).timestamp(),
+            "exp": (datetime.now(timezone.utc) + timedelta(days=30)).timestamp(),
         }
     )
     payload = await verify_token(token, secret="test-nextauth-secret-min-32-chars!!")

@@ -8,7 +8,9 @@ from apps.api.src.auth.channels import send_whatsapp_otp, send_email_otp
 @patch("apps.api.src.auth.channels.httpx.AsyncClient")
 async def test_send_whatsapp_otp_calls_chasqui(mock_client_class):
     mock_client = AsyncMock()
-    mock_client.post = AsyncMock(return_value=AsyncMock(status_code=200, json=lambda: {"success": True}))
+    mock_client.post = AsyncMock(
+        return_value=AsyncMock(status_code=200, json=lambda: {"success": True})
+    )
     mock_client.__aenter__ = AsyncMock(return_value=mock_client)
     mock_client.__aexit__ = AsyncMock(return_value=False)
     mock_client_class.return_value = mock_client

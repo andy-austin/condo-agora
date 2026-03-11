@@ -23,9 +23,7 @@ from apps.api.tests.conftest import (
 
 class TestCreateInvitation:
     @pytest.mark.asyncio
-    @patch(
-        "apps.api.src.auth.service.send_email_invitation", new_callable=AsyncMock
-    )
+    @patch("apps.api.src.auth.service.send_email_invitation", new_callable=AsyncMock)
     async def test_creates_invitation_successfully(self, mock_send_email):
         inv_id = ObjectId()
         org_id = ObjectId()
@@ -59,13 +57,15 @@ class TestCreateInvitation:
     async def test_rejects_invalid_phone_for_whatsapp(self):
         with pytest.raises(Exception, match="Invalid phone number format"):
             await create_invitation(
-                "not-a-phone", str(ObjectId()), "inviter-1", "MEMBER", channel="whatsapp"
+                "not-a-phone",
+                str(ObjectId()),
+                "inviter-1",
+                "MEMBER",
+                channel="whatsapp",
             )
 
     @pytest.mark.asyncio
-    @patch(
-        "apps.api.src.auth.service.send_whatsapp_invitation", new_callable=AsyncMock
-    )
+    @patch("apps.api.src.auth.service.send_whatsapp_invitation", new_callable=AsyncMock)
     async def test_creates_whatsapp_invitation(self, mock_send_whatsapp):
         inv_id = ObjectId()
         org_id = ObjectId()
@@ -87,9 +87,7 @@ class TestCreateInvitation:
         mock_send_whatsapp.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch(
-        "apps.api.src.auth.service.send_email_invitation", new_callable=AsyncMock
-    )
+    @patch("apps.api.src.auth.service.send_email_invitation", new_callable=AsyncMock)
     async def test_resends_duplicate_pending_invitation(self, mock_send_email):
         org_id = ObjectId()
         existing = {
@@ -117,9 +115,7 @@ class TestCreateInvitation:
         mock_send_email.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch(
-        "apps.api.src.auth.service.send_email_invitation", new_callable=AsyncMock
-    )
+    @patch("apps.api.src.auth.service.send_email_invitation", new_callable=AsyncMock)
     async def test_notifies_existing_user_when_send_fails(self, mock_send_email):
         mock_send_email.side_effect = Exception("Send failed")
         mock_invitations_collection.find_one.return_value = None
@@ -317,9 +313,7 @@ class TestRevokeInvitation:
 
 class TestResendInvitation:
     @pytest.mark.asyncio
-    @patch(
-        "apps.api.src.auth.service.send_email_invitation", new_callable=AsyncMock
-    )
+    @patch("apps.api.src.auth.service.send_email_invitation", new_callable=AsyncMock)
     async def test_resends_invitation(self, mock_send_email):
         inv_id = ObjectId()
         org_id = ObjectId()
@@ -350,9 +344,7 @@ class TestResendInvitation:
         assert call_kwargs.kwargs.get("org_name") == "Test Org"
 
     @pytest.mark.asyncio
-    @patch(
-        "apps.api.src.auth.service.send_whatsapp_invitation", new_callable=AsyncMock
-    )
+    @patch("apps.api.src.auth.service.send_whatsapp_invitation", new_callable=AsyncMock)
     async def test_resends_whatsapp_invitation(self, mock_send_whatsapp):
         inv_id = ObjectId()
         org_id = ObjectId()

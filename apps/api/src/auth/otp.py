@@ -9,6 +9,7 @@ from .rate_limit import check_rate_limit
 
 class OTPVerificationError(Exception):
     """Raised when OTP verification fails."""
+
     pass
 
 
@@ -37,13 +38,15 @@ async def request_otp(db, identifier: str, channel: str, ip_address: str) -> Non
 
     # Generate and store new code
     code = generate_otp()
-    await db.otp_codes.insert_one({
-        "identifier": identifier,
-        "code": code,
-        "channel": channel,
-        "attempts": 0,
-        "created_at": datetime.now(timezone.utc),
-    })
+    await db.otp_codes.insert_one(
+        {
+            "identifier": identifier,
+            "code": code,
+            "channel": channel,
+            "attempts": 0,
+            "created_at": datetime.now(timezone.utc),
+        }
+    )
 
     # Send via appropriate channel
     if channel == "whatsapp":
