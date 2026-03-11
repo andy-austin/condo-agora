@@ -54,20 +54,27 @@ async def process_pending_invitations(user: dict):
     organization memberships.  Idempotent — safe to call multiple times.
     """
     email = user.get("email")
-    if not email:
+    phone = user.get("phone_number")
+
+    match_conditions = []
+    if email:
+        match_conditions.append({"email": email})
+    if phone:
+        match_conditions.append({"phone": phone})
+
+    if not match_conditions:
         return
 
     if not db.is_connected():
         await db.connect()
 
     now = datetime.utcnow()
-    cursor = db.db.invitations.find(
-        {
-            "email": email,
-            "accepted_at": None,
-            "expires_at": {"$gt": now},
-        }
-    )
+    query = {
+        "$or": match_conditions,
+        "accepted_at": None,
+        "expires_at": {"$gt": now},
+    }
+    cursor = db.db.invitations.find(query)
 
     async for invite in cursor:
         # Guard against duplicates (webhook + JIT race condition)
@@ -120,23 +127,31 @@ async def process_pending_invitations(user: dict):
 async def handle_user_created(data: dict):
     """
     Syncs a newly created Clerk user to our local database.
+    Handles both email-based and phone-only users.
     """
     clerk_id = data.get("id")
     email_addresses = data.get("email_addresses", [])
     primary_email_id = data.get("primary_email_address_id")
+    phone_numbers = data.get("phone_numbers", [])
 
     primary_email = next(
         (e["email_address"] for e in email_addresses if e["id"] == primary_email_id),
         email_addresses[0]["email_address"] if email_addresses else None,
     )
 
-    if not primary_email:
-        print(f"Warning: No email found for Clerk user {clerk_id}")
+    primary_phone = phone_numbers[0].get("phone_number") if phone_numbers else None
+
+    if not primary_email and not primary_phone:
+        print(f"Warning: No email or phone found for Clerk user {clerk_id}")
         return
 
     first_name = data.get("first_name")
     last_name = data.get("last_name")
     image_url = data.get("image_url")
+    unsafe_metadata = data.get("unsafe_metadata", {})
+    requires_profile_completion = unsafe_metadata.get(
+        "requires_profile_completion", False
+    )
 
     if not db.is_connected():
         await db.connect()
@@ -152,9 +167,11 @@ async def handle_user_created(data: dict):
             {
                 "$set": {
                     "email": primary_email,
+                    "phone_number": primary_phone,
                     "first_name": first_name,
                     "last_name": last_name,
                     "avatar_url": image_url,
+                    "requires_profile_completion": requires_profile_completion,
                     "updated_at": now,
                 }
             },
@@ -164,9 +181,11 @@ async def handle_user_created(data: dict):
         user_data = {
             "clerk_id": clerk_id,
             "email": primary_email,
+            "phone_number": primary_phone,
             "first_name": first_name,
             "last_name": last_name,
             "avatar_url": image_url,
+            "requires_profile_completion": requires_profile_completion,
             "created_at": now,
             "updated_at": now,
         }
@@ -181,19 +200,27 @@ async def handle_user_created(data: dict):
 async def handle_user_updated(data: dict):
     """
     Updates an existing user in our local database when changed in Clerk.
+    Handles both email-based and phone-only users.
     """
     clerk_id = data.get("id")
     email_addresses = data.get("email_addresses", [])
     primary_email_id = data.get("primary_email_address_id")
+    phone_numbers = data.get("phone_numbers", [])
 
     primary_email = next(
         (e["email_address"] for e in email_addresses if e["id"] == primary_email_id),
         email_addresses[0]["email_address"] if email_addresses else None,
     )
 
+    primary_phone = phone_numbers[0].get("phone_number") if phone_numbers else None
+
     first_name = data.get("first_name")
     last_name = data.get("last_name")
     image_url = data.get("image_url")
+    unsafe_metadata = data.get("unsafe_metadata", {})
+    requires_profile_completion = unsafe_metadata.get(
+        "requires_profile_completion", False
+    )
 
     if not db.is_connected():
         await db.connect()
@@ -203,9 +230,11 @@ async def handle_user_updated(data: dict):
         {
             "$set": {
                 "email": primary_email,
+                "phone_number": primary_phone,
                 "first_name": first_name,
                 "last_name": last_name,
                 "avatar_url": image_url,
+                "requires_profile_completion": requires_profile_completion,
                 "updated_at": datetime.utcnow(),
             }
         },

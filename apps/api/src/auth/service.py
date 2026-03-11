@@ -85,6 +85,48 @@ async def create_organization(name: str, creator_user_id: str):
     return org_data
 
 
+async def complete_user_profile(
+    user_id: str,
+    first_name: str = None,
+    last_name: str = None,
+) -> dict:
+    """
+    Marks a user's profile as complete and optionally updates name fields.
+    Clears the requires_profile_completion flag in both MongoDB and Clerk.
+    """
+    if not db.is_connected():
+        await db.connect()
+
+    from bson import ObjectId as _ObjectId
+
+    user = await db.db.users.find_one({"_id": _ObjectId(user_id)})
+    if not user:
+        raise Exception("User not found")
+
+    update_fields = {
+        "requires_profile_completion": False,
+        "updated_at": datetime.utcnow(),
+    }
+    if first_name is not None:
+        update_fields["first_name"] = first_name
+    if last_name is not None:
+        update_fields["last_name"] = last_name
+
+    await db.db.users.update_one(
+        {"_id": _ObjectId(user_id)},
+        {"$set": update_fields},
+    )
+
+    from .clerk_utils import update_clerk_user_metadata
+
+    await update_clerk_user_metadata(
+        user["clerk_id"],
+        {"requires_profile_completion": False},
+    )
+
+    return await db.db.users.find_one({"_id": _ObjectId(user_id)})
+
+
 async def create_invitation(
     email: str,
     organization_id: str,

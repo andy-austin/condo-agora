@@ -34,12 +34,35 @@ function getLocaleFromHeaders(acceptLanguage: string | null): string {
   return defaultLocale;
 }
 
+// Paths excluded from the profile-completion redirect
+const isProfileExcludedRoute = createRouteMatcher([
+  '/complete-profile',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/api/(.*)',
+]);
+
 export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
     await auth.protect();
   }
 
-  // 2. Locale Management
+  // 2. Profile completion redirect
+  // Prerequisite: `unsafe_metadata` must be exposed in session claims via
+  // the Clerk Dashboard JWT template (Session > Customize session token).
+  const { userId, sessionClaims } = await auth();
+  if (
+    userId &&
+    !isProfileExcludedRoute(request) &&
+    (sessionClaims?.unsafe_metadata as Record<string, unknown> | undefined)
+      ?.requires_profile_completion === true
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/complete-profile';
+    return NextResponse.redirect(url);
+  }
+
+  // 3. Locale Management
   const localeCookie = request.cookies.get('NEXT_LOCALE')?.value;
 
   if (localeCookie && locales.includes(localeCookie as any)) {

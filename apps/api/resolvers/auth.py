@@ -3,6 +3,7 @@ from typing import List, Optional
 import strawberry
 
 from ..graphql_types.auth import (
+    CompleteProfileInput,
     Invitation,
     InvitationMethod,
     MemberWithUser,
@@ -14,6 +15,7 @@ from ..graphql_types.auth import (
 from ..graphql_types.house import House
 from ..src.auth.permissions import require_org_admin, require_org_member
 from ..src.auth.service import accept_invitation_by_id as service_accept_invitation
+from ..src.auth.service import complete_user_profile as service_complete_profile
 from ..src.auth.service import create_invitation as service_create_invitation
 from ..src.auth.service import create_organization as service_create_org
 from ..src.auth.service import get_organization_members as service_get_members
@@ -97,7 +99,8 @@ async def resolve_me(info: strawberry.types.Info) -> Optional[User]:
     return User(
         id=str(user_data["_id"]),
         clerk_id=user_data["clerk_id"],
-        email=user_data["email"],
+        email=user_data.get("email"),
+        phone_number=user_data.get("phone_number"),
         first_name=user_data.get("first_name"),
         last_name=user_data.get("last_name"),
         avatar_url=user_data.get("avatar_url"),
@@ -211,7 +214,8 @@ def _mongo_member_to_member_with_user(m: dict) -> MemberWithUser:
         house_id=m.get("house_id"),
         role=Role(m["role"]),
         created_at=m["created_at"],
-        email=user.get("email", ""),
+        email=user.get("email"),
+        phone_number=user.get("phone_number"),
         first_name=user.get("first_name"),
         last_name=user.get("last_name"),
         avatar_url=user.get("avatar_url"),
@@ -300,4 +304,33 @@ async def resolve_create_organization(
         slug=org["slug"],
         created_at=org["created_at"],
         updated_at=org["updated_at"],
+    )
+
+
+async def resolve_complete_profile(
+    info: strawberry.types.Info, input: CompleteProfileInput
+) -> User:
+    """Resolver for completing a user's profile after phone-based onboarding."""
+    user = info.context.get("user")
+    if not user:
+        raise Exception("Authentication required")
+
+    user_id = user.get("id") or str(user.get("_id"))
+    updated = await service_complete_profile(
+        user_id=user_id,
+        first_name=input.first_name,
+        last_name=input.last_name,
+    )
+
+    return User(
+        id=str(updated["_id"]),
+        clerk_id=updated["clerk_id"],
+        email=updated.get("email"),
+        phone_number=updated.get("phone_number"),
+        first_name=updated.get("first_name"),
+        last_name=updated.get("last_name"),
+        avatar_url=updated.get("avatar_url"),
+        created_at=updated["created_at"],
+        updated_at=updated["updated_at"],
+        memberships=[],
     )

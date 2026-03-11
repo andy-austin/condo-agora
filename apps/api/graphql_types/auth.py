@@ -46,10 +46,11 @@ class OrganizationMember:
 class User:
     id: str
     clerk_id: str
-    email: str
-    first_name: Optional[str]
-    last_name: Optional[str]
-    avatar_url: Optional[str]
+    email: Optional[str] = None
+    phone_number: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    avatar_url: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     memberships: List[OrganizationMember]
@@ -65,11 +66,18 @@ class MemberWithUser:
     house_id: Optional[str] = None
     role: Role
     created_at: datetime
-    email: str
+    email: Optional[str] = None
+    phone_number: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     avatar_url: Optional[str] = None
     house_name: Optional[str] = None
+
+
+@strawberry.input
+class CompleteProfileInput:
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
 
 
 @strawberry.enum
