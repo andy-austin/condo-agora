@@ -1,3 +1,5 @@
+import os
+
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from strawberry.fastapi import GraphQLRouter
@@ -8,7 +10,8 @@ from .src.auth.dependencies import get_current_user_optional
 from .src.auth.invite_router import invite_router
 from .src.auth.otp_router import router as otp_router
 
-app = FastAPI(root_path="/api")
+root_path = "/api" if os.getenv("VERCEL") else ""
+app = FastAPI(root_path=root_path)
 
 
 async def get_context(user=Depends(get_current_user_optional)):

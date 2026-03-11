@@ -13,20 +13,13 @@ resend.api_key = RESEND_API_KEY
 
 
 async def send_whatsapp_otp(to: str, code: str) -> None:
-    """Send OTP code via WhatsApp using Chasqui template API."""
+    """Send OTP code via WhatsApp using Chasqui text API."""
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"{CHASQUI_API_URL}/messages/send/template",
+            f"{CHASQUI_API_URL}/messages/send/text",
             json={
                 "to": to,
-                "template_name": "otp_code",
-                "language_code": "es",
-                "components": [
-                    {
-                        "type": "body",
-                        "parameters": [{"type": "text", "text": code}],
-                    }
-                ],
+                "body": f"Tu código de verificación de Condo Agora es: {code}. Expira en 5 minutos.",
             },
             headers={"Authorization": f"Bearer {CHASQUI_API_TOKEN}"},
             timeout=10.0,
