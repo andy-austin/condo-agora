@@ -243,7 +243,8 @@
       "expandSidebar": "Expand sidebar",
       "collapseSidebar": "Collapse sidebar",
       "openMenu": "Open menu",
-      "closeMenu": "Close menu"
+      "closeMenu": "Close menu",
+      "more": "More"
     },
     "common": {
       "viewAll": "View all",
