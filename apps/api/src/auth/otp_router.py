@@ -53,8 +53,9 @@ async def request_otp_endpoint(body: OTPRequestBody, request: Request):
         raise HTTPException(status_code=429, detail=str(exc))
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
-    except Exception:
-        raise HTTPException(status_code=502, detail="Failed to send verification code. Please try again later.")
+    except Exception as exc:
+        import traceback
+        raise HTTPException(status_code=502, detail=f"DEBUG: {type(exc).__name__}: {exc}")
     return {"message": "Code sent"}
 
 
