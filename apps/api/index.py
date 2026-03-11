@@ -5,6 +5,7 @@ from strawberry.fastapi import GraphQLRouter
 from .database import db
 from .schema import schema
 from .src.auth.dependencies import get_current_user_optional
+from .src.auth.invite_router import invite_router
 from .src.auth.otp_router import router as otp_router
 
 app = FastAPI(root_path="/api")
@@ -34,6 +35,7 @@ app.add_middleware(
 )
 
 app.include_router(otp_router, prefix="/api/auth")
+app.include_router(invite_router, prefix="/api")
 router = GraphQLRouter(schema, path="/graphql", context_getter=get_context)
 app.include_router(router)
 
