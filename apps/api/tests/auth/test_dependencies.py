@@ -1,6 +1,7 @@
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
 from bson import ObjectId
-from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi import HTTPException
 
 from apps.api.src.auth.dependencies import get_current_user, get_current_user_optional

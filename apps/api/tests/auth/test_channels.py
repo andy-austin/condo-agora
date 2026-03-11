@@ -1,7 +1,8 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from apps.api.src.auth.channels import send_whatsapp_otp, send_email_otp
+import pytest
+
+from apps.api.src.auth.channels import send_email_otp, send_whatsapp_otp
 
 
 @pytest.mark.asyncio

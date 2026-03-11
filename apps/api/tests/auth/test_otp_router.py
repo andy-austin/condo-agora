@@ -10,8 +10,8 @@ os.environ.setdefault("MONGODB_URI", "mongodb://test:test@localhost:27017/test_d
 os.environ.setdefault("MONGODB_DB_NAME", "test_db")
 os.environ["INTERNAL_API_SECRET"] = "test-secret"
 
-from apps.api.src.auth.otp_router import router  # noqa: E402
 from apps.api.src.auth.otp import OTPVerificationError  # noqa: E402
+from apps.api.src.auth.otp_router import router  # noqa: E402
 from apps.api.src.auth.rate_limit import RateLimitExceeded  # noqa: E402
 
 # Build a minimal FastAPI app for testing

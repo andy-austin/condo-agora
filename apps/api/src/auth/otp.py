@@ -3,7 +3,7 @@ import secrets
 import uuid
 from datetime import datetime, timezone
 
-from .channels import send_whatsapp_otp, send_email_otp
+from .channels import send_email_otp, send_whatsapp_otp
 from .rate_limit import check_rate_limit
 
 

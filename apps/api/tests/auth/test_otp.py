@@ -1,13 +1,14 @@
 # apps/api/tests/auth/test_otp.py
-import pytest
 from datetime import datetime, timezone
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from apps.api.src.auth.otp import (
+    OTPVerificationError,
     generate_otp,
     request_otp,
     verify_otp,
-    OTPVerificationError,
 )
 
 
