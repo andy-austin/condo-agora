@@ -204,7 +204,7 @@ export default function DashboardPage() {
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl lg:text-3xl font-bold">
+        <h1 className="text-2xl lg:text-3xl font-bold font-display">
           {t('overview.welcomeBack', { name: user?.firstName || user?.primaryEmailAddress?.emailAddress?.split('@')[0] || 'User' })}
         </h1>
         {data?.organizationName && (

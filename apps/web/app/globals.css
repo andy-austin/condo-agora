@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -124,14 +124,17 @@
 
   .heading-xl {
     @apply text-5xl lg:text-7xl font-bold tracking-tight leading-[1.1];
+    font-family: 'DM Serif Display', Georgia, serif;
   }
 
   .heading-lg {
     @apply text-3xl lg:text-5xl font-bold tracking-tight;
+    font-family: 'DM Serif Display', Georgia, serif;
   }
 
   .heading-md {
     @apply text-xl lg:text-2xl font-semibold;
+    font-family: 'DM Serif Display', Georgia, serif;
   }
 
   .text-body {
