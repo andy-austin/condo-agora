@@ -21,6 +21,8 @@ export const GET_COMMUNITY_ANALYTICS = gql`
       }
       topContributors {
         userId
+        firstName
+        lastName
         proposalsCount
         commentsCount
         totalScore
@@ -55,6 +57,8 @@ export interface MonthlyProposalStat {
 
 export interface TopContributor {
   userId: string;
+  firstName: string | null;
+  lastName: string | null;
   proposalsCount: number;
   commentsCount: number;
   totalScore: number;

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import strawberry
 
@@ -18,9 +18,11 @@ class MonthlyProposalStat:
 @strawberry.type
 class TopContributor:
     user_id: str
-    proposals_count: int
-    comments_count: int
-    total_score: int
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    proposals_count: int = 0
+    comments_count: int = 0
+    total_score: int = 0
 
 
 @strawberry.type

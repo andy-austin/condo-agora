@@ -358,7 +358,7 @@ export default function ReportsPage() {
                   <tr key={c.userId} className="border-b last:border-0">
                     <td className="py-2 text-muted-foreground">{i + 1}</td>
                     <td className="py-2 font-medium truncate max-w-[200px]">
-                      {c.userId}
+                      {[c.firstName, c.lastName].filter(Boolean).join(' ') || c.userId}
                     </td>
                     <td className="py-2 text-center">{c.proposalsCount}</td>
                     <td className="py-2 text-center">{c.commentsCount}</td>
