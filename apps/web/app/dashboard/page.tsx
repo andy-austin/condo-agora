@@ -175,28 +175,32 @@ export default function DashboardPage() {
       value: totalProperties,
       icon: Building2,
       href: '/dashboard/properties',
-      color: 'text-blue-600 bg-blue-100',
+      iconColor: 'text-amber-600 bg-amber-100',
+      cardBg: 'bg-gradient-to-br from-amber-50 to-orange-50/50',
     },
     {
       label: t('overview.members'),
       value: totalResidents,
       icon: Users,
       href: '/dashboard/committee',
-      color: 'text-emerald-600 bg-emerald-100',
+      iconColor: 'text-blue-600 bg-blue-100',
+      cardBg: 'bg-gradient-to-br from-blue-50 to-sky-50/50',
     },
     {
       label: t('overview.boardMembers'),
       value: totalAdmins,
       icon: Mail,
       href: '/dashboard/committee',
-      color: 'text-amber-600 bg-amber-100',
+      iconColor: 'text-emerald-600 bg-emerald-100',
+      cardBg: 'bg-gradient-to-br from-emerald-50 to-green-50/50',
     },
     {
       label: t('overview.unassigned'),
       value: unassignedMembers,
       icon: Lightbulb,
       href: '/dashboard/committee',
-      color: 'text-purple-600 bg-purple-100',
+      iconColor: 'text-purple-600 bg-purple-100',
+      cardBg: 'bg-gradient-to-br from-purple-50 to-violet-50/50',
     },
   ];
 
@@ -222,17 +226,17 @@ export default function DashboardPage() {
             <Link
               key={stat.label}
               href={stat.href}
-              className="group border rounded-xl p-5 hover:border-primary/30 hover:shadow-md transition-all duration-200"
+              className={`group border rounded-xl p-5 hover:shadow-md transition-all duration-200 ${stat.cardBg}`}
             >
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm text-muted-foreground">{stat.label}</span>
                 <div
-                  className={`w-9 h-9 rounded-lg flex items-center justify-center ${stat.color}`}
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center ${stat.iconColor}`}
                 >
                   <Icon size={18} />
                 </div>
               </div>
-              <p className="text-2xl font-bold">{stat.value}</p>
+              <p className="text-3xl font-bold font-display">{stat.value}</p>
               <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1 group-hover:text-primary transition-colors">
                 {t('overview.viewDetails')} <ArrowRight size={12} />
               </p>
@@ -258,24 +262,33 @@ export default function DashboardPage() {
             <div className="border rounded-xl p-6">
               <h2 className="text-lg font-semibold mb-4">{t('overview.quickActions')}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <Button variant="outline" className="justify-start h-auto py-3" asChild>
-                  <Link href="/dashboard/properties">
-                    <Plus size={16} className="mr-2 text-primary" />
-                    {t('overview.addProperty')}
-                  </Link>
-                </Button>
-                <Button variant="outline" className="justify-start h-auto py-3" asChild>
-                  <Link href="/dashboard/settings">
-                    <UserPlus size={16} className="mr-2 text-primary" />
-                    {t('overview.inviteMember')}
-                  </Link>
-                </Button>
-                <Button variant="outline" className="justify-start h-auto py-3" asChild>
-                  <Link href="/dashboard/committee">
-                    <Users size={16} className="mr-2 text-primary" />
-                    {t('overview.manageCommittee')}
-                  </Link>
-                </Button>
+                <Link
+                  href="/dashboard/properties"
+                  className="group flex flex-col items-center gap-2 p-4 rounded-xl border hover:border-amber-300 hover:bg-amber-50/50 transition-all"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Plus size={20} />
+                  </div>
+                  <span className="text-sm font-medium text-center">{t('overview.addProperty')}</span>
+                </Link>
+                <Link
+                  href="/dashboard/settings"
+                  className="group flex flex-col items-center gap-2 p-4 rounded-xl border hover:border-blue-300 hover:bg-blue-50/50 transition-all"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <UserPlus size={20} />
+                  </div>
+                  <span className="text-sm font-medium text-center">{t('overview.inviteMember')}</span>
+                </Link>
+                <Link
+                  href="/dashboard/committee"
+                  className="group flex flex-col items-center gap-2 p-4 rounded-xl border hover:border-emerald-300 hover:bg-emerald-50/50 transition-all"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Users size={20} />
+                  </div>
+                  <span className="text-sm font-medium text-center">{t('overview.manageCommittee')}</span>
+                </Link>
               </div>
             </div>
           )}
@@ -332,9 +345,14 @@ export default function DashboardPage() {
                 })}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                {t('overview.noMembersYet')}
-              </p>
+              <div className="flex flex-col items-center py-8 text-center">
+                <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mb-3">
+                  <Users size={24} className="text-blue-400" />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {t('overview.noMembersYet')}
+                </p>
+              </div>
             )}
           </div>
 
@@ -353,16 +371,16 @@ export default function DashboardPage() {
         <div className="space-y-6">
           {/* Onboarding Checklist - only show if incomplete */}
           {!onboardingComplete && (
-            <div className="border rounded-xl p-6 bg-primary/5 border-primary/20">
+            <div className="border rounded-xl p-6 bg-gradient-to-br from-primary/5 to-amber-50/50 border-primary/20">
               <h2 className="text-lg font-semibold mb-1">{t('overview.gettingStarted')}</h2>
               <p className="text-sm text-muted-foreground mb-4">
                 {t('overview.completeSteps')}
               </p>
 
               {/* Progress bar */}
-              <div className="w-full h-2 bg-muted rounded-full mb-4 overflow-hidden">
+              <div className="w-full h-2.5 bg-muted rounded-full mb-4 overflow-hidden">
                 <div
-                  className="h-full bg-primary rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-primary to-amber-500 rounded-full transition-all duration-700 ease-out"
                   style={{
                     width: `${(onboardingSteps.filter((s) => s.done).length / onboardingSteps.length) * 100}%`,
                   }}
@@ -374,18 +392,21 @@ export default function DashboardPage() {
                   <Link
                     key={step.label}
                     href={step.href}
-                    className={`flex items-center gap-3 text-sm py-1 transition-colors ${
+                    className={`flex items-center gap-3 text-sm py-1.5 transition-colors ${
                       step.done
                         ? 'text-muted-foreground line-through'
-                        : 'text-foreground hover:text-primary'
+                        : 'text-foreground font-medium hover:text-primary'
                     }`}
                   >
                     {step.done ? (
-                      <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                      <CheckCircle2 size={20} className="text-emerald-500 shrink-0 transition-transform" />
                     ) : (
-                      <Circle size={18} className="text-muted-foreground shrink-0" />
+                      <Circle size={20} className="text-muted-foreground/50 shrink-0" />
                     )}
                     {step.label}
+                    {!step.done && (
+                      <ArrowRight size={14} className="ml-auto text-muted-foreground" />
+                    )}
                   </Link>
                 ))}
               </div>
@@ -423,9 +444,14 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                {t('overview.noPropertiesYet')}
-              </p>
+              <div className="flex flex-col items-center py-8 text-center">
+                <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mb-3">
+                  <Building2 size={24} className="text-amber-400" />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {t('overview.noPropertiesYet')}
+                </p>
+              </div>
             )}
           </div>
         </div>
