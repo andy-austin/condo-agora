@@ -13,6 +13,7 @@ from ..src.proposal.service import update_proposal as service_update_proposal
 from ..src.proposal.service import (
     update_proposal_status as service_update_proposal_status,
 )
+from ..src.notification.service import notify_designated_voters
 
 
 def _mongo_proposal_to_graphql(p: dict) -> Proposal:
@@ -139,6 +140,17 @@ async def resolve_update_proposal_status(
     updated = await service_update_proposal_status(
         id, status, rejection_reason, responsible_house_id
     )
+
+    if status == "VOTING":
+        await notify_designated_voters(
+            organization_id=proposal["organization_id"],
+            notification_type="PROPOSAL_VOTING_STARTED",
+            title=f"Vote Now: {proposal['title']}",
+            message=proposal["description"][:100]
+            + ("..." if len(proposal["description"]) > 100 else ""),
+            reference_id=id,
+        )
+
     return _mongo_proposal_to_graphql(updated)
 
 
