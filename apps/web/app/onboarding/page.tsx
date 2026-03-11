@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useRef,
+  type ReactNode,
   type DragEvent,
   type ChangeEvent,
 } from 'react';
@@ -149,7 +150,7 @@ function MethodCard({
   onClick,
 }: {
   active: boolean;
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   subtitle: string;
   onClick: () => void;
@@ -486,7 +487,6 @@ export default function OnboardingPage() {
     }
 
     // Check duplicate phones
-    const phones = rows.filter((r) => r.phone).map((r) => r.phone);
     const seen = new Set<string>();
     for (const row of rows) {
       if (!row.phone) continue;
