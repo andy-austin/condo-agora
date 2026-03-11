@@ -37,8 +37,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(otp_router, prefix="/api/auth")
-app.include_router(invite_router, prefix="/api")
+app.include_router(otp_router, prefix="/auth")
+app.include_router(invite_router)
 router = GraphQLRouter(schema, path="/graphql", context_getter=get_context)
 app.include_router(router)
 

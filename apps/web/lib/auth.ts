@@ -18,7 +18,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!credentials?.identifier || !credentials?.code) return null;
 
         try {
-          const res = await fetch(`${FASTAPI_URL}/api/auth/otp/verify`, {
+          const res = await fetch(`${FASTAPI_URL}/auth/otp/verify`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       if (account?.provider === "google" && user?.email) {
         try {
-          const res = await fetch(`${FASTAPI_URL}/api/auth/otp/google-link`, {
+          const res = await fetch(`${FASTAPI_URL}/auth/otp/google-link`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
