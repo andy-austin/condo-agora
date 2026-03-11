@@ -1,16 +1,15 @@
 'use client';
 
-import { Star, Quote } from "lucide-react";
+import { Quote } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const testimonialKeys = ['maria', 'carlos', 'ana'] as const;
 
-// DiceBear avatar seeds - deterministic based on name
-const avatarSeeds: Record<typeof testimonialKeys[number], string> = {
-  maria: 'Maria-Gonzalez',
-  carlos: 'Carlos-Rodriguez',
-  ana: 'Ana-Martinez'
+const avatarColors: Record<typeof testimonialKeys[number], string> = {
+  maria: 'bg-primary/20 text-primary',
+  carlos: 'bg-amber-100 text-amber-700',
+  ana: 'bg-emerald-100 text-emerald-700',
 };
 
 export function TestimonialsSection() {
@@ -39,27 +38,13 @@ export function TestimonialsSection() {
             <div key={key} className="card-minimal relative">
               <Quote className="absolute top-6 right-6 w-8 h-8 text-primary/10" />
 
-              <div className="flex gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                ))}
-              </div>
-
               <p className="text-foreground mb-6 leading-relaxed">
                 &quot;{t(`items.${key}.quote`)}&quot;
               </p>
 
               <div className="flex items-center gap-3">
-                {/* DiceBear Avatar */}
-                <div className="relative w-12 h-12 rounded-full overflow-hidden ring-2 ring-primary/20 bg-muted">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeeds[key]}&backgroundColor=f3f4f6`}
-                    alt={t(`items.${key}.name`)}
-                    width={48}
-                    height={48}
-                    className="w-full h-full object-cover"
-                  />
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm ${avatarColors[key]}`}>
+                  {t(`items.${key}.name`).charAt(0)}
                 </div>
                 <div>
                   <p className="font-semibold">{t(`items.${key}.name`)}</p>
