@@ -68,8 +68,8 @@ class TestGetCommunityAnalytics:
 
         mock_users_collection.find.return_value = create_async_cursor_mock(
             [
-                {"clerk_id": "user-1", "first_name": "Alice", "last_name": "Smith"},
-                {"clerk_id": "user-2", "first_name": "Bob", "last_name": "Jones"},
+                {"nextauth_id": "user-1", "first_name": "Alice", "last_name": "Smith"},
+                {"nextauth_id": "user-2", "first_name": "Bob", "last_name": "Jones"},
             ]
         )
 

@@ -534,11 +534,11 @@ async def remove_member_from_organization(member_id: str, admin_user_id: str):
         # No other org memberships — remove user entirely
         user = await db.db.users.find_one({"_id": ObjectId(target_user_id)})
 
-        # Delete from Clerk
-        if user and user.get("clerk_id"):
+        # Delete from Clerk (legacy - to be removed when Clerk is fully removed)
+        if user and user.get("nextauth_id"):
             try:
-                await delete_clerk_user(user["clerk_id"])
-                print(f"Deleted Clerk user {user['clerk_id']}")
+                await delete_clerk_user(user["nextauth_id"])
+                print(f"Deleted Clerk user {user['nextauth_id']}")
             except Exception as e:
                 print(f"Warning: failed to delete Clerk user: {e}")
 

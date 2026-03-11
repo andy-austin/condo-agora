@@ -88,14 +88,14 @@ async def get_community_analytics(organization_id: str) -> dict:
         reverse=True,
     )[:5]
 
-    # Resolve user names from clerk_id
+    # Resolve user names from user_id
     top_user_ids = [c["user_id"] for c in top_contributors_raw]
     user_names: dict = {}
     async for user in db.db.users.find(
-        {"clerk_id": {"$in": top_user_ids}},
-        {"clerk_id": 1, "first_name": 1, "last_name": 1},
+        {"nextauth_id": {"$in": top_user_ids}},
+        {"nextauth_id": 1, "first_name": 1, "last_name": 1},
     ):
-        user_names[user["clerk_id"]] = {
+        user_names[user["nextauth_id"]] = {
             "first_name": user.get("first_name"),
             "last_name": user.get("last_name"),
         }

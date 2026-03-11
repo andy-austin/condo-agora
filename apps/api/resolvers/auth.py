@@ -96,8 +96,10 @@ async def resolve_me(info: strawberry.types.Info) -> Optional[User]:
 
     return User(
         id=str(user_data["_id"]),
-        clerk_id=user_data["clerk_id"],
-        email=user_data["email"],
+        nextauth_id=user_data["nextauth_id"],
+        email=user_data.get("email"),
+        phone=user_data.get("phone"),
+        auth_provider=user_data.get("auth_provider", "phone"),
         first_name=user_data.get("first_name"),
         last_name=user_data.get("last_name"),
         avatar_url=user_data.get("avatar_url"),

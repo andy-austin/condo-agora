@@ -112,7 +112,7 @@ async def process_pending_invitations(user: dict):
             print(f"Warning: failed to create notification: {e}")
 
         print(
-            f"User {user.get('clerk_id', user['_id'])} auto-joined "
+            f"User {user.get('nextauth_id', user['_id'])} auto-joined "
             f"organization {invite['organization_id']} via invitation"
         )
 
@@ -143,12 +143,12 @@ async def handle_user_created(data: dict):
 
     now = datetime.utcnow()
 
-    # Upsert user - find by clerk_id, update or create
-    existing_user = await db.db.users.find_one({"clerk_id": clerk_id})
+    # Upsert user - find by nextauth_id, update or create
+    existing_user = await db.db.users.find_one({"nextauth_id": clerk_id})
 
     if existing_user:
         await db.db.users.update_one(
-            {"clerk_id": clerk_id},
+            {"nextauth_id": clerk_id},
             {
                 "$set": {
                     "email": primary_email,
@@ -159,10 +159,10 @@ async def handle_user_created(data: dict):
                 }
             },
         )
-        user = await db.db.users.find_one({"clerk_id": clerk_id})
+        user = await db.db.users.find_one({"nextauth_id": clerk_id})
     else:
         user_data = {
-            "clerk_id": clerk_id,
+            "nextauth_id": clerk_id,
             "email": primary_email,
             "first_name": first_name,
             "last_name": last_name,
@@ -199,7 +199,7 @@ async def handle_user_updated(data: dict):
         await db.connect()
 
     await db.db.users.update_one(
-        {"clerk_id": clerk_id},
+        {"nextauth_id": clerk_id},
         {
             "$set": {
                 "email": primary_email,

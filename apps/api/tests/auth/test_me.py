@@ -23,8 +23,10 @@ async def test_resolve_me_authenticated():
 
     mock_user_doc = {
         "_id": user_id,
-        "clerk_id": "clerk-123",
+        "nextauth_id": "nextauth-123",
         "email": "test@example.com",
+        "phone": None,
+        "auth_provider": "email",
         "first_name": "Test",
         "last_name": "User",
         "avatar_url": None,

@@ -30,7 +30,7 @@ async def test_handle_user_created_syncs_to_db():
     user_id = ObjectId()
     mock_user_doc = {
         "_id": user_id,
-        "clerk_id": "user_123",
+        "nextauth_id": "user_123",
         "email": "test@example.com",
         "first_name": "Test",
         "last_name": "User",
@@ -62,7 +62,7 @@ async def test_handle_user_created_syncs_to_db():
 
         mock_db.db.users.insert_one.assert_called_once()
         call_args = mock_db.db.users.insert_one.call_args[0][0]
-        assert call_args["clerk_id"] == "user_123"
+        assert call_args["nextauth_id"] == "user_123"
         assert call_args["email"] == "test@example.com"
         assert call_args["first_name"] == "Test"
 
@@ -77,7 +77,7 @@ async def test_handle_user_created_auto_joins_org_via_invitation():
 
     mock_user_doc = {
         "_id": user_id,
-        "clerk_id": "user_123",
+        "nextauth_id": "user_123",
         "email": "invited@example.com",
         "first_name": "Test",
         "last_name": "User",
@@ -138,7 +138,7 @@ async def test_handle_user_created_skips_duplicate_membership():
 
     mock_user_doc = {
         "_id": user_id,
-        "clerk_id": "user_123",
+        "nextauth_id": "user_123",
         "email": "invited@example.com",
         "created_at": datetime.now(timezone.utc),
         "updated_at": datetime.now(timezone.utc),
@@ -211,6 +211,6 @@ async def test_handle_user_updated_syncs_to_db():
 
         mock_db.db.users.update_one.assert_called_once()
         call_args = mock_db.db.users.update_one.call_args
-        assert call_args[0][0] == {"clerk_id": "user_123"}
+        assert call_args[0][0] == {"nextauth_id": "user_123"}
         assert call_args[0][1]["$set"]["email"] == "updated@example.com"
         assert call_args[0][1]["$set"]["first_name"] == "Updated"

@@ -45,11 +45,13 @@ class OrganizationMember:
 @strawberry.type
 class User:
     id: str
-    clerk_id: str
-    email: str
-    first_name: Optional[str]
-    last_name: Optional[str]
-    avatar_url: Optional[str]
+    nextauth_id: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    auth_provider: str = "phone"
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    avatar_url: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     memberships: List[OrganizationMember]
