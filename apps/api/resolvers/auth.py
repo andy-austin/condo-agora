@@ -3,6 +3,7 @@ from typing import List, Optional
 import strawberry
 
 from ..graphql_types.auth import (
+    CompleteProfileInput,
     Invitation,
     InvitationMethod,
     MemberWithUser,
@@ -14,6 +15,7 @@ from ..graphql_types.auth import (
 from ..graphql_types.house import House
 from ..src.auth.permissions import require_org_admin, require_org_member
 from ..src.auth.service import accept_invitation_by_id as service_accept_invitation
+from ..src.auth.service import complete_user_profile as service_complete_profile
 from ..src.auth.service import create_invitation as service_create_invitation
 from ..src.auth.service import create_organization as service_create_org
 from ..src.auth.service import get_organization_members as service_get_members
@@ -302,4 +304,34 @@ async def resolve_create_organization(
         slug=org["slug"],
         created_at=org["created_at"],
         updated_at=org["updated_at"],
+    )
+
+
+async def resolve_complete_profile(
+    info: strawberry.types.Info, input: CompleteProfileInput
+) -> User:
+    """Resolver for completing a user's profile after phone-based onboarding."""
+    user = info.context.get("user")
+    if not user:
+        raise Exception("Authentication required")
+
+    user_id = user.get("id") or str(user.get("_id"))
+    updated = await service_complete_profile(
+        user_id=user_id,
+        first_name=input.first_name,
+        last_name=input.last_name,
+    )
+
+    return User(
+        id=str(updated["_id"]),
+        nextauth_id=updated["nextauth_id"],
+        email=updated.get("email"),
+        phone=updated.get("phone"),
+        auth_provider=updated.get("auth_provider", "phone"),
+        first_name=updated.get("first_name"),
+        last_name=updated.get("last_name"),
+        avatar_url=updated.get("avatar_url"),
+        created_at=updated["created_at"],
+        updated_at=updated["updated_at"],
+        memberships=[],
     )
