@@ -89,6 +89,7 @@ class MongoDB:
         )
         await self.db.organization_members.create_index("user_id")
         await self.db.organization_members.create_index("organization_id")
+        await self.db.organization_members.create_index("house_id")
 
         # Invitations collection indexes
         await self.db.invitations.create_index("token", unique=True)
@@ -97,9 +98,6 @@ class MongoDB:
 
         # Houses collection indexes
         await self.db.houses.create_index("organization_id")
-
-        # Notes collection indexes
-        await self.db.notes.create_index("created_at")
 
         # Proposals collection indexes
         await self.db.proposals.create_index("organization_id")
