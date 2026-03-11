@@ -1,3 +1,4 @@
+import os
 import re
 import uuid
 from datetime import datetime, timedelta
@@ -6,19 +7,14 @@ from bson import ObjectId
 from fastapi import HTTPException
 
 from ...database import db
-from .clerk_utils import (
-    create_clerk_invitation,
-    delete_clerk_user,
-    revoke_clerk_invitations_for_email,
-)
+from .channels import send_email_invitation, send_whatsapp_invitation
 
 EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+PHONE_REGEX = re.compile(r"^\+?[1-9]\d{6,14}$")
 
 
 def _get_app_url() -> str:
     """Resolve the app base URL from environment variables."""
-    import os
-
     return os.getenv("NEXT_PUBLIC_APP_URL") or (
         f"https://{os.getenv('VERCEL_PROJECT_PRODUCTION_URL')}"
         if os.getenv("VERCEL_PROJECT_PRODUCTION_URL")
@@ -32,7 +28,6 @@ def _get_app_url() -> str:
 
 def _slugify(text: str) -> str:
     """Convert a string to a URL-friendly slug."""
-    import re
     import unicodedata
 
     text = unicodedata.normalize("NFKD", text)
@@ -86,30 +81,35 @@ async def create_organization(name: str, creator_user_id: str):
 
 
 async def create_invitation(
-    email: str,
+    identifier: str,
     organization_id: str,
     inviter_id: str,
     role: str,
-    method: str = "EMAIL",
+    channel: str = "email",
 ):
     """
     Creates a new invitation for a user to join an organization.
-    Validates email, prevents duplicates, and notifies existing users.
+    Validates identifier (email or phone), prevents duplicates, and sends
+    an invitation via the specified channel (email or whatsapp).
     """
     from ..notification.service import create_notification
 
     if not db.is_connected():
         await db.connect()
 
-    # Validate email format
-    if not EMAIL_REGEX.match(email):
-        raise Exception("Invalid email address format")
+    # Validate identifier format based on channel
+    if channel == "whatsapp":
+        if not PHONE_REGEX.match(identifier):
+            raise Exception("Invalid phone number format for WhatsApp")
+    else:
+        if not EMAIL_REGEX.match(identifier):
+            raise Exception("Invalid email address format")
 
-    # Check for existing pending invitation (same email + org)
+    # Check for existing pending invitation (same identifier + org)
     now = datetime.utcnow()
     existing = await db.db.invitations.find_one(
         {
-            "email": email,
+            "identifier": identifier,
             "organization_id": organization_id,
             "accepted_at": None,
         }
@@ -122,12 +122,12 @@ async def create_invitation(
     expires_at = now + timedelta(days=7)
 
     invitation_data = {
-        "email": email,
+        "identifier": identifier,
+        "channel": channel,
         "token": token,
         "organization_id": organization_id,
         "inviter_id": inviter_id,
         "role": role,
-        "method": method,
         "expires_at": expires_at,
         "created_at": now,
         "updated_at": now,
@@ -137,61 +137,43 @@ async def create_invitation(
     result = await db.db.invitations.insert_one(invitation_data)
     invitation_data["_id"] = str(result.inserted_id)
 
-    # Revoke any existing Clerk invitations for this email before creating a new one
-    await revoke_clerk_invitations_for_email(email)
-
-    # Trigger Clerk Invitation
-    redirect_url = f"{_get_app_url()}/dashboard"
-
-    # Look up org name so Clerk email template can reference it
+    # Look up org name for the invitation message
     org = await db.db.organizations.find_one({"_id": ObjectId(organization_id)})
     org_name = org["name"] if org else "Condo Agora"
 
+    invite_url = f"{_get_app_url()}/invite/{token}"
+
     try:
-        await create_clerk_invitation(
-            email=email,
-            redirect_url=redirect_url,
-            public_metadata={
-                "organization_id": organization_id,
-                "organization_name": org_name,
-                "role": role,
-                "invitation_token": token,
-            },
-        )
-        print(f"Clerk invitation sent to {email}")
-    except HTTPException as e:
-        detail = str(e.detail)
-        is_existing_user = e.status_code == 422 and "form_identifier_exists" in detail
-        is_duplicate = "duplicate" in detail.lower()
-
-        if is_existing_user or is_duplicate:
-            print(
-                f"User {email} already exists in Clerk or has prior invitation. "
-                "Sending in-app notification."
+        if channel == "whatsapp":
+            await send_whatsapp_invitation(
+                to=identifier, org_name=org_name, invite_url=invite_url
             )
-            # Notify existing user via in-app notification
-            existing_user = await db.db.users.find_one({"email": email})
-            if existing_user:
-                org = await db.db.organizations.find_one(
-                    {"_id": ObjectId(organization_id)}
-                )
-                org_name = org["name"] if org else "an organization"
-                await create_notification(
-                    user_id=str(existing_user["_id"]),
-                    organization_id=organization_id,
-                    notification_type="INVITATION",
-                    title="New Invitation",
-                    message=f"You have been invited to join {org_name}",
-                    reference_id=str(invitation_data["_id"]),
-                )
         else:
-            print(f"Failed to send Clerk invitation: {e}")
-            raise e
+            await send_email_invitation(
+                to=identifier, org_name=org_name, invite_url=invite_url
+            )
+        print(f"Invitation sent to {identifier} via {channel}")
     except Exception as e:
-        print(f"Failed to send Clerk invitation: {e}")
-        raise e
+        # If the user already exists locally, fall back to in-app notification
+        existing_user = await db.db.users.find_one({"email": identifier})
+        if existing_user:
+            print(
+                f"Failed to send {channel} invitation to {identifier}, "
+                "sending in-app notification instead."
+            )
+            await create_notification(
+                user_id=str(existing_user["_id"]),
+                organization_id=organization_id,
+                notification_type="INVITATION",
+                title="New Invitation",
+                message=f"You have been invited to join {org_name}",
+                reference_id=str(invitation_data["_id"]),
+            )
+        else:
+            print(f"Failed to send invitation: {e}")
+            raise e
 
-    print(f"Invitation created locally for {email} to join org {organization_id}")
+    print(f"Invitation created for {identifier} to join org {organization_id}")
 
     return invitation_data
 
@@ -215,9 +197,12 @@ async def accept_invitation_by_id(invitation_id: str, user_id: str):
     if invitation.get("expires_at") and invitation["expires_at"] < datetime.utcnow():
         raise Exception("Invitation has expired")
 
-    # Verify user's email matches invitation
+    # Verify user's email or phone matches invitation identifier
     user = await db.db.users.find_one({"_id": ObjectId(user_id)})
-    if not user or user.get("email") != invitation["email"]:
+    identifier = invitation.get("identifier") or invitation.get("email")
+    if not user or (
+        user.get("email") != identifier and user.get("phone") != identifier
+    ):
         raise Exception("This invitation is not for your account")
 
     # Check for duplicate membership
@@ -289,15 +274,12 @@ async def revoke_invitation(invitation_id: str):
     if invitation.get("accepted_at"):
         raise Exception("Cannot revoke an already accepted invitation")
 
-    # Revoke in Clerk so the email can be re-invited later
-    await revoke_clerk_invitations_for_email(invitation["email"])
-
     await db.db.invitations.delete_one({"_id": ObjectId(invitation_id)})
     return invitation["organization_id"]
 
 
 async def resend_invitation(invitation_id: str):
-    """Resend a pending invitation via Clerk."""
+    """Resend a pending invitation via the original channel."""
     if not db.is_connected():
         await db.connect()
 
@@ -308,34 +290,28 @@ async def resend_invitation(invitation_id: str):
     if invitation.get("accepted_at"):
         raise Exception("Cannot resend an already accepted invitation")
 
-    # Revoke old Clerk invitation before creating a new one
-    await revoke_clerk_invitations_for_email(invitation["email"])
-
-    # Resend via Clerk
-    redirect_url = f"{_get_app_url()}/dashboard"
-
-    # Look up org name for Clerk email template
+    # Look up org name for the invitation message
     org = await db.db.organizations.find_one(
         {"_id": ObjectId(invitation["organization_id"])}
     )
     org_name = org["name"] if org else "Condo Agora"
 
+    identifier = invitation.get("identifier") or invitation.get("email", "")
+    channel = invitation.get("channel", "email")
+    invite_url = f"{_get_app_url()}/invite/{invitation['token']}"
+
     try:
-        await create_clerk_invitation(
-            email=invitation["email"],
-            redirect_url=redirect_url,
-            public_metadata={
-                "organization_id": invitation["organization_id"],
-                "organization_name": org_name,
-                "role": invitation["role"],
-                "invitation_token": invitation["token"],
-            },
-        )
-    except HTTPException as e:
-        if e.status_code == 422 and "form_identifier_exists" in str(e.detail):
-            print(f"User {invitation['email']} already exists in Clerk.")
+        if channel == "whatsapp":
+            await send_whatsapp_invitation(
+                to=identifier, org_name=org_name, invite_url=invite_url
+            )
         else:
-            raise e
+            await send_email_invitation(
+                to=identifier, org_name=org_name, invite_url=invite_url
+            )
+    except Exception as e:
+        print(f"Failed to resend invitation to {identifier} via {channel}: {e}")
+        raise e
 
     # Update timestamp
     now = datetime.utcnow()
@@ -482,8 +458,8 @@ async def get_user_with_memberships(user_id: str):
 
 async def remove_member_from_organization(member_id: str, admin_user_id: str):
     """
-    Removes a member from the organization and deletes the user from Clerk
-    and all related data. Admin only. Cannot remove yourself or the last admin.
+    Removes a member from the organization and all related data.
+    Admin only. Cannot remove yourself or the last admin.
     """
     if not db.is_connected():
         await db.connect()
@@ -532,17 +508,6 @@ async def remove_member_from_organization(member_id: str, admin_user_id: str):
 
     if other_memberships == 0:
         # No other org memberships — remove user entirely
-        user = await db.db.users.find_one({"_id": ObjectId(target_user_id)})
-
-        # Delete from Clerk (legacy - to be removed when Clerk is fully removed)
-        if user and user.get("nextauth_id"):
-            try:
-                await delete_clerk_user(user["nextauth_id"])
-                print(f"Deleted Clerk user {user['nextauth_id']}")
-            except Exception as e:
-                print(f"Warning: failed to delete Clerk user: {e}")
-
-        # Delete local user record
         await db.db.users.delete_one({"_id": ObjectId(target_user_id)})
 
         # Delete any remaining notifications
