@@ -357,7 +357,10 @@
       "boardMembers": "Board Members (Admins)",
       "noAdmins": "No administrators found.",
       "membersAndResidents": "Members & Residents",
-      "noOtherMembers": "No other members yet. Invite users from the Settings page."
+      "noOtherMembers": "No other members yet. Invite users from the Settings page.",
+      "couldNotLoad": "Could not load committee",
+      "failedToUpdateRole": "Failed to update role.",
+      "changeRoleFor": "Change role for {name}"
     },
     "proposals": {
       "title": "Proposals",

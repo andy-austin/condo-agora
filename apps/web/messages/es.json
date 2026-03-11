@@ -357,7 +357,10 @@
       "boardMembers": "Directivos (Admins)",
       "noAdmins": "No se encontraron administradores.",
       "membersAndResidents": "Miembros y residentes",
-      "noOtherMembers": "Aún no hay otros miembros. Invitá usuarios desde la página de Configuración."
+      "noOtherMembers": "Aún no hay otros miembros. Invitá usuarios desde la página de Configuración.",
+      "couldNotLoad": "No se pudo cargar el comité",
+      "failedToUpdateRole": "No se pudo actualizar el rol.",
+      "changeRoleFor": "Cambiar rol de {name}"
     },
     "proposals": {
       "title": "Propuestas",
