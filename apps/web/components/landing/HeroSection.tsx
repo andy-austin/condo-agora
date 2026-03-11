@@ -56,7 +56,7 @@ export function HeroSection() {
                   )}
                   <Icon className="w-5 h-5 text-primary" />
                   <div className="text-left">
-                    <p className="text-xl font-bold text-foreground">{stat.value}</p>
+                    <p className="text-xl font-bold text-foreground font-display">{stat.value}</p>
                     <p className="text-xs text-muted-foreground">{t(`stats.${stat.labelKey}`)}</p>
                   </div>
                 </div>
