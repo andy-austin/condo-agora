@@ -19,6 +19,7 @@ from .schemas.project_milestone import (
 )
 from .schemas.proposal import ProposalMutations, ProposalQueries
 from .schemas.proposal_vote import ProposalVoteMutations, ProposalVoteQueries
+from .schemas.onboarding import OnboardingMutations
 from .schemas.voting import VotingMutations, VotingQueries
 
 
@@ -54,6 +55,7 @@ class Mutation(
     DocumentMutations,
     ProjectMilestoneMutations,
     BudgetMutations,
+    OnboardingMutations,
 ):
     pass
 
