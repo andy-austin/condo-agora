@@ -22,7 +22,11 @@ const nextConfig = {
         {
           source: '/api/auth/otp/:path*',
           destination: 'http://localhost:8000/api/auth/otp/:path*',
-        }
+        },
+        {
+          source: '/api/invite/:path*',
+          destination: 'http://localhost:8000/api/invite/:path*',
+        },
       ]
     }
 
