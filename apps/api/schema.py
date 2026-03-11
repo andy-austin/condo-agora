@@ -1,4 +1,8 @@
+import os
+
 import strawberry
+from graphql.validation import NoSchemaIntrospectionCustomRule
+from strawberry.extensions import AddValidationRules
 
 from .schemas.analytics import AnalyticsQueries
 from .schemas.announcement import AnnouncementMutations, AnnouncementQueries
@@ -54,4 +58,8 @@ class Mutation(
     pass
 
 
-schema = strawberry.Schema(query=Query, mutation=Mutation)
+_extensions = []
+if os.environ.get("VERCEL_ENV") == "production":
+    _extensions.append(AddValidationRules([NoSchemaIntrospectionCustomRule]))
+
+schema = strawberry.Schema(query=Query, mutation=Mutation, extensions=_extensions)
