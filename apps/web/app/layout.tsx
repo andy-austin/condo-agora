@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
-import { ClerkProvider } from '@clerk/nextjs';
 import { Analytics } from '@vercel/analytics/next';
+import { Providers } from './providers';
 import './globals.css';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -27,11 +27,11 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body>
-        <ClerkProvider afterSignOutUrl="/" afterSignUpUrl="/dashboard">
+        <Providers>
           <NextIntlClientProvider messages={messages}>
             {children}
           </NextIntlClientProvider>
-        </ClerkProvider>
+        </Providers>
         <Analytics />
       </body>
     </html>
