@@ -16,7 +16,7 @@ export function ProblemSection() {
   const { ref, isVisible } = useScrollReveal<HTMLElement>();
 
   return (
-    <section className="section-padding bg-muted/30" ref={ref}>
+    <section className="section-padding bg-[hsl(25,15%,12%)] text-white" ref={ref}>
       <div className="container-tight">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className={`scroll-reveal-left ${isVisible ? 'visible' : ''}`}>
@@ -24,7 +24,7 @@ export function ProblemSection() {
             <h2 className="heading-lg mb-6">
               {t('title')}
             </h2>
-            <p className="text-body mb-8">
+            <p className="text-lg text-white/70 leading-relaxed mb-8">
               {t('description')}
             </p>
             <a href="#features" className="inline-flex items-center text-primary font-medium hover:underline">
@@ -40,14 +40,14 @@ export function ProblemSection() {
               return (
                 <div
                   key={key}
-                  className="card-minimal flex items-start gap-4"
+                  className="flex items-start gap-4 bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm"
                 >
                   <div className="icon-box shrink-0">
                     <Icon className="w-5 h-5" />
                   </div>
                   <div>
                     <h3 className="heading-md mb-2">{t(`items.${key}.title`)}</h3>
-                    <p className="text-muted-foreground">{t(`items.${key}.description`)}</p>
+                    <p className="text-white/60">{t(`items.${key}.description`)}</p>
                   </div>
                 </div>
               );

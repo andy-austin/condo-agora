@@ -10,7 +10,7 @@ export function HowItWorks() {
   const { ref, isVisible } = useScrollReveal<HTMLElement>();
 
   return (
-    <section id="how-it-works" className="section-padding bg-muted/30" ref={ref}>
+    <section id="how-it-works" className="section-padding" ref={ref}>
       <div className="container-tight">
         <div className={`text-center max-w-2xl mx-auto mb-16 scroll-reveal ${isVisible ? 'visible' : ''}`}>
           <span className="text-sm font-medium text-primary mb-4 block">{t('label')}</span>
