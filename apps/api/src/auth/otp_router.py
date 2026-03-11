@@ -32,6 +32,8 @@ async def request_otp_endpoint(body: OTPRequestBody, request: Request):
 
     Public endpoint — rate limited per identifier (3/hr) and per IP (10/hr).
     """
+    import traceback
+
     if not db.is_connected():
         await db.connect()
 
@@ -53,6 +55,8 @@ async def request_otp_endpoint(body: OTPRequestBody, request: Request):
         raise HTTPException(status_code=429, detail=str(exc))
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}\n{traceback.format_exc()}")
 
     return {"message": "Code sent"}
 
