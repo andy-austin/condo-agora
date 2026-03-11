@@ -112,13 +112,6 @@ async def complete_user_profile(
         {"$set": update_fields},
     )
 
-    from .clerk_utils import update_clerk_user_metadata
-
-    await update_clerk_user_metadata(
-        user["clerk_id"],
-        {"requires_profile_completion": False},
-    )
-
     return await db.db.users.find_one({"_id": _ObjectId(user_id)})
 
 
