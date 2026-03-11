@@ -272,3 +272,4 @@ apps/web/package-lock.json
 
 # Git worktrees
 .worktrees/
+.superpowers/
