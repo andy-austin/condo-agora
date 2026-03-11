@@ -1,2 +1,14 @@
-# Re-use dependencies from apps/api
--r ../apps/api/requirements.txt
+# Runtime dependencies for Vercel serverless function
+# Keep in sync with apps/api/requirements.txt
+fastapi>=0.104.0
+strawberry-graphql[fastapi]>=0.213.0
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+
+# Database (MongoDB)
+motor>=3.3.0
+
+# Auth
+PyJWT[crypto]>=2.8.0
+httpx>=0.25.0
+resend>=0.7.0
