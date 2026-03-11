@@ -6,11 +6,13 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
+import { UserMenu } from "@/components/auth/UserMenu";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const t = useTranslations('header');
+  const { data: session } = useSession();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -37,24 +39,28 @@ export function Header() {
 
           <div className="hidden lg:flex items-center gap-4">
             <LanguageSwitcher />
-            <SignedOut>
-              <SignInButton mode="modal">
-                <Button variant="ghost" className="text-sm font-medium">
-                  {t('login')}
-                </Button>
-              </SignInButton>
-              <Button className="btn-primary text-sm py-2.5 px-6">
-                {t('requestDemo')}
-              </Button>
-            </SignedOut>
-            <SignedIn>
-              <Link href="/dashboard">
+            {!session ? (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" className="text-sm font-medium">
+                    {t('login')}
+                  </Button>
+                </Link>
                 <Button className="btn-primary text-sm py-2.5 px-6">
-                  {t('dashboard')}
+                  {t('requestDemo')}
                 </Button>
-              </Link>
-              <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: 'ring-2 ring-border' } }} />
-            </SignedIn>
+              </>
+            ) : null}
+            {session ? (
+              <>
+                <Link href="/dashboard">
+                  <Button className="btn-primary text-sm py-2.5 px-6">
+                    {t('dashboard')}
+                  </Button>
+                </Link>
+                <UserMenu />
+              </>
+            ) : null}
           </div>
 
           <button
@@ -101,24 +107,28 @@ export function Header() {
               </a>
               <div className="border-t border-border mt-4 pt-4 flex flex-col gap-3 px-4">
                 <LanguageSwitcher />
-                <SignedOut>
-                  <SignInButton mode="modal">
-                    <Button variant="ghost" className="justify-start">
-                      {t('login')}
-                    </Button>
-                  </SignInButton>
-                  <Button className="btn-primary">
-                    {t('requestDemo')}
-                  </Button>
-                </SignedOut>
-                <SignedIn>
-                  <Link href="/dashboard">
+                {!session ? (
+                  <>
+                    <Link href="/login">
+                      <Button variant="ghost" className="justify-start">
+                        {t('login')}
+                      </Button>
+                    </Link>
                     <Button className="btn-primary">
-                      {t('dashboard')}
+                      {t('requestDemo')}
                     </Button>
-                  </Link>
-                  <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: 'ring-2 ring-border' } }} />
-                </SignedIn>
+                  </>
+                ) : null}
+                {session ? (
+                  <>
+                    <Link href="/dashboard">
+                      <Button className="btn-primary">
+                        {t('dashboard')}
+                      </Button>
+                    </Link>
+                    <UserMenu />
+                  </>
+                ) : null}
               </div>
             </nav>
           </div>
