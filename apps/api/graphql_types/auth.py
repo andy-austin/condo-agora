@@ -74,6 +74,12 @@ class MemberWithUser:
     house_name: Optional[str] = None
 
 
+@strawberry.input
+class CompleteProfileInput:
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+
+
 @strawberry.enum
 class InvitationMethod(Enum):
     EMAIL = "EMAIL"

@@ -5,6 +5,7 @@ import strawberry
 from ..graphql_types.auth import Invitation, MemberWithUser, Organization, User
 from ..resolvers.auth import (
     resolve_accept_invitation,
+    resolve_complete_profile,
     resolve_create_invitation,
     resolve_create_organization,
     resolve_me,
@@ -46,4 +47,7 @@ class AuthMutations:
     remove_member: bool = strawberry.mutation(resolver=resolve_remove_member)
     create_organization: Organization = strawberry.mutation(
         resolver=resolve_create_organization
+    )
+    complete_profile: User = strawberry.mutation(
+        resolver=resolve_complete_profile
     )
