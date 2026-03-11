@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 export default function InvitePage() {
   const { token } = useParams<{ token: string }>();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
