@@ -19,17 +19,23 @@ async def get_houses(organization_id: str) -> List:
     cursor = db.db.houses.find({"organization_id": organization_id}).sort(
         "created_at", 1
     )
-
     async for house in cursor:
-        # Fetch residents for this house
-        residents = []
-        residents_cursor = db.db.organization_members.find(
-            {"house_id": str(house["_id"])}
-        )
-        async for resident in residents_cursor:
-            residents.append(resident)
-        house["residents"] = residents
         houses.append(house)
+
+    if not houses:
+        return houses
+
+    # Batch-fetch all residents for this organization's houses in one query
+    house_ids = [str(h["_id"]) for h in houses]
+    residents_by_house: dict = {hid: [] for hid in house_ids}
+    residents_cursor = db.db.organization_members.find({"house_id": {"$in": house_ids}})
+    async for resident in residents_cursor:
+        hid = resident.get("house_id")
+        if hid in residents_by_house:
+            residents_by_house[hid].append(resident)
+
+    for house in houses:
+        house["residents"] = residents_by_house.get(str(house["_id"]), [])
 
     return houses
 
