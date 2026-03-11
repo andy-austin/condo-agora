@@ -1,18 +1,17 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Authentication Flow', () => {
-  test('sign-in page renders Clerk sign-in component', async ({ page }) => {
-    await page.goto('/sign-in');
+  test('login page renders phone/OTP form', async ({ page }) => {
+    await page.goto('/login');
     await expect(
-      page.locator('.cl-rootBox, .cl-signIn-root, [data-clerk-component]')
+      page.locator('input[type="tel"], input[type="email"]')
     ).toBeVisible({ timeout: 10_000 });
   });
 
-  test('sign-up page renders Clerk sign-up component', async ({ page }) => {
-    await page.goto('/sign-up');
-    await expect(
-      page.locator('.cl-rootBox, .cl-signUp-root, [data-clerk-component]')
-    ).toBeVisible({ timeout: 10_000 });
+  test('login page shows WhatsApp and Email channel options', async ({ page }) => {
+    await page.goto('/login');
+    await expect(page.getByRole('button', { name: /whatsapp/i })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: /email/i })).toBeVisible({ timeout: 10_000 });
   });
 
   test('dashboard is accessible and shows welcome message', async ({ page }) => {

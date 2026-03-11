@@ -1,4 +1,5 @@
 # apps/api/src/auth/otp.py
+import os
 import secrets
 import uuid
 from datetime import datetime, timezone
@@ -62,6 +63,29 @@ async def verify_otp(db, identifier: str, code: str) -> dict:
 
     Raises OTPVerificationError on failure.
     """
+    # Test mode bypass: skip code verification, just find/create user
+    if os.getenv("NODE_ENV") == "test" and code == "000000":
+        is_phone = identifier.startswith("+")
+        lookup_field = "phone" if is_phone else "email"
+        user = await db.users.find_one({lookup_field: identifier})
+        if not user:
+            now = datetime.now(timezone.utc)
+            new_user = {
+                "nextauth_id": str(uuid.uuid4()),
+                "email": None if is_phone else identifier,
+                "phone": identifier if is_phone else None,
+                "first_name": None,
+                "last_name": None,
+                "avatar_url": None,
+                "auth_provider": "phone" if is_phone else "email",
+                "created_at": now,
+                "updated_at": now,
+            }
+            result = await db.users.insert_one(new_user)
+            new_user["_id"] = result.inserted_id
+            user = new_user
+        return user
+
     otp_doc = await db.otp_codes.find_one({"identifier": identifier})
 
     if not otp_doc:

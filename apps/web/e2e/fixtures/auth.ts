@@ -5,41 +5,32 @@ import path from 'path';
  * Authentication fixtures for E2E tests.
  *
  * Three strategies available:
- * 1. `authedPage` — Uses route interception to mock Clerk auth for isolated UI tests.
- * 2. `realAuthedPage` — Uses real Clerk login (cached via storageState) for full integration tests.
- * 3. `adminPage` / `residentPage` / `memberPage` — Role-specific real Clerk login fixtures.
+ * 1. `authedPage` — Performs a real NextAuth OTP login using the test bypass
+ *    (NODE_ENV=test + code "000000") and caches the session via storageState.
+ * 2. `realAuthedPage` — Alias for `authedPage` for backward compatibility.
+ * 3. `adminPage` / `residentPage` / `memberPage` — Role-specific OTP login fixtures.
  */
 
 // ---------------------------------------------------------------------------
-// Test user credentials (from env or defaults)
+// Test user phone numbers (one per role)
 // ---------------------------------------------------------------------------
 
 export type UserRole = 'admin' | 'resident' | 'member';
 
-function getRequiredEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`${name} environment variable is required`);
-  }
-  return value;
-}
-
-const E2E_PASSWORD = getRequiredEnv('E2E_USER_PASSWORD');
-
-export const TEST_USERS: Record<UserRole, { email: string; password: string }> = {
+export const TEST_USERS: Record<UserRole, { phone: string }> = {
   admin: {
-    email: process.env.E2E_ADMIN_EMAIL || 'admin@agora.com',
-    password: E2E_PASSWORD,
+    phone: process.env.E2E_ADMIN_PHONE || '+56900000001',
   },
   resident: {
-    email: process.env.E2E_RESIDENT_EMAIL || 'resident@agora.com',
-    password: E2E_PASSWORD,
+    phone: process.env.E2E_RESIDENT_PHONE || '+56900000002',
   },
   member: {
-    email: process.env.E2E_MEMBER_EMAIL || 'member@agora.com',
-    password: E2E_PASSWORD,
+    phone: process.env.E2E_MEMBER_PHONE || '+56900000003',
   },
 };
+
+// Test OTP code used in test mode (backend bypass accepts this when NODE_ENV=test)
+export const TEST_OTP_CODE = '000000';
 
 // Auth state paths — one per role + legacy
 export const AUTH_STATE_PATH = path.join(__dirname, '../.auth/user.json');
@@ -50,12 +41,12 @@ export const AUTH_STATE_PATHS: Record<UserRole, string> = {
   member: path.join(__dirname, '../.auth/member.json'),
 };
 
-// Legacy test constants (used by existing mocked tests)
+// Legacy test constants (kept for backward compatibility with existing mocked tests)
 export const TEST_USER = {
   id: 'user_test_123',
   firstName: 'Test',
   lastName: 'User',
-  email: TEST_USERS.admin.email,
+  email: 'admin@agora.com',
   clerkId: 'user_test_123',
 };
 
@@ -71,46 +62,56 @@ export const TEST_MEMBERSHIP = {
 };
 
 // ---------------------------------------------------------------------------
-// Clerk login helpers
+// NextAuth OTP login helpers
 // ---------------------------------------------------------------------------
 
 /**
- * Log in through Clerk's sign-in page with specific credentials.
+ * Log in via the NextAuth OTP flow.
+ * Navigates to /login, enters the phone number, then submits the test OTP code.
+ * Requires the backend to be running with NODE_ENV=test for the bypass to work.
  */
-export async function clerkLogin(page: Page, email?: string, password?: string) {
-  const loginEmail = email || TEST_USERS.admin.email;
-  const loginPassword = password || E2E_PASSWORD;
+export async function otpLogin(page: Page, phone?: string) {
+  const loginPhone = phone || TEST_USERS.admin.phone;
 
-  await page.goto('/sign-in');
+  await page.goto('/login');
 
-  // Wait for Clerk's sign-in form to load
-  await page.waitForSelector('.cl-rootBox, [data-clerk-component]', { timeout: 15_000 });
+  // Wait for the login form to load
+  await page.waitForSelector('input[type="tel"], input[type="email"]', { timeout: 15_000 });
 
-  // Fill email
-  const emailInput = page.locator('input[name="identifier"], input[type="email"]').first();
-  await emailInput.waitFor({ state: 'visible', timeout: 10_000 });
-  await emailInput.fill(loginEmail);
+  // Ensure WhatsApp/phone channel is selected (it is the default)
+  const whatsappButton = page.getByRole('button', { name: /whatsapp/i });
+  if (await whatsappButton.isVisible()) {
+    await whatsappButton.click();
+  }
 
-  // Click continue (Clerk uses a two-step flow)
-  await page.getByRole('button', { name: /continue/i }).click();
+  // Enter phone number
+  const phoneInput = page.locator('input[type="tel"]').first();
+  await phoneInput.waitFor({ state: 'visible', timeout: 10_000 });
+  await phoneInput.fill(loginPhone);
 
-  // Fill password
-  const passwordInput = page.locator('input[name="password"], input[type="password"]').first();
-  await passwordInput.waitFor({ state: 'visible', timeout: 10_000 });
-  await passwordInput.fill(loginPassword);
+  // Submit to request OTP
+  await page.getByRole('button', { name: /send|enviar/i }).click();
 
-  // Click sign in
-  await page.getByRole('button', { name: /sign in|continue/i }).click();
+  // Wait for OTP input to appear
+  const otpInput = page.locator('input[inputmode="numeric"], input[pattern="[0-9]{6}"]').first();
+  await otpInput.waitFor({ state: 'visible', timeout: 15_000 });
+  await otpInput.fill(TEST_OTP_CODE);
 
-  // Wait for redirect to dashboard (indicates successful login)
+  // Submit OTP
+  await page.getByRole('button', { name: /verify|verificar/i }).click();
+
+  // Wait for redirect to dashboard
   await page.waitForURL(/\/dashboard/, { timeout: 15_000 });
 }
 
 /**
  * Log in as a specific role and cache the auth state.
  */
-async function loginAsRole(browser: import('@playwright/test').Browser, role: UserRole): Promise<BrowserContext> {
-  const { email, password } = TEST_USERS[role];
+async function loginAsRole(
+  browser: import('@playwright/test').Browser,
+  role: UserRole,
+): Promise<BrowserContext> {
+  const { phone } = TEST_USERS[role];
   const statePath = AUTH_STATE_PATHS[role];
 
   // Try to reuse saved auth state
@@ -119,7 +120,7 @@ async function loginAsRole(browser: import('@playwright/test').Browser, role: Us
     // Verify the saved state is still valid
     const page = await context.newPage();
     await page.goto('/dashboard');
-    // If we get redirected to sign-in, the session expired
+    // If we get redirected to login, the session expired
     await page.waitForURL(/\/dashboard/, { timeout: 10_000 });
     await page.close();
     return context;
@@ -129,7 +130,7 @@ async function loginAsRole(browser: import('@playwright/test').Browser, role: Us
 
   const context = await browser.newContext();
   const page = await context.newPage();
-  await clerkLogin(page, email, password);
+  await otpLogin(page, phone);
   await context.storageState({ path: statePath });
   await page.close();
   await context.close();
@@ -139,61 +140,8 @@ async function loginAsRole(browser: import('@playwright/test').Browser, role: Us
 }
 
 // ---------------------------------------------------------------------------
-// Clerk auth mocking (for isolated UI tests)
+// Mock helpers (kept for isolated UI tests that don't need a real backend)
 // ---------------------------------------------------------------------------
-
-/**
- * Sets up Clerk auth mocking by intercepting Clerk frontend API requests.
- */
-export async function mockClerkAuth(page: Page) {
-  await page.route('**/clerk**', async (route) => {
-    const url = route.request().url();
-
-    if (url.includes('/v1/client')) {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          response: {
-            id: 'client_test',
-            sessions: [
-              {
-                id: 'sess_test',
-                status: 'active',
-                user: {
-                  id: TEST_USER.clerkId,
-                  first_name: TEST_USER.firstName,
-                  last_name: TEST_USER.lastName,
-                  email_addresses: [
-                    { id: 'email_test', email_address: TEST_USER.email },
-                  ],
-                  primary_email_address_id: 'email_test',
-                  image_url: '',
-                },
-                last_active_token: { jwt: 'mock-jwt-token' },
-              },
-            ],
-            sign_in: null,
-            sign_up: null,
-            last_active_session_id: 'sess_test',
-          },
-          client: {
-            id: 'client_test',
-            sessions: [],
-            last_active_session_id: 'sess_test',
-          },
-        }),
-      });
-      return;
-    }
-
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ response: {} }),
-    });
-  });
-}
 
 /**
  * Mock the GraphQL `me` query to return a test user with organization membership.
@@ -229,9 +177,11 @@ export const test = base.extend<{
   residentPage: Page;
   memberPage: Page;
 }>({
-  authedPage: async ({ page }, use) => {
-    await mockClerkAuth(page);
+  authedPage: async ({ browser }, use) => {
+    const context = await loginAsRole(browser, 'admin');
+    const page = await context.newPage();
     await use(page);
+    await context.close();
   },
 
   realAuthedPage: async ({ browser }, use) => {
@@ -239,15 +189,19 @@ export const test = base.extend<{
     let context: BrowserContext;
     try {
       context = await browser.newContext({ storageState: AUTH_STATE_PATH });
+      const page = await context.newPage();
+      await page.goto('/dashboard');
+      await page.waitForURL(/\/dashboard/, { timeout: 10_000 });
+      await page.close();
     } catch {
-      // No saved state — perform fresh login
+      // No saved state or expired — perform fresh login
       context = await browser.newContext();
       const page = await context.newPage();
-      await clerkLogin(page);
+      await otpLogin(page);
       await context.storageState({ path: AUTH_STATE_PATH });
       await page.close();
-      // Recreate context from saved state
       await context.close();
+      // Recreate context from saved state
       context = await browser.newContext({ storageState: AUTH_STATE_PATH });
     }
 
