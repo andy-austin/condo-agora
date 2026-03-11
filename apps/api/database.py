@@ -78,7 +78,13 @@ class MongoDB:
 
         # Users collection indexes
         await self.db.users.create_index("clerk_id", unique=True)
-        await self.db.users.create_index("email")
+        # Drop existing non-sparse email index before recreating as sparse
+        try:
+            await self.db.users.drop_index("email_1")
+        except Exception:
+            pass
+        await self.db.users.create_index("email", sparse=True)
+        await self.db.users.create_index("phone_number", unique=True, sparse=True)
 
         # Organizations collection indexes
         await self.db.organizations.create_index("slug", unique=True)
