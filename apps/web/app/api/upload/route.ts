@@ -1,11 +1,6 @@
 import { put } from '@vercel/blob';
-import { createClerkClient } from '@clerk/nextjs/server';
+import { auth } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
-
-const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
-  publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-});
 
 const ALLOWED_MIME_TYPES = new Set([
   'application/pdf',
@@ -21,8 +16,8 @@ const ALLOWED_MIME_TYPES = new Set([
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const { isSignedIn } = await clerkClient.authenticateRequest(request);
-  if (!isSignedIn) {
+  const session = await auth();
+  if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

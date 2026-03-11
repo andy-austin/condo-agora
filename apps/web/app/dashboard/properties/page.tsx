@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_HOUSES,
@@ -46,7 +45,6 @@ type MeResponse = {
 export default function PropertiesPage() {
   const router = useRouter();
   const t = useTranslations('dashboard');
-  const { getAuthToken } = useAuthToken();
 
   const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [organizationName, setOrganizationName] = useState('');
@@ -57,19 +55,17 @@ export default function PropertiesPage() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchHouses = useCallback(async (orgId: string) => {
-    const token = await getAuthToken();
-    const client = getApiClient(token);
+    const client = getApiClient();
     const data = await client.request<GetHousesResponse>(GET_HOUSES, {
       organizationId: orgId,
     });
     return data.houses;
-  }, [getAuthToken]);
+  }, []);
 
   useEffect(() => {
     const init = async () => {
       try {
-        const token = await getAuthToken();
-        const client = getApiClient(token);
+        const client = getApiClient();
         const meData = await client.request<MeResponse>(ME_QUERY);
 
         if (!meData.me || meData.me.memberships.length === 0) {
@@ -102,13 +98,12 @@ export default function PropertiesPage() {
     };
 
     init();
-  }, [getAuthToken, fetchHouses, router, t]);
+  }, [fetchHouses, router, t]);
 
   const handleCreate = async (name: string) => {
     if (!organizationId) return;
 
-    const token = await getAuthToken();
-    const client = getApiClient(token);
+    const client = getApiClient();
     const data = await client.request<CreateHouseResponse>(CREATE_HOUSE, {
       organizationId,
       name,
@@ -126,8 +121,7 @@ export default function PropertiesPage() {
   const handleDelete = async (id: string) => {
     setDeleting(id);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request<DeleteHouseResponse>(DELETE_HOUSE, { id });
       setHouses(houses.filter((h) => h.id !== id));
     } catch (err) {

@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import { CREATE_VOTING_SESSION } from '@/lib/queries/voting';
 import { GET_PROPOSALS, type Proposal } from '@/lib/queries/proposal';
@@ -33,7 +32,6 @@ type MeResponse = {
 
 export default function NewVotingSessionPage() {
   const t = useTranslations('dashboard');
-  const { getAuthToken } = useAuthToken();
   const router = useRouter();
 
   const [title, setTitle] = useState('');
@@ -47,9 +45,8 @@ export default function NewVotingSessionPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+        if (!token) return;
+    const client = getApiClient();
 
     try {
       const meData = await client.request<MeResponse>(ME_QUERY);
@@ -71,7 +68,7 @@ export default function NewVotingSessionPage() {
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, router, t]);
+  }, [router, t]);
 
   useEffect(() => {
     fetchData();
@@ -90,9 +87,8 @@ export default function NewVotingSessionPage() {
     e.preventDefault();
     if (!organizationId || !title.trim() || selectedIds.size === 0) return;
 
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+        if (!token) return;
+    const client = getApiClient();
 
     try {
       setSubmitting(true);

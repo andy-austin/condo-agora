@@ -27,7 +27,6 @@ type Props = {
   voteThreshold: number | null;
   isAdmin: boolean;
   houseId: string | null;
-  getAuthToken: () => Promise<string | null>;
   onProposalUpdate: () => void;
 };
 
@@ -38,7 +37,6 @@ export default function ProposalVoteSection({
   voteThreshold,
   isAdmin,
   houseId,
-  getAuthToken,
   onProposalUpdate,
 }: Props) {
   const t = useTranslations('dashboard.proposalVote');
@@ -56,8 +54,7 @@ export default function ProposalVoteSection({
     if (!hasVote) return;
     setLoading(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
 
       const promises: Promise<unknown>[] = [
         client.request<ProposalVoteResultsResponse>(PROPOSAL_VOTE_RESULTS, {
@@ -84,7 +81,7 @@ export default function ProposalVoteSection({
     } finally {
       setLoading(false);
     }
-  }, [proposalId, houseId, voteStatus, hasVote, getAuthToken]);
+  }, [proposalId, houseId, voteStatus, hasVote]);
 
   useEffect(() => {
     fetchVoteData();
@@ -100,8 +97,7 @@ export default function ProposalVoteSection({
   const handleStartVote = async () => {
     setActing(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request<StartProposalVoteResponse>(START_PROPOSAL_VOTE, {
         proposalId,
         threshold,
@@ -120,8 +116,7 @@ export default function ProposalVoteSection({
     if (!houseId) return;
     setActing(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<CastProposalVoteResponse>(CAST_PROPOSAL_VOTE, {
         proposalId,
         houseId,
@@ -142,8 +137,7 @@ export default function ProposalVoteSection({
   const handleCloseVote = async () => {
     setActing(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request<CloseProposalVoteResponse>(CLOSE_PROPOSAL_VOTE, {
         proposalId,
       });

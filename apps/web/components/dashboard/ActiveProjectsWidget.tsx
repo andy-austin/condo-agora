@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import { GET_PROPOSALS, type Proposal } from '@/lib/queries/proposal';
 import { ArrowRight, Loader2, Wrench } from 'lucide-react';
@@ -31,14 +30,12 @@ export default function ActiveProjectsWidget({
   organizationId,
 }: ActiveProjectsWidgetProps) {
   const t = useTranslations('dashboard');
-  const { getAuthToken } = useAuthToken();
   const [projects, setProjects] = useState<ProjectWithProgress[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchProjects = useCallback(async () => {
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+        if (!token) return;
+    const client = getApiClient();
     try {
       const data = await client.request<{ proposals: Proposal[] }>(
         GET_PROPOSALS,
@@ -72,7 +69,7 @@ export default function ActiveProjectsWidget({
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, organizationId]);
+  }, [organizationId]);
 
   useState(() => {
     fetchProjects();

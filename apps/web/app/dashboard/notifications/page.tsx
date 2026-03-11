@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_NOTIFICATIONS,
@@ -27,14 +26,12 @@ const REFERENCE_ROUTES: Record<string, (id: string) => string> = {
 export default function NotificationsPage() {
   const t = useTranslations('dashboard');
   const router = useRouter();
-  const { getAuthToken } = useAuthToken();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<GetNotificationsResponse>(GET_NOTIFICATIONS, {
         limit: 100,
       });
@@ -44,7 +41,7 @@ export default function NotificationsPage() {
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, t]);
+  }, [t]);
 
   useEffect(() => {
     fetchNotifications();
@@ -53,8 +50,7 @@ export default function NotificationsPage() {
   const handleClick = async (notification: Notification) => {
     if (!notification.isRead) {
       try {
-        const token = await getAuthToken();
-        const client = getApiClient(token);
+        const client = getApiClient();
         await client.request(MARK_NOTIFICATION_READ, { id: notification.id });
         setNotifications((prev) =>
           prev.map((n) => (n.id === notification.id ? { ...n, isRead: true } : n))
@@ -72,8 +68,7 @@ export default function NotificationsPage() {
 
   const handleMarkAllRead = async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request(MARK_ALL_NOTIFICATIONS_READ);
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
     } catch (err) {

@@ -2,7 +2,6 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   CREATE_ORGANIZATION,
@@ -17,7 +16,6 @@ type Step = 1 | 2 | 3 | 4;
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { getAuthToken } = useAuthToken();
 
   const [step, setStep] = useState<Step>(1);
   const [submitting, setSubmitting] = useState(false);
@@ -40,8 +38,7 @@ export default function OnboardingPage() {
 
     setSubmitting(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<CreateOrganizationResponse>(
         CREATE_ORGANIZATION,
         { name: orgName.trim() }
@@ -61,8 +58,7 @@ export default function OnboardingPage() {
   const handleAddHouse = async (name: string) => {
     if (!orgId || !name.trim()) return;
 
-    const token = await getAuthToken();
-    const client = getApiClient(token);
+    const client = getApiClient();
     const data = await client.request<CreateHouseResponse>(CREATE_HOUSE, {
       organizationId: orgId,
       name: name.trim(),

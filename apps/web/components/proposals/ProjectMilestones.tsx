@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, type FormEvent } from 'react';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_PROJECT_MILESTONES,
@@ -31,7 +30,6 @@ export default function ProjectMilestones({
   proposalId,
   isAdmin,
 }: ProjectMilestonesProps) {
-  const { getAuthToken } = useAuthToken();
   const [milestones, setMilestones] = useState<ProjectMilestone[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -42,9 +40,8 @@ export default function ProjectMilestones({
   const [error, setError] = useState<string | null>(null);
 
   const fetchMilestones = useCallback(async () => {
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+        if (!token) return;
+    const client = getApiClient();
     try {
       const data = await client.request<{
         projectMilestones: ProjectMilestone[];
@@ -55,7 +52,7 @@ export default function ProjectMilestones({
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, proposalId]);
+  }, [proposalId]);
 
   useState(() => {
     fetchMilestones();
@@ -64,9 +61,8 @@ export default function ProjectMilestones({
   const handleCreate = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+        if (!token) return;
+    const client = getApiClient();
     try {
       setSubmitting(true);
       const data = await client.request<{
@@ -90,9 +86,8 @@ export default function ProjectMilestones({
   };
 
   const handleStatusUpdate = async (id: string, status: string) => {
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+        if (!token) return;
+    const client = getApiClient();
     try {
       const data = await client.request<{
         updateMilestoneStatus: ProjectMilestone;
@@ -106,9 +101,8 @@ export default function ProjectMilestones({
   };
 
   const handleDelete = async (id: string) => {
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+        if (!token) return;
+    const client = getApiClient();
     try {
       await client.request(DELETE_PROJECT_MILESTONE, { id });
       setMilestones((prev) => prev.filter((m) => m.id !== id));

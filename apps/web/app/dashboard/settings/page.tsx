@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, FormEvent } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -97,7 +96,6 @@ export default function SettingsPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { getAuthToken } = useAuthToken();
 
   const organizationId = user?.memberships[0]?.organization.id || '';
   const currentMembership = user?.memberships.find(
@@ -107,8 +105,7 @@ export default function SettingsPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const meData = await client.request<MeQueryResponse>(ME_QUERY);
 
       if (meData.me) {
@@ -129,7 +126,7 @@ export default function SettingsPage() {
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken]);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -231,7 +228,7 @@ export default function SettingsPage() {
               user={user}
               organizationId={organizationId}
               isAdmin={isAdmin}
-              getAuthToken={getAuthToken}
+              ={}
               onMembersChange={setMembers}
               t={t}
             />
@@ -256,7 +253,6 @@ function MembersTab({
   user,
   organizationId,
   isAdmin,
-  getAuthToken,
   onMembersChange,
   t,
 }: {
@@ -264,7 +260,6 @@ function MembersTab({
   user: User;
   organizationId: string;
   isAdmin: boolean;
-  getAuthToken: () => Promise<string | null>;
   onMembersChange: (members: Member[]) => void;
   t: ReturnType<typeof useTranslations>;
 }) {
@@ -294,8 +289,7 @@ function MembersTab({
     setSubmitting(true);
     setInviteSuccess(false);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const result = await client.request<{ createInvitation: Invitation }>(
         CREATE_INVITATION, { email, organizationId, role }
       );
@@ -325,8 +319,7 @@ function MembersTab({
 
     setRemovingId(member.id);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request(REMOVE_MEMBER, { memberId: member.id });
       onMembersChange(members.filter((m) => m.id !== member.id));
     } catch (err) {
@@ -505,7 +498,7 @@ function MembersTab({
       {isAdmin && organizationId && (
         <PendingInvitationsTable
           organizationId={organizationId}
-          getAuthToken={getAuthToken}
+          ={}
           t={t}
           refreshTrigger={inviteRefresh}
           lastCreatedInvitation={lastCreatedInvitation}

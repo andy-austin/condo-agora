@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_VOTING_SESSIONS,
@@ -37,16 +36,14 @@ type MeResponse = {
 
 export default function VotingPage() {
   const t = useTranslations('dashboard');
-  const { getAuthToken } = useAuthToken();
   const [sessions, setSessions] = useState<VotingSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchData = useCallback(async () => {
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+        if (!token) return;
+    const client = getApiClient();
 
     try {
       setLoading(true);
@@ -69,7 +66,7 @@ export default function VotingPage() {
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, t]);
+  }, [t]);
 
   useEffect(() => {
     fetchData();

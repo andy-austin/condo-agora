@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { getApiClient } from '@/lib/api';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import {
   GET_ACTIVITY_FEED,
   type ActivityItem,
@@ -26,14 +25,12 @@ const TYPE_ROUTES: Record<string, (id: string) => string> = {
 
 export default function ActivityFeed({ organizationId }: Props) {
   const t = useTranslations('dashboard');
-  const { getAuthToken } = useAuthToken();
   const [items, setItems] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchFeed = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<ActivityFeedResponse>(GET_ACTIVITY_FEED, {
         organizationId,
         limit: 10,
@@ -44,7 +41,7 @@ export default function ActivityFeed({ organizationId }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [organizationId, getAuthToken]);
+  }, [organizationId]);
 
   useEffect(() => {
     fetchFeed();

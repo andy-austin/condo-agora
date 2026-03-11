@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_PROPOSALS,
@@ -45,7 +44,6 @@ type MeResponse = {
 
 export default function ArchivePage() {
   const t = useTranslations('dashboard');
-  const { getAuthToken } = useAuthToken();
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,8 +53,7 @@ export default function ArchivePage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const meData = await client.request<MeResponse>(ME_QUERY);
 
       if (!meData.me || meData.me.memberships.length === 0) {
@@ -78,7 +75,7 @@ export default function ArchivePage() {
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken]);
+  }, []);
 
   useEffect(() => {
     fetchData();

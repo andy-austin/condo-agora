@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_ORGANIZATION_MEMBERS,
@@ -36,7 +35,6 @@ type MeResponse = {
 
 export default function CommitteePage() {
   const t = useTranslations('dashboard');
-  const { getAuthToken } = useAuthToken();
 
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,22 +45,20 @@ export default function CommitteePage() {
 
   const fetchMembers = useCallback(
     async (orgId: string) => {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<GetMembersResponse>(
         GET_ORGANIZATION_MEMBERS,
         { organizationId: orgId }
       );
       return data.organizationMembers;
     },
-    [getAuthToken]
+    []
   );
 
   useEffect(() => {
     const init = async () => {
       try {
-        const token = await getAuthToken();
-        const client = getApiClient(token);
+        const client = getApiClient();
         const meData = await client.request<MeResponse>(ME_QUERY);
 
         if (!meData.me || meData.me.memberships.length === 0) {
@@ -87,13 +83,12 @@ export default function CommitteePage() {
     };
 
     init();
-  }, [getAuthToken, fetchMembers, t]);
+  }, [fetchMembers, t]);
 
   const handleRoleChange = async (memberId: string, newRole: string) => {
     setUpdatingId(memberId);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<UpdateMemberRoleResponse>(
         UPDATE_MEMBER_ROLE,
         { memberId, role: newRole }
