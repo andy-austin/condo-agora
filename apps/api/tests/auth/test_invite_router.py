@@ -93,7 +93,9 @@ def test_accept_invitation_already_member():
     with patch("apps.api.src.auth.invite_router.db") as mock_db:
         mock_db.is_connected.return_value = True
         mock_db.db.invitations.find_one = AsyncMock(return_value=invitation)
-        mock_db.db.organization_members.find_one = AsyncMock(return_value=existing_membership)
+        mock_db.db.organization_members.find_one = AsyncMock(
+            return_value=existing_membership
+        )
         mock_db.db.invitations.update_one = AsyncMock()
 
         app.dependency_overrides[get_current_user] = _override_user()

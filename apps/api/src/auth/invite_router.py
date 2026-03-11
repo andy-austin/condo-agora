@@ -23,7 +23,9 @@ async def accept_invitation(
         raise HTTPException(status_code=404, detail="Invitation not found")
 
     if invitation["status"] != "pending":
-        raise HTTPException(status_code=400, detail=f"Invitation is {invitation['status']}")
+        raise HTTPException(
+            status_code=400, detail=f"Invitation is {invitation['status']}"
+        )
 
     if invitation["expires_at"] < datetime.now(timezone.utc):
         await db.db.invitations.update_one(
@@ -43,10 +45,12 @@ async def accept_invitation(
             raise HTTPException(status_code=403, detail="Invitation not for this user")
 
     # Check if already a member
-    existing = await db.db.organization_members.find_one({
-        "organization_id": invitation["organization_id"],
-        "user_id": user["_id"],
-    })
+    existing = await db.db.organization_members.find_one(
+        {
+            "organization_id": invitation["organization_id"],
+            "user_id": user["_id"],
+        }
+    )
     if existing:
         await db.db.invitations.update_one(
             {"_id": invitation["_id"]},
@@ -56,13 +60,15 @@ async def accept_invitation(
 
     # Create membership
     now = datetime.now(timezone.utc)
-    await db.db.organization_members.insert_one({
-        "organization_id": invitation["organization_id"],
-        "user_id": user["_id"],
-        "role": invitation["role"],
-        "created_at": now,
-        "updated_at": now,
-    })
+    await db.db.organization_members.insert_one(
+        {
+            "organization_id": invitation["organization_id"],
+            "user_id": user["_id"],
+            "role": invitation["role"],
+            "created_at": now,
+            "updated_at": now,
+        }
+    )
 
     # Mark invitation as accepted
     await db.db.invitations.update_one(
