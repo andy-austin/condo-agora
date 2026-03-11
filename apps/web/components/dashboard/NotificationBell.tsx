@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getApiClient } from '@/lib/api';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import {
   GET_NOTIFICATIONS,
   GET_UNREAD_COUNT,
@@ -29,7 +28,6 @@ const REFERENCE_ROUTES: Record<string, string> = {
 export default function NotificationBell() {
   const t = useTranslations('dashboard');
   const router = useRouter();
-  const { getAuthToken } = useAuthToken();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -37,19 +35,17 @@ export default function NotificationBell() {
 
   const fetchUnreadCount = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<UnreadCountResponse>(GET_UNREAD_COUNT);
       setUnreadCount(data.unreadNotificationCount);
     } catch {
       // silently fail for count
     }
-  }, [getAuthToken]);
+  }, []);
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<GetNotificationsResponse>(GET_NOTIFICATIONS, {
         limit: 10,
       });
@@ -58,7 +54,7 @@ export default function NotificationBell() {
     } catch {
       // silently fail
     }
-  }, [getAuthToken]);
+  }, []);
 
   useEffect(() => {
     fetchUnreadCount();
@@ -84,8 +80,7 @@ export default function NotificationBell() {
 
   const handleNotificationClick = async (notification: Notification) => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request(MARK_NOTIFICATION_READ, { id: notification.id });
       setNotifications((prev) =>
         prev.map((n) => (n.id === notification.id ? { ...n, isRead: true } : n))
@@ -118,8 +113,7 @@ export default function NotificationBell() {
 
   const handleMarkAllRead = async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request(MARK_ALL_NOTIFICATIONS_READ);
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
       setUnreadCount(0);

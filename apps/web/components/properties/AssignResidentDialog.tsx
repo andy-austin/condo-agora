@@ -19,7 +19,6 @@ type AssignResidentDialogProps = {
   houseId: string;
   existingResidentUserIds: string[];
   onAssigned: () => void;
-  getAuthToken: () => Promise<string | null>;
 };
 
 export default function AssignResidentDialog({
@@ -27,7 +26,6 @@ export default function AssignResidentDialog({
   houseId,
   existingResidentUserIds,
   onAssigned,
-  getAuthToken,
 }: AssignResidentDialogProps) {
   const [open, setOpen] = useState(false);
   const [members, setMembers] = useState<Member[]>([]);
@@ -41,8 +39,7 @@ export default function AssignResidentDialog({
     const fetchMembers = async () => {
       setLoadingMembers(true);
       try {
-        const token = await getAuthToken();
-        const client = getApiClient(token);
+        const client = getApiClient();
         const data = await client.request<GetMembersResponse>(
           GET_ORGANIZATION_MEMBERS,
           { organizationId }
@@ -61,7 +58,7 @@ export default function AssignResidentDialog({
     };
 
     fetchMembers();
-  }, [open, organizationId, existingResidentUserIds, getAuthToken]);
+  }, [open, organizationId, existingResidentUserIds]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -69,8 +66,7 @@ export default function AssignResidentDialog({
 
     setSubmitting(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request<AssignResidentResponse>(ASSIGN_RESIDENT_TO_HOUSE, {
         userId: selectedUserId,
         houseId,

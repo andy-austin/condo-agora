@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_HOUSE,
@@ -73,7 +72,6 @@ export default function HouseDetailPage() {
   const t = useTranslations('dashboard');
   const houseId = params.id as string;
   const activeTab = searchParams.get('tab') || 'overview';
-  const { getAuthToken } = useAuthToken();
 
   const [house, setHouse] = useState<House | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,8 +84,7 @@ export default function HouseDetailPage() {
 
   const fetchHouse = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
 
       const [houseData, meData] = await Promise.all([
         client.request<GetHouseResponse>(GET_HOUSE, { id: houseId }),
@@ -114,7 +111,7 @@ export default function HouseDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [houseId, getAuthToken]);
+  }, [houseId]);
 
   useEffect(() => {
     fetchHouse();
@@ -125,8 +122,7 @@ export default function HouseDetailPage() {
 
     setSaving(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<UpdateHouseResponse>(UPDATE_HOUSE, {
         id: house.id,
         name: editName.trim(),
@@ -279,7 +275,6 @@ export default function HouseDetailPage() {
         <ResidentsTab
           house={house}
           isAdmin={isAdmin}
-          getAuthToken={getAuthToken}
           onRefresh={fetchHouse}
         />
       )}
@@ -371,12 +366,10 @@ function OverviewTab({ house }: { house: House }) {
 function ResidentsTab({
   house,
   isAdmin,
-  getAuthToken,
   onRefresh,
 }: {
   house: House;
   isAdmin: boolean;
-  getAuthToken: () => Promise<string | null>;
   onRefresh: () => void;
 }) {
   const t = useTranslations('dashboard');
@@ -387,8 +380,7 @@ function ResidentsTab({
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const token = await getAuthToken();
-        const client = getApiClient(token);
+        const client = getApiClient();
         const data = await client.request<GetMembersResponse>(
           GET_ORGANIZATION_MEMBERS,
           { organizationId: house.organizationId }
@@ -400,7 +392,7 @@ function ResidentsTab({
     };
 
     fetchMembers();
-  }, [house.organizationId, getAuthToken]);
+  }, [house.organizationId]);
 
   const memberMap = new Map(members.map((m) => [m.userId, m]));
 
@@ -416,8 +408,7 @@ function ResidentsTab({
 
     setRemoving(userId);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request<RemoveResidentResponse>(REMOVE_RESIDENT_FROM_HOUSE, {
         userId,
         organizationId: house.organizationId,
@@ -436,8 +427,7 @@ function ResidentsTab({
   const handleSetVoter = async (userId: string) => {
     setSettingVoter(userId);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request<SetHouseVoterResponse>(SET_HOUSE_VOTER, {
         houseId: house.id,
         targetUserId: userId,
@@ -467,7 +457,6 @@ function ResidentsTab({
             houseId={house.id}
             existingResidentUserIds={existingResidentUserIds}
             onAssigned={onRefresh}
-            getAuthToken={getAuthToken}
           />
         )}
       </div>
@@ -493,7 +482,6 @@ function ResidentsTab({
               houseId={house.id}
               existingResidentUserIds={existingResidentUserIds}
               onAssigned={onRefresh}
-              getAuthToken={getAuthToken}
             />
           )}
         </div>

@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   CREATE_PROPOSAL,
@@ -38,7 +37,6 @@ type MeResponse = {
 export default function NewProposalPage() {
   const router = useRouter();
   const t = useTranslations('dashboard');
-  const { getAuthToken } = useAuthToken();
 
   const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [loadingOrg, setLoadingOrg] = useState(true);
@@ -52,8 +50,7 @@ export default function NewProposalPage() {
 
   const fetchOrg = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<MeResponse>(ME_QUERY);
 
       if (!data.me || data.me.memberships.length === 0) {
@@ -67,7 +64,7 @@ export default function NewProposalPage() {
     } finally {
       setLoadingOrg(false);
     }
-  }, [getAuthToken, t]);
+  }, [t]);
 
   useEffect(() => {
     fetchOrg();
@@ -89,8 +86,7 @@ export default function NewProposalPage() {
     setSubmitting(true);
 
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<CreateProposalResponse>(CREATE_PROPOSAL, {
         organizationId,
         title: title.trim(),

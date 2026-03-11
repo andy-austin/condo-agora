@@ -21,14 +21,12 @@ type CommentSectionProps = {
   proposalId: string;
   currentUserId: string | null;
   isAdmin: boolean;
-  getAuthToken: () => Promise<string | null>;
 };
 
 export default function CommentSection({
   proposalId,
   currentUserId,
   isAdmin,
-  getAuthToken,
 }: CommentSectionProps) {
   const t = useTranslations('dashboard.proposals');
   const [comments, setComments] = useState<Comment[]>([]);
@@ -38,8 +36,7 @@ export default function CommentSection({
 
   const fetchComments = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<GetCommentsResponse>(GET_COMMENTS, { proposalId });
       setComments(data.comments);
     } catch (err) {
@@ -47,7 +44,7 @@ export default function CommentSection({
     } finally {
       setLoading(false);
     }
-  }, [proposalId, getAuthToken]);
+  }, [proposalId]);
 
   useEffect(() => {
     fetchComments();
@@ -57,8 +54,7 @@ export default function CommentSection({
     if (!newContent.trim()) return;
     setSubmitting(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<CreateCommentResponse>(CREATE_COMMENT, {
         proposalId,
         content: newContent.trim(),
@@ -76,8 +72,7 @@ export default function CommentSection({
   const handleDelete = async (commentId: string) => {
     if (!confirm(t('deleteConfirm'))) return;
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request<DeleteCommentResponse>(DELETE_COMMENT, { id: commentId });
       await fetchComments();
     } catch (err) {
@@ -86,8 +81,7 @@ export default function CommentSection({
   };
 
   const handleReply = async (parentId: string, content: string) => {
-    const token = await getAuthToken();
-    const client = getApiClient(token);
+    const client = getApiClient();
     const data = await client.request<CreateCommentResponse>(CREATE_COMMENT, {
       proposalId,
       content,
@@ -104,8 +98,7 @@ export default function CommentSection({
   };
 
   const handleUpdate = async (commentId: string, content: string) => {
-    const token = await getAuthToken();
-    const client = getApiClient(token);
+    const client = getApiClient();
     const data = await client.request<UpdateCommentResponse>(UPDATE_COMMENT, {
       id: commentId,
       content,

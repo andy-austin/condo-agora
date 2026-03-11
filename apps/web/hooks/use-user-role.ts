@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAuthToken } from './use-auth-token';
 import { getApiClient } from '@/lib/api';
 
 const ME_ROLE_QUERY = `
@@ -32,14 +31,12 @@ type MeResponse = {
 };
 
 export function useUserRole() {
-  const { getAuthToken } = useAuthToken();
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchRole = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<MeResponse>(ME_ROLE_QUERY);
 
       if (data.me) {
@@ -50,7 +47,7 @@ export function useUserRole() {
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken]);
+  }, []);
 
   useEffect(() => {
     fetchRole();

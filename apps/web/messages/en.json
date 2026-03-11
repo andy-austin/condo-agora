@@ -225,6 +225,18 @@
     "allOperational": "✓ All systems operational",
     "someIssues": "⚠ Some services may be experiencing issues"
   },
+  "login": {
+    "sendCode": "Send Code",
+    "or": "or",
+    "signInWithGoogle": "Sign in with Google",
+    "codeSentTo": "Code sent to",
+    "verify": "Verify",
+    "back": "Back",
+    "errorSendingCode": "Error sending code",
+    "errorConnection": "Connection error",
+    "errorInvalidCode": "Invalid code",
+    "errorVerification": "Verification error"
+  },
   "languageSwitcher": {
     "label": "Language",
     "es": "Español",

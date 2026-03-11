@@ -77,14 +77,9 @@ class MongoDB:
             return
 
         # Users collection indexes
-        await self.db.users.create_index("clerk_id", unique=True)
-        # Drop existing non-sparse email index before recreating as sparse
-        try:
-            await self.db.users.drop_index("email_1")
-        except Exception:
-            pass
-        await self.db.users.create_index("email", sparse=True)
-        await self.db.users.create_index("phone_number", unique=True, sparse=True)
+        await self.db.users.create_index("nextauth_id", unique=True)
+        await self.db.users.create_index("email", unique=True, sparse=True)
+        await self.db.users.create_index("phone", unique=True, sparse=True)
 
         # Organizations collection indexes
         await self.db.organizations.create_index("slug", unique=True)
@@ -161,6 +156,14 @@ class MongoDB:
             [("proposal_id", 1), ("house_id", 1)], unique=True
         )
         await self.db.proposal_votes.create_index("proposal_id")
+
+        # OTP codes - auto-expire after 5 minutes
+        await self.db.otp_codes.create_index("created_at", expireAfterSeconds=300)
+        await self.db.otp_codes.create_index("identifier")
+
+        # Rate limits - auto-expire after 1 hour
+        await self.db.rate_limits.create_index("window_start", expireAfterSeconds=3600)
+        await self.db.rate_limits.create_index("key")
 
 
 # Global database instance

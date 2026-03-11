@@ -2,7 +2,6 @@ import re
 from datetime import datetime
 
 from ...database import db
-from ..auth.clerk_utils import create_phone_user
 from ..auth.service import create_organization
 
 E164_REGEX = re.compile(r"^\+[1-9]\d{6,14}$")
@@ -61,52 +60,27 @@ async def bulk_setup_organization(
                     results.append(row_result)
                     continue
 
-                existing_user = await db.db.users.find_one({"phone_number": phone})
+                existing_user = await db.db.users.find_one({"phone": phone})
 
                 if existing_user:
                     user_id = str(existing_user["_id"])
                 else:
-                    clerk_result = await create_phone_user(
-                        phone=phone,
-                        first_name=first_name,
-                        last_name=last_name,
-                        metadata={
-                            "organization_id": org_id,
-                            "house_id": house_id,
-                        },
-                    )
-
-                    if clerk_result is None:
-                        row_result["status"] = "ERROR"
-                        row_result["error"] = "Clerk API not configured"
-                        results.append(row_result)
-                        continue
-
-                    if clerk_result.get("error"):
-                        row_result["status"] = "ERROR"
-                        row_result["error"] = clerk_result.get("detail", "Clerk error")
-                        results.append(row_result)
-                        continue
-
-                    clerk_id = clerk_result["id"]
-
-                    local_user = await db.db.users.find_one({"clerk_id": clerk_id})
-                    if local_user:
-                        user_id = str(local_user["_id"])
-                    else:
-                        user_doc = {
-                            "clerk_id": clerk_id,
-                            "email": None,
-                            "phone_number": phone,
-                            "first_name": first_name,
-                            "last_name": last_name,
-                            "avatar_url": None,
-                            "requires_profile_completion": True,
-                            "created_at": now,
-                            "updated_at": now,
-                        }
-                        insert_result = await db.db.users.insert_one(user_doc)
-                        user_id = str(insert_result.inserted_id)
+                    # Create a local user record; the user will complete
+                    # authentication via OTP when they first log in.
+                    user_doc = {
+                        "nextauth_id": None,
+                        "email": None,
+                        "phone": phone,
+                        "auth_provider": "phone",
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "avatar_url": None,
+                        "requires_profile_completion": True,
+                        "created_at": now,
+                        "updated_at": now,
+                    }
+                    insert_result = await db.db.users.insert_one(user_doc)
+                    user_id = str(insert_result.inserted_id)
 
                 member_data = {
                     "user_id": user_id,

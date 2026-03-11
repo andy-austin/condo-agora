@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, FormEvent } from 'react';
 import { getApiClient } from '@/lib/api';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import {
   GET_ANNOUNCEMENTS,
   CREATE_ANNOUNCEMENT,
@@ -23,7 +22,6 @@ type Props = {
 
 export default function AnnouncementsSection({ organizationId, isAdmin }: Props) {
   const t = useTranslations('dashboard');
-  const { getAuthToken } = useAuthToken();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -35,8 +33,7 @@ export default function AnnouncementsSection({ organizationId, isAdmin }: Props)
 
   const fetchAnnouncements = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<GetAnnouncementsResponse>(GET_ANNOUNCEMENTS, {
         organizationId,
       });
@@ -46,7 +43,7 @@ export default function AnnouncementsSection({ organizationId, isAdmin }: Props)
     } finally {
       setLoading(false);
     }
-  }, [organizationId, getAuthToken]);
+  }, [organizationId]);
 
   useEffect(() => {
     fetchAnnouncements();
@@ -57,8 +54,7 @@ export default function AnnouncementsSection({ organizationId, isAdmin }: Props)
     if (!formTitle.trim() || !formContent.trim()) return;
     setSubmitting(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<CreateAnnouncementResponse>(CREATE_ANNOUNCEMENT, {
         organizationId,
         title: formTitle.trim(),
@@ -84,8 +80,7 @@ export default function AnnouncementsSection({ organizationId, isAdmin }: Props)
   const handleDelete = async (id: string) => {
     if (!confirm(t('announcements.deleteConfirm'))) return;
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request<DeleteAnnouncementResponse>(DELETE_ANNOUNCEMENT, { id });
       setAnnouncements((prev) => prev.filter((a) => a.id !== id));
     } catch (err) {

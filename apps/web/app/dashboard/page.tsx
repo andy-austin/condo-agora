@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import { GET_HOUSES, type House, type GetHousesResponse } from '@/lib/queries/house';
 import {
@@ -58,17 +57,15 @@ type DashboardData = {
 };
 
 export default function DashboardPage() {
-  const { user } = useUser();
+  const { data: session } = useSession();
   const t = useTranslations('dashboard');
-  const { getAuthToken } = useAuthToken();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchDashboard = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const meData = await client.request<MeResponse>(ME_QUERY);
 
       if (!meData.me || meData.me.memberships.length === 0) {
@@ -106,7 +103,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken]);
+  }, []);
 
   useEffect(() => {
     fetchDashboard();
@@ -209,7 +206,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl lg:text-3xl font-bold font-display">
-          {t('overview.welcomeBack', { name: user?.firstName || user?.primaryEmailAddress?.emailAddress?.split('@')[0] || 'User' })}
+          {t('overview.welcomeBack', { name: session?.user?.name?.split(' ')[0] || session?.user?.email?.split('@')[0] || 'User' })}
         </h1>
         {data?.organizationName && (
           <p className="text-muted-foreground mt-1">

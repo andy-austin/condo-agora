@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_VOTING_RESULTS,
@@ -21,7 +20,6 @@ import { BarChart2, CheckCircle2, XCircle, Users, Loader2 } from 'lucide-react';
 export default function VotingResultsPage() {
   const t = useTranslations('dashboard');
   const { sessionId } = useParams<{ sessionId: string }>();
-  const { getAuthToken } = useAuthToken();
 
   const [results, setResults] = useState<VotingResults | null>(null);
   const [session, setSession] = useState<VotingSession | null>(null);
@@ -29,9 +27,7 @@ export default function VotingResultsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+    const client = getApiClient();
 
     try {
       setLoading(true);
@@ -50,7 +46,7 @@ export default function VotingResultsPage() {
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, sessionId, t]);
+  }, [sessionId, t]);
 
   useEffect(() => {
     fetchData();

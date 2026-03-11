@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_PROPOSAL,
@@ -76,7 +75,6 @@ export default function ProposalDetailPage() {
   const router = useRouter();
   const t = useTranslations('dashboard');
   const proposalId = params.id as string;
-  const { getAuthToken } = useAuthToken();
 
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [loading, setLoading] = useState(true);
@@ -98,8 +96,7 @@ export default function ProposalDetailPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
 
       const [proposalData, meData] = await Promise.all([
         client.request<GetProposalResponse>(GET_PROPOSAL, { id: proposalId }),
@@ -140,7 +137,7 @@ export default function ProposalDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [proposalId, getAuthToken, t]);
+  }, [proposalId, t]);
 
   useEffect(() => {
     fetchData();
@@ -150,8 +147,7 @@ export default function ProposalDetailPage() {
     if (!proposal) return;
     setSaving(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<UpdateProposalResponse>(UPDATE_PROPOSAL, {
         id: proposal.id,
         title: editTitle.trim(),
@@ -175,8 +171,7 @@ export default function ProposalDetailPage() {
     if (!proposal) return;
     setModerating(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<UpdateProposalStatusResponse>(
         UPDATE_PROPOSAL_STATUS,
         {
@@ -202,8 +197,7 @@ export default function ProposalDetailPage() {
     if (!proposal) return;
     setModerating(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<AssignResponsibleHouseResponse>(
         ASSIGN_RESPONSIBLE_HOUSE,
         { proposalId: proposal.id, houseId }
@@ -221,8 +215,7 @@ export default function ProposalDetailPage() {
   const handleDelete = async () => {
     if (!proposal || !confirm('Are you sure you want to delete this proposal?')) return;
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request<DeleteProposalResponse>(DELETE_PROPOSAL, { id: proposal.id });
       router.push('/dashboard/proposals');
     } catch (err) {
@@ -404,7 +397,6 @@ export default function ProposalDetailPage() {
               voteThreshold={proposal.voteThreshold}
               isAdmin={isAdmin}
               houseId={userHouseId}
-              getAuthToken={getAuthToken}
               onProposalUpdate={fetchData}
             />
           )}
@@ -433,7 +425,6 @@ export default function ProposalDetailPage() {
             proposalId={proposal.id}
             currentUserId={currentUserId}
             isAdmin={isAdmin}
-            getAuthToken={getAuthToken}
           />
         </div>
 

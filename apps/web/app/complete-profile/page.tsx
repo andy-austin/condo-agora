@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useUser } from '@clerk/nextjs';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import { COMPLETE_PROFILE } from '@/lib/queries/onboarding';
 import { Button } from '@/components/ui/button';
@@ -13,19 +11,15 @@ import { Loader2, User } from 'lucide-react';
 export default function CompleteProfilePage() {
   const router = useRouter();
   const t = useTranslations('completeProfile');
-  const { user } = useUser();
-  const { getAuthToken } = useAuthToken();
 
-  const [firstName, setFirstName] = useState(user?.firstName ?? '');
-  const [lastName, setLastName] = useState(user?.lastName ?? '');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const callCompleteProfile = async () => {
-    const token = await getAuthToken();
-    const client = getApiClient(token);
+    const client = getApiClient();
     await client.request(COMPLETE_PROFILE, {
       input: {
         firstName: firstName.trim() || undefined,
@@ -39,30 +33,7 @@ export default function CompleteProfilePage() {
     setError('');
     setSaving(true);
     try {
-      // Update Clerk user with email/password if provided
-      if (user) {
-        if (email.trim()) {
-          await user.createEmailAddress({ email: email.trim() });
-        }
-        if (password.trim()) {
-          await user.updatePassword({ newPassword: password.trim() });
-        }
-        // Update first/last name in Clerk if changed
-        const updates: Record<string, string> = {};
-        if (firstName.trim() && firstName.trim() !== user.firstName) {
-          updates.firstName = firstName.trim();
-        }
-        if (lastName.trim() && lastName.trim() !== user.lastName) {
-          updates.lastName = lastName.trim();
-        }
-        if (Object.keys(updates).length > 0) {
-          await user.update(updates);
-        }
-      }
-
-      // Call backend mutation to update local DB and clear the flag
       await callCompleteProfile();
-
       router.push('/dashboard');
     } catch (err: unknown) {
       console.error('Failed to complete profile:', err);
@@ -76,7 +47,6 @@ export default function CompleteProfilePage() {
     setError('');
     setSaving(true);
     try {
-      // Just clear the flag in the backend, no Clerk updates
       await callCompleteProfile();
       router.push('/dashboard');
     } catch (err: unknown) {
@@ -154,24 +124,6 @@ export default function CompleteProfilePage() {
               className="w-full rounded-lg border border-border bg-background p-3 text-foreground placeholder:text-muted-foreground focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          {/* Password */}
-          <div>
-            <label
-              htmlFor="password"
-              className="mb-1.5 block text-sm font-medium text-foreground"
-            >
-              {t('password')}
-            </label>
-            <input
-              id="password"
-              type="password"
-              placeholder={t('passwordPlaceholder')}
-              className="w-full rounded-lg border border-border bg-background p-3 text-foreground placeholder:text-muted-foreground focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
         </div>

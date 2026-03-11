@@ -45,9 +45,10 @@ class OrganizationMember:
 @strawberry.type
 class User:
     id: str
-    clerk_id: str
+    nextauth_id: str
     email: Optional[str] = None
-    phone_number: Optional[str] = None
+    phone: Optional[str] = None
+    auth_provider: str = "phone"
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     avatar_url: Optional[str] = None
@@ -66,8 +67,7 @@ class MemberWithUser:
     house_id: Optional[str] = None
     role: Role
     created_at: datetime
-    email: Optional[str] = None
-    phone_number: Optional[str] = None
+    email: str
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     avatar_url: Optional[str] = None

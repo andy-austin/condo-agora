@@ -98,9 +98,10 @@ async def resolve_me(info: strawberry.types.Info) -> Optional[User]:
 
     return User(
         id=str(user_data["_id"]),
-        clerk_id=user_data["clerk_id"],
+        nextauth_id=user_data["nextauth_id"],
         email=user_data.get("email"),
-        phone_number=user_data.get("phone_number"),
+        phone=user_data.get("phone"),
+        auth_provider=user_data.get("auth_provider", "phone"),
         first_name=user_data.get("first_name"),
         last_name=user_data.get("last_name"),
         avatar_url=user_data.get("avatar_url"),
@@ -214,8 +215,7 @@ def _mongo_member_to_member_with_user(m: dict) -> MemberWithUser:
         house_id=m.get("house_id"),
         role=Role(m["role"]),
         created_at=m["created_at"],
-        email=user.get("email"),
-        phone_number=user.get("phone_number"),
+        email=user.get("email", ""),
         first_name=user.get("first_name"),
         last_name=user.get("last_name"),
         avatar_url=user.get("avatar_url"),
@@ -324,9 +324,10 @@ async def resolve_complete_profile(
 
     return User(
         id=str(updated["_id"]),
-        clerk_id=updated["clerk_id"],
+        nextauth_id=updated["nextauth_id"],
         email=updated.get("email"),
-        phone_number=updated.get("phone_number"),
+        phone=updated.get("phone"),
+        auth_provider=updated.get("auth_provider", "phone"),
         first_name=updated.get("first_name"),
         last_name=updated.get("last_name"),
         avatar_url=updated.get("avatar_url"),

@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_DOCUMENTS,
@@ -38,7 +37,6 @@ export default function DocumentSection({
   isAdmin,
   currentUserId,
 }: DocumentSectionProps) {
-  const { getAuthToken } = useAuthToken();
   const t = useTranslations('dashboard.proposals');
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,9 +46,7 @@ export default function DocumentSection({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchDocuments = useCallback(async () => {
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+    const client = getApiClient();
     try {
       const data = await client.request<{ documents: Document[] }>(
         GET_DOCUMENTS,
@@ -62,7 +58,7 @@ export default function DocumentSection({
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, proposalId]);
+  }, [proposalId]);
 
   useState(() => {
     fetchDocuments();
@@ -86,9 +82,7 @@ export default function DocumentSection({
       const { url, fileName, fileSize, mimeType } = await uploadRes.json();
 
       // Store metadata in backend
-      const token = await getAuthToken();
-      if (!token) return;
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<{ attachDocument: Document }>(
         ATTACH_DOCUMENT,
         {
@@ -109,9 +103,7 @@ export default function DocumentSection({
   };
 
   const handleDelete = async (docId: string) => {
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+    const client = getApiClient();
     try {
       await client.request(DELETE_DOCUMENT, { id: docId });
       setDocuments((prev) => prev.filter((d) => d.id !== docId));
@@ -121,9 +113,7 @@ export default function DocumentSection({
   };
 
   const handleMarkSelected = async (docId: string) => {
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+    const client = getApiClient();
     try {
       const data = await client.request<{ markQuoteSelected: Document }>(
         MARK_QUOTE_SELECTED,

@@ -15,7 +15,6 @@ import { Clock, Mail, RotateCw, Trash2 } from 'lucide-react';
 
 type PendingInvitationsTableProps = {
   organizationId: string;
-  getAuthToken: () => Promise<string | null>;
   t: (key: string, values?: Record<string, string | number>) => string;
   refreshTrigger?: number;
   lastCreatedInvitation?: Invitation | null;
@@ -23,7 +22,6 @@ type PendingInvitationsTableProps = {
 
 export default function PendingInvitationsTable({
   organizationId,
-  getAuthToken,
   t,
   refreshTrigger,
   lastCreatedInvitation,
@@ -34,8 +32,7 @@ export default function PendingInvitationsTable({
 
   const fetchInvitations = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<PendingInvitationsResponse>(
         GET_PENDING_INVITATIONS,
         { organizationId }
@@ -46,7 +43,7 @@ export default function PendingInvitationsTable({
     } finally {
       setLoading(false);
     }
-  }, [organizationId, getAuthToken]);
+  }, [organizationId]);
 
   useEffect(() => {
     fetchInvitations();
@@ -65,8 +62,7 @@ export default function PendingInvitationsTable({
   const handleRevoke = async (invitationId: string) => {
     setActionLoading(invitationId);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request(REVOKE_INVITATION, { invitationId });
       setInvitations((prev) => prev.filter((inv) => inv.id !== invitationId));
     } catch (err) {
@@ -79,8 +75,7 @@ export default function PendingInvitationsTable({
   const handleResend = async (invitationId: string) => {
     setActionLoading(invitationId);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       await client.request(RESEND_INVITATION, { invitationId });
       await fetchInvitations();
     } catch (err) {

@@ -20,8 +20,8 @@ const nextConfig = {
     if (isDev) {
       return [
         {
-          source: '/api/graphql/:path*',
-          destination: 'http://localhost:8000/graphql/:path*'
+          source: '/api/auth/otp/:path*',
+          destination: 'http://localhost:8000/api/auth/otp/:path*',
         }
       ]
     }

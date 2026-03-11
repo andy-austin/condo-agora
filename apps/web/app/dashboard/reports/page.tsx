@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, type ComponentType } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_COMMUNITY_ANALYTICS,
@@ -61,7 +60,6 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export default function ReportsPage() {
   const t = useTranslations('dashboard');
-  const { getAuthToken } = useAuthToken();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -74,8 +72,7 @@ export default function ReportsPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const meData = await client.request<MeResponse>(ME_QUERY);
 
       if (!meData.me || meData.me.memberships.length === 0) {
@@ -108,7 +105,7 @@ export default function ReportsPage() {
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, t]);
+  }, [t]);
 
   useEffect(() => {
     fetchData();
@@ -118,8 +115,7 @@ export default function ReportsPage() {
     async (sessionId: string) => {
       setLoadingReport(true);
       try {
-        const token = await getAuthToken();
-        const client = getApiClient(token);
+        const client = getApiClient();
         const data = await client.request<{ participationReport: ParticipationReport }>(
           GET_PARTICIPATION_REPORT,
           { sessionId }
@@ -132,7 +128,7 @@ export default function ReportsPage() {
         setLoadingReport(false);
       }
     },
-    [getAuthToken]
+    []
   );
 
   useEffect(() => {

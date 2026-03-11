@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, FormEvent } from 'react';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_PROPOSAL_BUDGET,
@@ -19,7 +18,6 @@ interface BudgetSectionProps {
 }
 
 export default function BudgetSection({ proposalId, isAdmin }: BudgetSectionProps) {
-  const { getAuthToken } = useAuthToken();
   const [budget, setBudget] = useState<Budget | null>(null);
   const [loading, setLoading] = useState(true);
   const [editingBudget, setEditingBudget] = useState(false);
@@ -30,8 +28,7 @@ export default function BudgetSection({ proposalId, isAdmin }: BudgetSectionProp
 
   const fetchBudget = useCallback(async () => {
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<{ proposalBudget: Budget | null }>(
         GET_PROPOSAL_BUDGET,
         { proposalId }
@@ -46,7 +43,7 @@ export default function BudgetSection({ proposalId, isAdmin }: BudgetSectionProp
     } finally {
       setLoading(false);
     }
-  }, [proposalId, getAuthToken]);
+  }, [proposalId]);
 
   useEffect(() => {
     fetchBudget();
@@ -58,8 +55,7 @@ export default function BudgetSection({ proposalId, isAdmin }: BudgetSectionProp
     if (isNaN(amount) || amount < 0) return;
     setSaving(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<{ setBudget: Budget }>(SET_BUDGET, {
         proposalId,
         approvedAmount: amount,
@@ -80,8 +76,7 @@ export default function BudgetSection({ proposalId, isAdmin }: BudgetSectionProp
     if (isNaN(amount) || amount < 0) return;
     setSaving(true);
     try {
-      const token = await getAuthToken();
-      const client = getApiClient(token);
+      const client = getApiClient();
       const data = await client.request<{ updateSpentAmount: Budget }>(UPDATE_SPENT_AMOUNT, {
         proposalId,
         spentAmount: amount,

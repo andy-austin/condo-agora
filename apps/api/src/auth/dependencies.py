@@ -1,194 +1,45 @@
-import os
-from datetime import datetime
-from typing import Optional
-
-import httpx
-from fastapi import HTTPException, Security
+from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from ...database import db
-from .utils import verify_clerk_token
-from .webhooks import process_pending_invitations
+from .utils import verify_token
 
 security = HTTPBearer()
 security_optional = HTTPBearer(auto_error=False)
 
-CLERK_SECRET_KEY = os.getenv("CLERK_SECRET_KEY")
 
-
-async def _provision_user_from_clerk(clerk_id: str) -> Optional[dict]:
-    """
-    Just-in-time user provisioning: fetch user from Clerk API and create
-    a local MongoDB record. This handles cases where the webhook didn't fire
-    or there was a race condition.
-    """
-    if not CLERK_SECRET_KEY:
-        print("Warning: CLERK_SECRET_KEY not set, cannot provision user")
-        return None
-
+async def get_current_user(
+    credential: HTTPAuthorizationCredentials = Depends(security),
+) -> dict:
+    """Extract and verify JWT from Authorization header. Returns user dict."""
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"https://api.clerk.com/v1/users/{clerk_id}",
-                headers={
-                    "Authorization": f"Bearer {CLERK_SECRET_KEY}",
-                    "Content-Type": "application/json",
-                },
-            )
-            response.raise_for_status()
-            data = response.json()
-    except Exception as e:
-        print(f"Failed to fetch user {clerk_id} from Clerk API: {e}")
-        return None
+        payload = await verify_token(credential.credentials)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
 
-    email_addresses = data.get("email_addresses", [])
-    primary_email_id = data.get("primary_email_address_id")
-    primary_email = next(
-        (e["email_address"] for e in email_addresses if e["id"] == primary_email_id),
-        email_addresses[0]["email_address"] if email_addresses else None,
-    )
-
-    if not primary_email:
-        print(f"Warning: No email found for Clerk user {clerk_id}")
-        return None
-
-    now = datetime.utcnow()
-    user_data = {
-        "clerk_id": clerk_id,
-        "email": primary_email,
-        "first_name": data.get("first_name"),
-        "last_name": data.get("last_name"),
-        "avatar_url": data.get("image_url"),
-        "created_at": now,
-        "updated_at": now,
-    }
-    result = await db.db.users.insert_one(user_data)
-    user = await db.db.users.find_one({"_id": result.inserted_id})
-    print(f"JIT provisioned user {clerk_id} in local DB")
-
-    await process_pending_invitations(user)
-
-    return user
-
-
-async def _sync_user_profile_from_clerk(
-    clerk_id: str, existing_user: dict
-) -> Optional[dict]:
-    """
-    Re-fetch profile data from Clerk and update the local user record
-    if Clerk now has a name that we're missing locally.
-    """
-    if not CLERK_SECRET_KEY:
-        return None
-
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"https://api.clerk.com/v1/users/{clerk_id}",
-                headers={
-                    "Authorization": f"Bearer {CLERK_SECRET_KEY}",
-                    "Content-Type": "application/json",
-                },
-            )
-            response.raise_for_status()
-            data = response.json()
-    except Exception as e:
-        print(f"Failed to sync profile for {clerk_id}: {e}")
-        return None
-
-    first_name = data.get("first_name")
-    last_name = data.get("last_name")
-    image_url = data.get("image_url")
-
-    # Only update if Clerk actually has a name now
-    if not first_name and not last_name:
-        return None
-
-    update_fields = {"updated_at": datetime.utcnow()}
-    if first_name:
-        update_fields["first_name"] = first_name
-    if last_name:
-        update_fields["last_name"] = last_name
-    if image_url:
-        update_fields["avatar_url"] = image_url
-
-    await db.db.users.update_one({"_id": existing_user["_id"]}, {"$set": update_fields})
-    return await db.db.users.find_one({"_id": existing_user["_id"]})
-
-
-async def get_current_user(auth: HTTPAuthorizationCredentials = Security(security)):
-    """
-    Dependency to get the current authenticated user by validating the Clerk JWT.
-    Raises 401 if not authenticated.
-    """
-    token = auth.credentials
-    payload = await verify_clerk_token(token)
-
-    clerk_id = payload.get("sub")
-    if not clerk_id:
-        raise HTTPException(
-            status_code=401, detail="Invalid token payload: missing sub"
-        )
+    nextauth_id = payload.get("sub")
+    if not nextauth_id:
+        raise HTTPException(status_code=401, detail="Token missing subject")
 
     if not db.is_connected():
         await db.connect()
 
-    user = await db.db.users.find_one({"clerk_id": clerk_id})
+    user = await db.db.users.find_one({"nextauth_id": nextauth_id})
 
     if not user:
-        # JIT provisioning: webhook may not have fired yet
-        user = await _provision_user_from_clerk(clerk_id)
-        if not user:
-            raise HTTPException(
-                status_code=401,
-                detail="User record not found. Identity sync may be in progress.",
-            )
-    else:
-        # Safety net: process any pending invitations that a previous
-        # webhook call may have missed (e.g. serverless function killed
-        # before background task completed).
-        await process_pending_invitations(user)
+        raise HTTPException(status_code=401, detail="User not found")
 
-        # Re-sync profile from Clerk if name is missing (e.g. user signed
-        # up via invitation and the webhook fired before name was set).
-        if not user.get("first_name"):
-            updated = await _sync_user_profile_from_clerk(clerk_id, user)
-            if updated:
-                user = updated
-
-    # Convert ObjectId to string for the id field
     user["id"] = str(user["_id"])
     return user
 
 
 async def get_current_user_optional(
-    auth: Optional[HTTPAuthorizationCredentials] = Security(security_optional),
-):
-    """
-    Optional auth dependency - returns user if authenticated, None otherwise.
-    Use this for endpoints that work with or without authentication.
-    """
-    if not auth:
+    credential: HTTPAuthorizationCredentials | None = Depends(security_optional),
+) -> dict | None:
+    """Same as get_current_user but returns None instead of raising."""
+    if credential is None:
         return None
-
     try:
-        token = auth.credentials
-        payload = await verify_clerk_token(token)
-
-        clerk_id = payload.get("sub")
-        if not clerk_id:
-            return None
-
-        if not db.is_connected():
-            await db.connect()
-
-        user = await db.db.users.find_one({"clerk_id": clerk_id})
-        if not user:
-            # JIT provisioning: webhook may not have fired yet
-            user = await _provision_user_from_clerk(clerk_id)
-        if user:
-            user["id"] = str(user["_id"])
-        return user
-    except Exception as e:
-        print(f"Auth Error in optional dependency: {e}")
+        return await get_current_user(credential=credential)
+    except HTTPException:
         return None

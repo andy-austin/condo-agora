@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useAuthToken } from '@/hooks/use-auth-token';
 import { getApiClient } from '@/lib/api';
 import {
   GET_VOTING_SESSION,
@@ -58,7 +57,6 @@ type MeResponse = {
 export default function VotingSessionPage() {
   const t = useTranslations('dashboard');
   const { sessionId } = useParams<{ sessionId: string }>();
-  const { getAuthToken } = useAuthToken();
   const router = useRouter();
 
   const [session, setSession] = useState<VotingSession | null>(null);
@@ -74,9 +72,7 @@ export default function VotingSessionPage() {
   const [submitted, setSubmitted] = useState(false);
 
   const fetchData = useCallback(async () => {
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+    const client = getApiClient();
 
     try {
       setLoading(true);
@@ -131,7 +127,7 @@ export default function VotingSessionPage() {
     } finally {
       setLoading(false);
     }
-  }, [getAuthToken, sessionId, t]);
+  }, [sessionId, t]);
 
   useEffect(() => {
     fetchData();
@@ -157,9 +153,7 @@ export default function VotingSessionPage() {
 
   const handleSubmitVote = async () => {
     if (!houseId || !session) return;
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+    const client = getApiClient();
 
     try {
       setSubmitting(true);
@@ -183,9 +177,7 @@ export default function VotingSessionPage() {
 
   const handleOpenSession = async () => {
     if (!session) return;
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+    const client = getApiClient();
     try {
       setActionLoading(true);
       const data = await client.request<{ openVotingSession: VotingSession }>(
@@ -202,9 +194,7 @@ export default function VotingSessionPage() {
 
   const handleCloseSession = async () => {
     if (!session) return;
-    const token = await getAuthToken();
-    if (!token) return;
-    const client = getApiClient(token);
+    const client = getApiClient();
     try {
       setActionLoading(true);
       await client.request(CLOSE_VOTING_SESSION, { sessionId: session.id });
