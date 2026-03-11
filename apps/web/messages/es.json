@@ -233,7 +233,7 @@
     "sidebar": {
       "overview": "Inicio",
       "properties": "Propiedades",
-      "committee": "Comité",
+      "committee": "Administración",
       "proposals": "Propuestas",
       "voting": "Votaciones",
       "reports": "Reportes",
@@ -350,7 +350,7 @@
       "voterUpdated": "Votante designado actualizado correctamente."
     },
     "committee": {
-      "title": "Comité",
+      "title": "Administración",
       "subtitle": "Directivos y residentes de {orgName}",
       "notInOrg": "No sos parte de ninguna organización.",
       "failedToLoad": "No se pudieron cargar los miembros del comité.",
