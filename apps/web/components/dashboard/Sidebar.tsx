@@ -3,8 +3,8 @@
 import { useState, createContext, useContext, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
-import { UserButton } from '@clerk/nextjs';
+import { useSession } from 'next-auth/react';
+import { UserMenu } from '@/components/auth/UserMenu';
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
@@ -80,11 +80,7 @@ function TopBar({ collapsed }: { collapsed: boolean }) {
     >
       <LanguageSwitcher />
       <NotificationBell />
-      <UserButton
-        appearance={{
-          elements: { avatarBox: 'w-8 h-8 ring-2 ring-border' },
-        }}
-      />
+      <UserMenu />
     </header>
   );
 }
@@ -208,7 +204,7 @@ function SidebarNav({
   setCollapsed: (v: boolean) => void;
 }) {
   const pathname = usePathname();
-  const { user } = useUser();
+  const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const t = useTranslations('dashboard');
 
@@ -301,19 +297,13 @@ function SidebarNav({
             <LanguageSwitcher />
           </div>
           <div className="flex items-center gap-3 px-3 py-3 mt-2 rounded-lg bg-sidebar-accent/50">
-            <UserButton
-              appearance={{
-                elements: { avatarBox: 'w-8 h-8 ring-2 ring-border' },
-              }}
-            />
+            <UserMenu />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium truncate">
-                {user?.firstName || user?.lastName
-                  ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim()
-                  : user?.primaryEmailAddress?.emailAddress}
+                {session?.user?.name?.split(' ')[0] ?? session?.user?.email}
               </p>
               <p className="text-xs text-muted-foreground truncate">
-                {user?.primaryEmailAddress?.emailAddress}
+                {session?.user?.email}
               </p>
             </div>
             <NotificationBell />
