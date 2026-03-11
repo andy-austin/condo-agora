@@ -207,6 +207,7 @@ export default function NewProposalPage() {
               placeholder={t('proposals.descriptionPlaceholder')}
               className="w-full px-3 py-2.5 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
               rows={8}
+              maxLength={5000}
             />
             <p className="text-xs text-muted-foreground mt-1">
               {t('proposals.descriptionHint')}

@@ -158,6 +158,7 @@ export default function NewVotingSessionPage() {
             onChange={(e) => setTitle(e.target.value)}
             className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
             placeholder={t('voting.sessionTitlePlaceholder')}
+            maxLength={200}
             required
           />
         </div>
