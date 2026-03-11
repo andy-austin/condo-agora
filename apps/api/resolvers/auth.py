@@ -12,7 +12,7 @@ from ..graphql_types.auth import (
     User,
 )
 from ..graphql_types.house import House
-from ..src.auth.permissions import require_org_admin
+from ..src.auth.permissions import require_org_admin, require_org_member
 from ..src.auth.service import accept_invitation_by_id as service_accept_invitation
 from ..src.auth.service import create_invitation as service_create_invitation
 from ..src.auth.service import create_organization as service_create_org
@@ -222,11 +222,12 @@ def _mongo_member_to_member_with_user(m: dict) -> MemberWithUser:
 async def resolve_organization_members(
     info: strawberry.types.Info, organization_id: str
 ) -> List[MemberWithUser]:
-    """Resolver for listing all members of an organization."""
+    """Resolver for listing all members of an organization. MEMBER only."""
     user = info.context.get("user")
     if not user:
         raise Exception("Authentication required")
 
+    await require_org_member(user, organization_id)
     members = await service_get_members(organization_id)
     return [_mongo_member_to_member_with_user(m) for m in members]
 

@@ -63,14 +63,15 @@ async def resolve_participation_report(
     if not user:
         raise Exception("Authentication required")
 
-    report = await service_participation(session_id)
-
-    # Need to check admin access
+    # Check admin access before fetching report
     from ..src.voting.service import get_voting_session
 
     session = await get_voting_session(session_id)
-    if session:
-        await require_org_admin(user, session["organization_id"])
+    if not session:
+        raise Exception("Voting session not found")
+    await require_org_admin(user, session["organization_id"])
+
+    report = await service_participation(session_id)
 
     return ParticipationReport(
         session_id=report["session_id"],
