@@ -750,5 +750,18 @@
     "retryFailed": "Retry failed rows",
     "success": "Organization created successfully!",
     "successSub": "Redirecting to dashboard..."
+  },
+  "completeProfile": {
+    "title": "Complete Your Profile",
+    "subtitle": "Add your email and set a password for easier access",
+    "email": "Email (optional)",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password (optional)",
+    "passwordPlaceholder": "At least 8 characters",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "save": "Save & Continue",
+    "skip": "Skip for now",
+    "saving": "Saving..."
   }
 }

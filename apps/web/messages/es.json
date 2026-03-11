@@ -750,5 +750,18 @@
     "retryFailed": "Reintentar filas fallidas",
     "success": "¡Organización creada exitosamente!",
     "successSub": "Redirigiendo al panel..."
+  },
+  "completeProfile": {
+    "title": "Completa Tu Perfil",
+    "subtitle": "Agrega tu correo y establece una contraseña para acceder más fácil",
+    "email": "Correo electrónico (opcional)",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "password": "Contraseña (opcional)",
+    "passwordPlaceholder": "Al menos 8 caracteres",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "save": "Guardar y Continuar",
+    "skip": "Omitir por ahora",
+    "saving": "Guardando..."
   }
 }
