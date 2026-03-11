@@ -116,10 +116,16 @@ async def resolve_houses(
 
 
 async def resolve_house(info: strawberry.types.Info, id: str) -> Optional[House]:
-    """Resolver for getting a single house by ID."""
+    """Resolver for getting a single house by ID. MEMBER only."""
+    user = info.context.get("user")
+    if not user:
+        raise Exception("Authentication required")
+
     house = await service_get_house(id)
     if not house:
         return None
+
+    await require_org_member(user, house["organization_id"])
     return _mongo_house_to_graphql(house)
 
 

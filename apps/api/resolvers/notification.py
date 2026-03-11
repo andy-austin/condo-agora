@@ -73,9 +73,15 @@ async def resolve_mark_notification_read(
     if not user:
         raise Exception("Authentication required")
 
+    user_id = user.get("id") or str(user.get("_id"))
+
     notification = await service_mark_notification_read(id)
     if not notification:
         raise Exception("Notification not found")
+
+    if notification["user_id"] != user_id:
+        raise Exception("Not authorized")
+
     return _mongo_notification_to_graphql(notification)
 
 
