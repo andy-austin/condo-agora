@@ -106,7 +106,7 @@ export default function CommitteePage() {
       );
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to update role.';
+        err instanceof Error ? err.message : t('committee.failedToUpdateRole');
       alert(message);
     } finally {
       setUpdatingId(null);
@@ -128,7 +128,7 @@ export default function CommitteePage() {
   if (error) {
     return (
       <ErrorState
-        title="Could not load committee"
+        title={t('committee.couldNotLoad')}
         message={error}
         onRetry={() => window.location.reload()}
       />
@@ -261,14 +261,14 @@ function MemberRow({
         )}
       </div>
       <div className="flex items-center gap-2">
-        <Badge variant={roleBadgeVariant(member.role)}>{member.role}</Badge>
+        <Badge variant={roleBadgeVariant(member.role)}>{t(`labels.roles.${member.role.toLowerCase()}`)}</Badge>
         {isAdmin && (
           <select
             className="text-xs border rounded px-2 py-1 bg-background"
             value={member.role}
             onChange={(e) => onRoleChange(member.id, e.target.value)}
             disabled={isUpdating}
-            aria-label={`Change role for ${displayName}`}
+            aria-label={t('committee.changeRoleFor', { name: displayName })}
           >
             <option value="ADMIN">{t('labels.roles.admin')}</option>
             <option value="RESIDENT">{t('labels.roles.resident')}</option>
