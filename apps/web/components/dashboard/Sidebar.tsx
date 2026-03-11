@@ -19,6 +19,7 @@ import {
   Menu,
   X,
   ChevronLeft,
+  MoreHorizontal,
 } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 
@@ -34,6 +35,12 @@ const navItems = [
 
 const bottomNavItems = [
   { href: '/dashboard/settings', key: 'settings', icon: Settings },
+];
+
+const mobileTabItems = [
+  { href: '/dashboard', key: 'overview', icon: LayoutDashboard, exact: true },
+  { href: '/dashboard/proposals', key: 'proposals', icon: Lightbulb },
+  { href: '/dashboard/vote', key: 'voting', icon: Vote },
 ];
 
 const SidebarContext = createContext({ collapsed: false });
@@ -52,12 +59,13 @@ export function SidebarLayout({ children }: { children: ReactNode }) {
         {/* Desktop top bar */}
         <TopBar collapsed={collapsed} />
         <main
-          className={`pt-14 lg:pt-14 min-h-screen transition-all duration-300 ${
+          className={`pt-14 lg:pt-14 pb-16 lg:pb-0 min-h-screen transition-all duration-300 ${
             collapsed ? 'lg:pl-[68px]' : 'lg:pl-60'
           }`}
         >
           {children}
         </main>
+        <MobileTabBar />
       </div>
     </SidebarContext.Provider>
   );
@@ -78,6 +86,117 @@ function TopBar({ collapsed }: { collapsed: boolean }) {
         }}
       />
     </header>
+  );
+}
+
+function MobileTabBar() {
+  const pathname = usePathname();
+  const t = useTranslations('dashboard');
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const isActive = (href: string, exact?: boolean) => {
+    if (exact) return pathname === href;
+    return pathname === href || pathname.startsWith(href + '/');
+  };
+
+  const isMoreActive = !mobileTabItems.some((item) => isActive(item.href, item.exact));
+
+  return (
+    <>
+      <nav
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border"
+        role="tablist"
+      >
+        <div className="flex items-stretch">
+          {mobileTabItems.map((item) => {
+            const active = isActive(item.href, item.exact);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                role="tab"
+                aria-selected={active}
+                className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] transition-colors ${
+                  active ? 'text-primary' : 'text-muted-foreground'
+                }`}
+              >
+                <Icon size={20} />
+                <span className="text-[10px] font-medium">{t(`sidebar.${item.key}`)}</span>
+              </Link>
+            );
+          })}
+          <button
+            role="tab"
+            aria-selected={isMoreActive}
+            onClick={() => setDrawerOpen(true)}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] transition-colors ${
+              isMoreActive ? 'text-primary' : 'text-muted-foreground'
+            }`}
+          >
+            <MoreHorizontal size={20} />
+            <span className="text-[10px] font-medium">{t('sidebar.more')}</span>
+          </button>
+        </div>
+      </nav>
+
+      {/* "More" drawer */}
+      {drawerOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setDrawerOpen(false)}
+        >
+          <div
+            className="absolute bottom-0 left-0 right-0 bg-background rounded-t-2xl border-t border-border shadow-xl animate-in slide-in-from-bottom duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-1 bg-muted-foreground/20 rounded-full mx-auto mt-3 mb-2" />
+            <nav className="px-4 pb-8 pt-2 space-y-1">
+              {navItems
+                .filter((item) => !mobileTabItems.some((tab) => tab.href === item.href))
+                .map((item) => {
+                  const active = isActive(item.href, item.exact);
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setDrawerOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                        active
+                          ? 'bg-primary/10 text-primary font-semibold'
+                          : 'text-foreground hover:bg-muted'
+                      }`}
+                    >
+                      <Icon size={20} />
+                      <span className="text-sm">{t(`sidebar.${item.key}`)}</span>
+                    </Link>
+                  );
+                })}
+              {bottomNavItems.map((item) => {
+                const active = isActive(item.href);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setDrawerOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                      active
+                        ? 'bg-primary/10 text-primary font-semibold'
+                        : 'text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <Icon size={20} />
+                    <span className="text-sm">{t(`sidebar.${item.key}`)}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

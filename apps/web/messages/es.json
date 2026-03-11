@@ -243,7 +243,8 @@
       "expandSidebar": "Expandir menú",
       "collapseSidebar": "Colapsar menú",
       "openMenu": "Abrir menú",
-      "closeMenu": "Cerrar menú"
+      "closeMenu": "Cerrar menú",
+      "more": "Más"
     },
     "common": {
       "viewAll": "Ver todos",
