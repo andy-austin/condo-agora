@@ -4,7 +4,6 @@ import uuid
 from datetime import datetime, timedelta
 
 from bson import ObjectId
-from fastapi import HTTPException
 
 from ...database import db
 from .channels import send_email_invitation, send_whatsapp_invitation

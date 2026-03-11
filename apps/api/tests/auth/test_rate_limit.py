@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime, timezone
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
 from apps.api.src.auth.rate_limit import check_rate_limit, RateLimitExceeded
 
