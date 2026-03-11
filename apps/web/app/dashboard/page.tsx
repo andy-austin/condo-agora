@@ -226,7 +226,7 @@ export default function DashboardPage() {
             <Link
               key={stat.label}
               href={stat.href}
-              className={`group border rounded-xl p-5 hover:shadow-md transition-all duration-200 ${stat.cardBg}`}
+              className={`group border rounded-xl p-5 hover-lift ${stat.cardBg}`}
             >
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm text-muted-foreground">{stat.label}</span>
