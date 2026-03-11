@@ -3,18 +3,14 @@ import { GraphQLClient } from "graphql-request";
 const endpoint = "/api/graphql";
 
 /**
- * Creates a GraphQL client with optional authentication.
- * 
- * @param token - The Clerk session token.
- * @returns A GraphQLClient instance configured with the necessary headers.
+ * Creates a GraphQL client that sends requests to the proxy route.
+ * Authentication is handled server-side by the proxy at /api/graphql.
+ *
+ * @returns A GraphQLClient instance configured for the proxy endpoint.
  */
-export const getApiClient = (token?: string | null) => {
+export const getApiClient = () => {
   return new GraphQLClient(endpoint, {
-    headers: token
-      ? {
-          Authorization: `Bearer ${token}`,
-        }
-      : {},
+    headers: {},
   });
 };
 
