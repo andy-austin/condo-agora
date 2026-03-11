@@ -29,12 +29,11 @@ async def send_whatsapp_otp(to: str, code: str) -> None:
 
 async def send_email_otp(to: str, code: str) -> None:
     """Send OTP code via email using Resend. Resend SDK is sync, so wrap in thread."""
-    await asyncio.to_thread(
-        resend.Emails.send,
-        from_email=RESEND_FROM_EMAIL,
-        to=to,
-        subject="Tu código de verificación - Condo Agora",
-        html=f"""
+    params = {
+        "from": RESEND_FROM_EMAIL,
+        "to": [to],
+        "subject": "Tu código de verificación - Condo Agora",
+        "html": f"""
         <div style="font-family: sans-serif; max-width: 400px; margin: 0 auto;">
             <h2>Código de verificación</h2>
             <p>Tu código es:</p>
@@ -46,7 +45,8 @@ async def send_email_otp(to: str, code: str) -> None:
             </p>
         </div>
         """,
-    )
+    }
+    await asyncio.to_thread(resend.Emails.send, params)
 
 
 async def send_whatsapp_invitation(to: str, org_name: str, invite_url: str) -> None:
@@ -76,12 +76,11 @@ async def send_whatsapp_invitation(to: str, org_name: str, invite_url: str) -> N
 
 async def send_email_invitation(to: str, org_name: str, invite_url: str) -> None:
     """Send invitation via email using Resend."""
-    await asyncio.to_thread(
-        resend.Emails.send,
-        from_email=RESEND_FROM_EMAIL,
-        to=to,
-        subject=f"Invitación a {org_name} - Condo Agora",
-        html=f"""
+    params = {
+        "from": RESEND_FROM_EMAIL,
+        "to": [to],
+        "subject": f"Invitación a {org_name} - Condo Agora",
+        "html": f"""
         <div style="font-family: sans-serif; max-width: 400px; margin: 0 auto;">
             <h2>Te han invitado a {org_name}</h2>
             <p>Has sido invitado a unirte a <strong>{org_name}</strong> en Condo Agora.</p>
@@ -96,4 +95,5 @@ async def send_email_invitation(to: str, org_name: str, invite_url: str) -> None
             </p>
         </div>
         """,
-    )
+    }
+    await asyncio.to_thread(resend.Emails.send, params)

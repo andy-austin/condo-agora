@@ -30,8 +30,8 @@ async def test_send_whatsapp_otp_calls_chasqui(mock_client_class):
 @patch("apps.api.src.auth.channels.resend")
 async def test_send_email_otp_calls_resend(mock_resend, mock_to_thread):
     # to_thread is used to wrap the sync resend call; mock it to call the function directly
-    async def fake_to_thread(func, **kwargs):
-        func(**kwargs)
+    async def fake_to_thread(func, params):
+        func(params)
 
     mock_to_thread.side_effect = fake_to_thread
     mock_resend.Emails.send = MagicMock(return_value={"id": "test"})
@@ -40,4 +40,5 @@ async def test_send_email_otp_calls_resend(mock_resend, mock_to_thread):
 
     mock_resend.Emails.send.assert_called_once()
     call_args = mock_resend.Emails.send.call_args
-    assert call_args[1]["to"] == "user@example.com"
+    params = call_args[0][0]
+    assert params["to"] == ["user@example.com"]
