@@ -1,17 +1,21 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { auth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { locales, defaultLocale } from './i18n/config';
 
-// 1. Clerk Protection
-const isPublicRoute = createRouteMatcher([
+// 1. Route Protection
+const publicPaths = [
   '/',
   '/health',
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/api/webhooks(.*)',
-  '/(.*)/sign-in(.*)',
-  '/(.*)/sign-up(.*)'
-]);
+  '/login',
+  '/invite',
+  '/api/auth',
+  '/api/graphql',
+  '/api/webhooks',
+];
+
+function isPublicRoute(pathname: string): boolean {
+  return publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
+}
 
 function getLocaleFromHeaders(acceptLanguage: string | null): string {
   if (!acceptLanguage) return defaultLocale;
@@ -34,19 +38,24 @@ function getLocaleFromHeaders(acceptLanguage: string | null): string {
   return defaultLocale;
 }
 
-export default clerkMiddleware(async (auth, request) => {
-  if (!isPublicRoute(request)) {
-    await auth.protect();
+export default auth((req) => {
+  const { pathname } = req.nextUrl;
+
+  // Route protection: redirect unauthenticated users to /login
+  if (!isPublicRoute(pathname) && !req.auth) {
+    const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('callbackUrl', req.url);
+    return NextResponse.redirect(loginUrl);
   }
 
   // 2. Locale Management
-  const localeCookie = request.cookies.get('NEXT_LOCALE')?.value;
+  const localeCookie = req.cookies.get('NEXT_LOCALE')?.value;
 
   if (localeCookie && locales.includes(localeCookie as any)) {
     return NextResponse.next();
   }
 
-  const acceptLanguage = request.headers.get('accept-language');
+  const acceptLanguage = req.headers.get('accept-language');
   const detectedLocale = getLocaleFromHeaders(acceptLanguage);
 
   const response = NextResponse.next();
