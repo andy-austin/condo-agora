@@ -30,7 +30,8 @@
     }
   },
   "logoCloud": {
-    "title": "Trusted by over 200 buildings across Uruguay"
+    "title": "Trusted by over 200 buildings across Uruguay",
+    "trustSignal": "Used by communities in Montevideo, Punta del Este, and Colonia"
   },
   "problems": {
     "label": "The Problem",
