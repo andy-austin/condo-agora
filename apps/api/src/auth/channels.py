@@ -4,9 +4,9 @@ import os
 import httpx
 import resend
 
-CHASQUI_API_URL = os.getenv("CHASQUI_API_URL", "")
-CHASQUI_API_TOKEN = os.getenv("CHASQUI_API_TOKEN", "")
-RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
+CHASQUI_API_URL = os.getenv("CHASQUI_API_URL", "").strip()
+CHASQUI_API_TOKEN = os.getenv("CHASQUI_API_TOKEN", "").strip()
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip()
 RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "noreply@condoagora.com")
 
 resend.api_key = RESEND_API_KEY

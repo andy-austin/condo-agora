@@ -58,9 +58,4 @@ async def debug():
         "mongodb_uri_set": bool(os.environ.get("MONGODB_URI")),
         "mongodb_db_name": os.environ.get("MONGODB_DB_NAME", "condo_agora"),
         "connected": db.is_connected(),
-        "chasqui_api_url_set": bool(os.environ.get("CHASQUI_API_URL")),
-        "chasqui_api_token_set": bool(os.environ.get("CHASQUI_API_TOKEN")),
-        "resend_api_key_set": bool(os.environ.get("RESEND_API_KEY")),
-        "internal_api_secret_set": bool(os.environ.get("INTERNAL_API_SECRET")),
-        "nextauth_secret_set": bool(os.environ.get("NEXTAUTH_SECRET")),
     }
