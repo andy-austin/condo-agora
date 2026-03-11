@@ -6,6 +6,7 @@ from ..graphql_types.proposal import Proposal
 from ..graphql_types.proposal_vote import ProposalVote, ProposalVoteResults
 from ..resolvers.proposal import _mongo_proposal_to_graphql
 from ..src.auth.permissions import require_org_admin, require_org_member
+from ..src.notification.service import notify_designated_voters
 from ..src.proposal.service import get_proposal as service_get_proposal
 from ..src.proposal_vote.service import cast_proposal_vote as service_cast_vote
 from ..src.proposal_vote.service import close_proposal_vote as service_close_vote
@@ -56,6 +57,16 @@ async def resolve_start_proposal_vote(
     admin_id = user.get("id") or str(user.get("_id"))
 
     updated = await service_start_vote(proposal_id, threshold, admin_id)
+
+    await notify_designated_voters(
+        organization_id=proposal["organization_id"],
+        notification_type="PROPOSAL_VOTING_STARTED",
+        title=f"Vote Now: {proposal['title']}",
+        message=proposal["description"][:100]
+        + ("..." if len(proposal["description"]) > 100 else ""),
+        reference_id=proposal_id,
+    )
+
     return _mongo_proposal_to_graphql(updated)
 
 

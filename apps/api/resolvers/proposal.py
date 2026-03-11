@@ -4,6 +4,7 @@ import strawberry
 
 from ..graphql_types.proposal import Proposal
 from ..src.auth.permissions import require_org_admin, require_org_member
+from ..src.notification.service import notify_designated_voters
 from ..src.proposal.service import assign_responsible_house as service_assign_house
 from ..src.proposal.service import create_proposal as service_create_proposal
 from ..src.proposal.service import delete_proposal as service_delete_proposal
@@ -139,6 +140,17 @@ async def resolve_update_proposal_status(
     updated = await service_update_proposal_status(
         id, status, rejection_reason, responsible_house_id
     )
+
+    if status == "VOTING":
+        await notify_designated_voters(
+            organization_id=proposal["organization_id"],
+            notification_type="PROPOSAL_VOTING_STARTED",
+            title=f"Vote Now: {proposal['title']}",
+            message=proposal["description"][:100]
+            + ("..." if len(proposal["description"]) > 100 else ""),
+            reference_id=id,
+        )
+
     return _mongo_proposal_to_graphql(updated)
 
 

@@ -111,6 +111,36 @@ async def notify_org_members(
             )
 
 
+async def notify_designated_voters(
+    organization_id: str,
+    notification_type: str,
+    title: str,
+    message: str,
+    reference_id: str,
+) -> None:
+    """Send a notification to all designated voters in an organization."""
+    await _ensure_connected()
+
+    cursor = db.db.houses.find(
+        {"organization_id": organization_id, "voter_user_id": {"$ne": None}}
+    )
+    voter_ids: set = set()
+    async for house in cursor:
+        vid = house.get("voter_user_id")
+        if vid:
+            voter_ids.add(vid)
+
+    for voter_id in voter_ids:
+        await create_notification(
+            voter_id,
+            organization_id,
+            notification_type,
+            title,
+            message,
+            reference_id,
+        )
+
+
 async def get_activity_feed(organization_id: str, limit: int = 20) -> List[dict]:
     """Get recent activity for an organization from proposals, comments, announcements."""
     await _ensure_connected()
