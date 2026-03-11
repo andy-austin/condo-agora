@@ -397,7 +397,6 @@ export default function ProposalDetailPage() {
               voteThreshold={proposal.voteThreshold}
               isAdmin={isAdmin}
               houseId={userHouseId}
-              ={}
               onProposalUpdate={fetchData}
             />
           )}
@@ -426,7 +425,6 @@ export default function ProposalDetailPage() {
             proposalId={proposal.id}
             currentUserId={currentUserId}
             isAdmin={isAdmin}
-            ={}
           />
         </div>
 

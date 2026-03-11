@@ -27,7 +27,6 @@ export default function VotingResultsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
-        if (!token) return;
     const client = getApiClient();
 
     try {

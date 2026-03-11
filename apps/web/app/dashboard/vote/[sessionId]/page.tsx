@@ -72,7 +72,6 @@ export default function VotingSessionPage() {
   const [submitted, setSubmitted] = useState(false);
 
   const fetchData = useCallback(async () => {
-        if (!token) return;
     const client = getApiClient();
 
     try {
@@ -154,7 +153,6 @@ export default function VotingSessionPage() {
 
   const handleSubmitVote = async () => {
     if (!houseId || !session) return;
-        if (!token) return;
     const client = getApiClient();
 
     try {
@@ -179,7 +177,6 @@ export default function VotingSessionPage() {
 
   const handleOpenSession = async () => {
     if (!session) return;
-        if (!token) return;
     const client = getApiClient();
     try {
       setActionLoading(true);
@@ -197,7 +194,6 @@ export default function VotingSessionPage() {
 
   const handleCloseSession = async () => {
     if (!session) return;
-        if (!token) return;
     const client = getApiClient();
     try {
       setActionLoading(true);

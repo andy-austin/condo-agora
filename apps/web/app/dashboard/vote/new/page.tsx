@@ -45,7 +45,6 @@ export default function NewVotingSessionPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
-        if (!token) return;
     const client = getApiClient();
 
     try {
@@ -86,8 +85,6 @@ export default function NewVotingSessionPage() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!organizationId || !title.trim() || selectedIds.size === 0) return;
-
-        if (!token) return;
     const client = getApiClient();
 
     try {

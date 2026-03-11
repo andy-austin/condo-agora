@@ -228,7 +228,6 @@ export default function SettingsPage() {
               user={user}
               organizationId={organizationId}
               isAdmin={isAdmin}
-              ={}
               onMembersChange={setMembers}
               t={t}
             />
@@ -498,7 +497,6 @@ function MembersTab({
       {isAdmin && organizationId && (
         <PendingInvitationsTable
           organizationId={organizationId}
-          ={}
           t={t}
           refreshTrigger={inviteRefresh}
           lastCreatedInvitation={lastCreatedInvitation}

@@ -42,7 +42,6 @@ export default function VotingPage() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchData = useCallback(async () => {
-        if (!token) return;
     const client = getApiClient();
 
     try {

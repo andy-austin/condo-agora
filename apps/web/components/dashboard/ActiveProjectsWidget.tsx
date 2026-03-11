@@ -34,7 +34,6 @@ export default function ActiveProjectsWidget({
   const [loading, setLoading] = useState(true);
 
   const fetchProjects = useCallback(async () => {
-        if (!token) return;
     const client = getApiClient();
     try {
       const data = await client.request<{ proposals: Proposal[] }>(

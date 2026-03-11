@@ -46,7 +46,6 @@ export default function DocumentSection({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchDocuments = useCallback(async () => {
-        if (!token) return;
     const client = getApiClient();
     try {
       const data = await client.request<{ documents: Document[] }>(
@@ -83,7 +82,6 @@ export default function DocumentSection({
       const { url, fileName, fileSize, mimeType } = await uploadRes.json();
 
       // Store metadata in backend
-            if (!token) return;
       const client = getApiClient();
       const data = await client.request<{ attachDocument: Document }>(
         ATTACH_DOCUMENT,
@@ -105,7 +103,6 @@ export default function DocumentSection({
   };
 
   const handleDelete = async (docId: string) => {
-        if (!token) return;
     const client = getApiClient();
     try {
       await client.request(DELETE_DOCUMENT, { id: docId });
@@ -116,7 +113,6 @@ export default function DocumentSection({
   };
 
   const handleMarkSelected = async (docId: string) => {
-        if (!token) return;
     const client = getApiClient();
     try {
       const data = await client.request<{ markQuoteSelected: Document }>(

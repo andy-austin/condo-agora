@@ -40,7 +40,6 @@ export default function ProjectMilestones({
   const [error, setError] = useState<string | null>(null);
 
   const fetchMilestones = useCallback(async () => {
-        if (!token) return;
     const client = getApiClient();
     try {
       const data = await client.request<{
@@ -61,7 +60,6 @@ export default function ProjectMilestones({
   const handleCreate = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
-        if (!token) return;
     const client = getApiClient();
     try {
       setSubmitting(true);
@@ -86,7 +84,6 @@ export default function ProjectMilestones({
   };
 
   const handleStatusUpdate = async (id: string, status: string) => {
-        if (!token) return;
     const client = getApiClient();
     try {
       const data = await client.request<{
@@ -101,7 +98,6 @@ export default function ProjectMilestones({
   };
 
   const handleDelete = async (id: string) => {
-        if (!token) return;
     const client = getApiClient();
     try {
       await client.request(DELETE_PROJECT_MILESTONE, { id });

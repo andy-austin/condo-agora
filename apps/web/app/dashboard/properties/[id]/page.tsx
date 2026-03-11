@@ -275,7 +275,6 @@ export default function HouseDetailPage() {
         <ResidentsTab
           house={house}
           isAdmin={isAdmin}
-          ={}
           onRefresh={fetchHouse}
         />
       )}
@@ -458,7 +457,6 @@ function ResidentsTab({
             houseId={house.id}
             existingResidentUserIds={existingResidentUserIds}
             onAssigned={onRefresh}
-            ={}
           />
         )}
       </div>
@@ -484,7 +482,6 @@ function ResidentsTab({
               houseId={house.id}
               existingResidentUserIds={existingResidentUserIds}
               onAssigned={onRefresh}
-              ={}
             />
           )}
         </div>

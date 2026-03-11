@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
         phone: (session.user as any).phone,
       },
       secret: NEXTAUTH_SECRET,
+      salt: "",
     });
     headers["Authorization"] = `Bearer ${token}`;
   }
