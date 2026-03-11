@@ -4,6 +4,7 @@ import strawberry
 
 from ..graphql_types.proposal import Proposal
 from ..src.auth.permissions import require_org_admin, require_org_member
+from ..src.notification.service import notify_designated_voters
 from ..src.proposal.service import assign_responsible_house as service_assign_house
 from ..src.proposal.service import create_proposal as service_create_proposal
 from ..src.proposal.service import delete_proposal as service_delete_proposal
@@ -13,7 +14,6 @@ from ..src.proposal.service import update_proposal as service_update_proposal
 from ..src.proposal.service import (
     update_proposal_status as service_update_proposal_status,
 )
-from ..src.notification.service import notify_designated_voters
 
 
 def _mongo_proposal_to_graphql(p: dict) -> Proposal:
