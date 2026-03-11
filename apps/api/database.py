@@ -77,7 +77,7 @@ class MongoDB:
             return
 
         # Users collection indexes
-        await self.db.users.create_index("nextauth_id", unique=True)
+        await self.db.users.create_index("nextauth_id", unique=True, sparse=True)
         await self.db.users.create_index("email", unique=True, sparse=True)
         await self.db.users.create_index("phone", unique=True, sparse=True)
 
