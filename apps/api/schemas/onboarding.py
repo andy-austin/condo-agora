@@ -1,6 +1,6 @@
 import strawberry
 
-from ..graphql_types.onboarding import BulkSetupInput, BulkSetupResult
+from ..graphql_types.onboarding import BulkSetupResult
 from ..resolvers.onboarding import resolve_bulk_setup_organization
 
 
