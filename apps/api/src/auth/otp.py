@@ -134,9 +134,7 @@ async def verify_otp(db, identifier: str, code: str) -> dict:
         user = new_user
 
     # Check if user has any organization memberships
-    membership = await db.organization_members.find_one(
-        {"user_id": str(user["_id"])}
-    )
+    membership = await db.organization_members.find_one({"user_id": str(user["_id"])})
     user["has_memberships"] = membership is not None
 
     return user
