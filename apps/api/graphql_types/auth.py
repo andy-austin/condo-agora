@@ -78,6 +78,8 @@ class MemberWithUser:
 class CompleteProfileInput:
     first_name: Optional[str] = None
     last_name: Optional[str] = None
+    email: Optional[str] = None
+    avatar_url: Optional[str] = None
 
 
 @strawberry.enum
