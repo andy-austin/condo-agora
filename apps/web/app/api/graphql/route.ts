@@ -26,15 +26,6 @@ export async function POST(request: NextRequest) {
       .setExpirationTime("1h")
       .sign(secret);
     headers["Authorization"] = `Bearer ${token}`;
-  } else {
-    console.error(
-      "[graphql-proxy] No auth: session exists =",
-      !!session,
-      ", user exists =",
-      !!session?.user,
-      ", user.id =",
-      session?.user?.id ?? "undefined"
-    );
   }
 
   const body = await request.text();
