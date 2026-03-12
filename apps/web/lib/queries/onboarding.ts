@@ -26,7 +26,7 @@ export const COMPLETE_PROFILE = `
       firstName
       lastName
       email
-      phoneNumber
+      phone
     }
   }
 `;
