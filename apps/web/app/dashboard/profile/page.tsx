@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { getApiClient } from '@/lib/api';
 import { ME_PROFILE_QUERY, UPDATE_PROFILE } from '@/lib/queries/profile';
