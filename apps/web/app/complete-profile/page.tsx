@@ -61,8 +61,8 @@ export default function CompleteProfilePage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         {/* Icon */}
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-indigo-500/20">
-          <User className="h-8 w-8 text-indigo-400" />
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+          <User className="h-8 w-8 text-primary" />
         </div>
 
         {/* Title */}
@@ -86,7 +86,7 @@ export default function CompleteProfilePage() {
             <input
               id="first-name"
               type="text"
-              className="w-full rounded-lg border border-border bg-background p-3 text-foreground placeholder:text-muted-foreground focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-lg border border-border bg-background p-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
             />
@@ -103,7 +103,7 @@ export default function CompleteProfilePage() {
             <input
               id="last-name"
               type="text"
-              className="w-full rounded-lg border border-border bg-background p-3 text-foreground placeholder:text-muted-foreground focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-lg border border-border bg-background p-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
             />
@@ -121,7 +121,7 @@ export default function CompleteProfilePage() {
               id="email"
               type="email"
               placeholder={t('emailPlaceholder')}
-              className="w-full rounded-lg border border-border bg-background p-3 text-foreground placeholder:text-muted-foreground focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-lg border border-border bg-background p-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />

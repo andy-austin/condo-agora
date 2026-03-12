@@ -31,34 +31,34 @@ export function PricingSection() {
             return (
               <div
                 key={tier}
-                className={`relative rounded-2xl p-8 transition-all duration-300 ${
+                className={`relative rounded-2xl p-8 transition-all duration-300 group ${
                   isPopular
-                    ? 'bg-foreground text-background ring-2 ring-primary shadow-2xl shadow-primary/20'
-                    : 'bg-card border border-border hover:border-primary/30 hover:shadow-lg'
+                    ? 'bg-[hsl(25,15%,10%)] text-white ring-1 ring-primary/30 shadow-2xl shadow-primary/10'
+                    : 'bg-card border border-border/60 hover:border-primary/30 hover:shadow-lg'
                 }`}
               >
                 {isPopular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-medium">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                    <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold tracking-wide uppercase shadow-lg shadow-primary/30">
                       {t('popular')}
                     </span>
                   </div>
                 )}
 
                 <div className="mb-6">
-                  <h3 className={`text-xl font-semibold mb-2 ${isPopular ? 'text-background' : ''}`}>
+                  <h3 className={`text-xl font-semibold mb-2 ${isPopular ? 'text-white' : ''}`}>
                     {t(`tiers.${tier}.name`)}
                   </h3>
-                  <p className={`text-sm ${isPopular ? 'text-background/70' : 'text-muted-foreground'}`}>
+                  <p className={`text-sm ${isPopular ? 'text-white/60' : 'text-muted-foreground'}`}>
                     {t(`tiers.${tier}.description`)}
                   </p>
                 </div>
 
-                <div className="mb-6">
-                  <span className={`text-4xl font-bold ${isPopular ? 'text-background' : ''}`}>
+                <div className="mb-8">
+                  <span className={`text-5xl font-bold tracking-tight ${isPopular ? 'text-white' : ''}`}>
                     {t(`tiers.${tier}.price`)}
                   </span>
-                  <span className={`text-sm ${isPopular ? 'text-background/70' : 'text-muted-foreground'}`}>
+                  <span className={`text-sm ml-1 ${isPopular ? 'text-white/50' : 'text-muted-foreground'}`}>
                     {t(`tiers.${tier}.period`)}
                   </span>
                 </div>
@@ -66,8 +66,10 @@ export function PricingSection() {
                 <ul className="space-y-3 mb-8">
                   {features.map((feature, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <Check className={`w-5 h-5 shrink-0 mt-0.5 ${isPopular ? 'text-primary' : 'text-primary'}`} />
-                      <span className={`text-sm ${isPopular ? 'text-background/90' : 'text-muted-foreground'}`}>
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${isPopular ? 'bg-primary/20' : 'bg-primary/10'}`}>
+                        <Check className="w-3 h-3 text-primary" />
+                      </div>
+                      <span className={`text-sm ${isPopular ? 'text-white/80' : 'text-muted-foreground'}`}>
                         {feature}
                       </span>
                     </li>
@@ -75,9 +77,9 @@ export function PricingSection() {
                 </ul>
 
                 <button
-                  className={`w-full inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-full transition-all duration-300 ${
+                  className={`w-full inline-flex items-center justify-center px-6 py-3.5 text-sm font-semibold rounded-xl transition-all duration-300 active:scale-[0.98] ${
                     isPopular
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25'
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30'
                       : 'bg-foreground text-background hover:bg-foreground/90'
                   }`}
                 >

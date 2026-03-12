@@ -226,16 +226,24 @@
     "someIssues": "⚠ Some services may be experiencing issues"
   },
   "login": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to manage your community",
     "sendCode": "Send Code",
     "or": "or",
     "signInWithGoogle": "Sign in with Google",
     "codeSentTo": "Code sent to",
-    "verify": "Verify",
+    "enterCode": "Enter verification code",
+    "verify": "Verify Code",
     "back": "Back",
+    "resendCode": "Didn't receive it? Resend code",
     "errorSendingCode": "Error sending code",
     "errorConnection": "Connection error",
     "errorInvalidCode": "Invalid code",
-    "errorVerification": "Verification error"
+    "errorVerification": "Verification error",
+    "brandTagline": "Community management, reimagined",
+    "brandFeature1": "Transparent voting for every decision",
+    "brandFeature2": "Real-time community collaboration",
+    "brandFeature3": "Smart building management tools"
   },
   "languageSwitcher": {
     "label": "Language",
