@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { getApiClient } from '@/lib/api';
 import {
   CREATE_ORGANIZATION,
@@ -16,6 +17,7 @@ type Step = 1 | 2 | 3 | 4;
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { update: updateSession } = useSession();
 
   const [step, setStep] = useState<Step>(1);
   const [submitting, setSubmitting] = useState(false);
@@ -105,7 +107,8 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
+    await updateSession({ hasMemberships: true });
     router.push('/dashboard');
   };
 

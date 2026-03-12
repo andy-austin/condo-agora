@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { getApiClient } from '@/lib/api';
 import { COMPLETE_PROFILE } from '@/lib/queries/onboarding';
@@ -10,6 +11,7 @@ import { Loader2, User } from 'lucide-react';
 
 export default function CompleteProfilePage() {
   const router = useRouter();
+  const { update: updateSession } = useSession();
   const t = useTranslations('completeProfile');
 
   const [firstName, setFirstName] = useState('');
@@ -34,6 +36,7 @@ export default function CompleteProfilePage() {
     setSaving(true);
     try {
       await callCompleteProfile();
+      await updateSession({ requiresProfileCompletion: false });
       router.push('/dashboard');
     } catch (err: unknown) {
       console.error('Failed to complete profile:', err);
@@ -48,6 +51,7 @@ export default function CompleteProfilePage() {
     setSaving(true);
     try {
       await callCompleteProfile();
+      await updateSession({ requiresProfileCompletion: false });
       router.push('/dashboard');
     } catch (err: unknown) {
       console.error('Failed to skip profile completion:', err);
