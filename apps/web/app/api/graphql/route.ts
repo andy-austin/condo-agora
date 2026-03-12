@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
-import { encode } from "next-auth/jwt";
+import { SignJWT } from "jose";
 
 const FASTAPI_URL = process.env.FASTAPI_URL || "http://localhost:8000";
 const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || "";
@@ -12,18 +12,19 @@ export async function POST(request: NextRequest) {
     "Content-Type": "application/json",
   };
 
-  // Forward the JWT token to FastAPI if user is authenticated
+  // Forward an HS256 JWT to FastAPI if user is authenticated
   if (session?.user?.id) {
-    const token = await encode({
-      token: {
-        sub: session.user.id,
-        email: session.user.email,
-        name: session.user.name,
-        phone: (session.user as any).phone,
-      },
-      secret: NEXTAUTH_SECRET,
-      salt: "",
-    });
+    const secret = new TextEncoder().encode(NEXTAUTH_SECRET);
+    const token = await new SignJWT({
+      sub: session.user.id,
+      email: session.user.email,
+      name: session.user.name,
+      phone: (session.user as any).phone,
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .setIssuedAt()
+      .setExpirationTime("1h")
+      .sign(secret);
     headers["Authorization"] = `Bearer ${token}`;
   }
 
