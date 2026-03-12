@@ -1,8 +1,12 @@
+import logging
+
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from ...database import db
 from .utils import verify_token
+
+logger = logging.getLogger(__name__)
 
 security = HTTPBearer()
 security_optional = HTTPBearer(auto_error=False)
@@ -38,8 +42,10 @@ async def get_current_user_optional(
 ) -> dict | None:
     """Same as get_current_user but returns None instead of raising."""
     if credential is None:
+        logger.warning("GraphQL request with no Authorization header")
         return None
     try:
         return await get_current_user(credential=credential)
-    except HTTPException:
+    except HTTPException as e:
+        logger.warning("Auth failed for GraphQL request: %s", e.detail)
         return None

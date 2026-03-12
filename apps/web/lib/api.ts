@@ -2,21 +2,33 @@ import { GraphQLClient } from "graphql-request";
 
 const endpoint = "/api/graphql";
 
-let _tokenPromise: Promise<string | null> | null = null;
+let _cachedToken: string | null = null;
 let _tokenExpiresAt = 0;
 
-function getAuthToken(): Promise<string | null> {
+async function getAuthToken(): Promise<string | null> {
   const now = Date.now();
-  if (_tokenPromise && now < _tokenExpiresAt) {
-    return _tokenPromise;
+  if (_cachedToken && now < _tokenExpiresAt) {
+    return _cachedToken;
   }
-  _tokenPromise = fetch("/api/auth/token")
-    .then((r) => r.json())
-    .then((d) => d.token as string | null)
-    .catch(() => null);
-  // Cache for 50 minutes (token expires in 1 hour)
-  _tokenExpiresAt = now + 50 * 60 * 1000;
-  return _tokenPromise;
+  try {
+    const res = await fetch("/api/auth/token");
+    const data = await res.json();
+    const token = data.token as string | null;
+    if (token) {
+      _cachedToken = token;
+      // Cache for 50 minutes (token expires in 1 hour)
+      _tokenExpiresAt = now + 50 * 60 * 1000;
+    } else {
+      // Don't cache null tokens — retry on next request
+      _cachedToken = null;
+      _tokenExpiresAt = 0;
+    }
+    return token;
+  } catch {
+    _cachedToken = null;
+    _tokenExpiresAt = 0;
+    return null;
+  }
 }
 
 /**
