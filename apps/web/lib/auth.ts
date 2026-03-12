@@ -39,6 +39,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             phone: user.phone,
             name: [user.first_name, user.last_name].filter(Boolean).join(" ") || null,
             image: user.avatar_url,
+            requiresProfileCompletion: user.requires_profile_completion || false,
+            hasMemberships: user.has_memberships || false,
           };
         } catch {
           return null;
@@ -63,6 +65,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.sub = user.id;
         token.phone = (user as any).phone;
         token.image = user.image || null;
+        token.requiresProfileCompletion = (user as any).requiresProfileCompletion || false;
+        token.hasMemberships = (user as any).hasMemberships || false;
       }
       if (account?.provider === "google" && user?.email) {
         try {
@@ -82,6 +86,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             const dbUser = await res.json();
             token.sub = dbUser.nextauth_id;
             token.phone = dbUser.phone;
+            token.requiresProfileCompletion = dbUser.requires_profile_completion || false;
+            token.hasMemberships = dbUser.has_memberships || false;
           }
         } catch {
           // Non-blocking
@@ -90,6 +96,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (trigger === "update" && session) {
         if ("image" in session) token.image = session.image;
         if ("name" in session) token.name = session.name;
+        if ("requiresProfileCompletion" in session) token.requiresProfileCompletion = session.requiresProfileCompletion;
+        if ("hasMemberships" in session) token.hasMemberships = session.hasMemberships;
       }
       return token;
     },
@@ -98,6 +106,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.sub as string;
         session.user.image = (token.image as string) || null;
         (session.user as any).phone = token.phone;
+        (session.user as any).requiresProfileCompletion = token.requiresProfileCompletion || false;
+        (session.user as any).hasMemberships = token.hasMemberships || false;
       }
       return session;
     },

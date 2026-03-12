@@ -84,6 +84,10 @@ async def verify_otp(db, identifier: str, code: str) -> dict:
             result = await db.users.insert_one(new_user)
             new_user["_id"] = result.inserted_id
             user = new_user
+        membership = await db.organization_members.find_one(
+            {"user_id": str(user["_id"])}
+        )
+        user["has_memberships"] = membership is not None
         return user
 
     otp_doc = await db.otp_codes.find_one({"identifier": identifier})
@@ -128,5 +132,9 @@ async def verify_otp(db, identifier: str, code: str) -> dict:
         result = await db.users.insert_one(new_user)
         new_user["_id"] = result.inserted_id
         user = new_user
+
+    # Check if user has any organization memberships
+    membership = await db.organization_members.find_one({"user_id": str(user["_id"])})
+    user["has_memberships"] = membership is not None
 
     return user

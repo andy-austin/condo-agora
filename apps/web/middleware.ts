@@ -38,6 +38,13 @@ function getLocaleFromHeaders(acceptLanguage: string | null): string {
   return defaultLocale;
 }
 
+// Paths where onboarding redirects should not apply
+const onboardingPaths = ['/onboarding', '/complete-profile', '/api/', '/login'];
+
+function isOnboardingPath(pathname: string): boolean {
+  return onboardingPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
+}
+
 export default auth((req) => {
   const { pathname } = req.nextUrl;
 
@@ -46,6 +53,21 @@ export default auth((req) => {
     const loginUrl = new URL('/login', req.url);
     loginUrl.searchParams.set('callbackUrl', req.url);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Onboarding redirects for authenticated users
+  if (req.auth && !isPublicRoute(pathname) && !isOnboardingPath(pathname)) {
+    const user = req.auth.user as any;
+
+    // Pre-created residents need to complete their profile first
+    if (user?.requiresProfileCompletion) {
+      return NextResponse.redirect(new URL('/complete-profile', req.url));
+    }
+
+    // New users with no organization go to onboarding
+    if (user?.hasMemberships === false) {
+      return NextResponse.redirect(new URL('/onboarding', req.url));
+    }
   }
 
   // 2. Locale Management

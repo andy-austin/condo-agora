@@ -132,5 +132,11 @@ async def handle_google_link(body: GoogleLinkBody, request: Request):
         new_user["_id"] = result.inserted_id
         user = new_user
 
+    # Check memberships
+    membership = await db.db.organization_members.find_one(
+        {"user_id": str(user["_id"])}
+    )
+    user["has_memberships"] = membership is not None
+
     user["_id"] = str(user["_id"])
     return user

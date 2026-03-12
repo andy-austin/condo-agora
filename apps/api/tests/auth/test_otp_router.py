@@ -280,6 +280,7 @@ def test_google_link_creates_new_user():
         mock_db.db.users.insert_one.return_value.inserted_id = (
             "507f1f77bcf86cd799439011"
         )
+        mock_db.db.organization_members.find_one = AsyncMock(return_value=None)
 
         response = client.post(
             "/otp/google-link",
@@ -313,6 +314,7 @@ def test_google_link_links_existing_user():
     with patch("apps.api.src.auth.otp_router.db") as mock_db:
         mock_db.is_connected.return_value = True
         mock_db.db.users.find_one = AsyncMock(return_value=dict(existing_user))
+        mock_db.db.organization_members.find_one = AsyncMock(return_value=None)
 
         response = client.post(
             "/otp/google-link",
@@ -336,6 +338,7 @@ def test_google_link_updates_avatar_if_missing():
         mock_db.is_connected.return_value = True
         mock_db.db.users.find_one = AsyncMock(return_value=dict(existing_user))
         mock_db.db.users.update_one = AsyncMock()
+        mock_db.db.organization_members.find_one = AsyncMock(return_value=None)
 
         response = client.post(
             "/otp/google-link",
