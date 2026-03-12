@@ -226,16 +226,24 @@
     "someIssues": "⚠ Algunos servicios pueden estar experimentando problemas"
   },
   "login": {
-    "sendCode": "Enviar código",
+    "title": "Bienvenido de vuelta",
+    "subtitle": "Ingresá para gestionar tu comunidad",
+    "sendCode": "Enviar Código",
     "or": "o",
     "signInWithGoogle": "Ingresar con Google",
     "codeSentTo": "Código enviado a",
-    "verify": "Verificar",
+    "enterCode": "Ingresá el código de verificación",
+    "verify": "Verificar Código",
     "back": "Volver",
+    "resendCode": "¿No lo recibiste? Reenviar código",
     "errorSendingCode": "Error al enviar el código",
     "errorConnection": "Error de conexión",
     "errorInvalidCode": "Código inválido",
-    "errorVerification": "Error de verificación"
+    "errorVerification": "Error de verificación",
+    "brandTagline": "Gestión comunitaria, reinventada",
+    "brandFeature1": "Votaciones transparentes para cada decisión",
+    "brandFeature2": "Colaboración comunitaria en tiempo real",
+    "brandFeature3": "Herramientas inteligentes de gestión"
   },
   "languageSwitcher": {
     "label": "Idioma",

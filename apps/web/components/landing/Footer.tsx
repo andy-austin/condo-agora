@@ -24,17 +24,17 @@ export function Footer() {
   };
 
   return (
-    <footer className="border-t border-border">
+    <footer className="border-t border-border bg-muted/20">
       <div className="container-tight py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12">
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2.5 mb-4">
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">C</span>
               </div>
               <span className="text-xl font-bold">{t('brand')}</span>
             </div>
-            <p className="text-muted-foreground mb-6 max-w-sm">
+            <p className="text-muted-foreground mb-6 max-w-sm text-sm leading-relaxed">
               {t('description')}
             </p>
             <div className="space-y-2 text-sm text-muted-foreground">
@@ -46,7 +46,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">{t('product')}</h4>
+            <h4 className="font-semibold text-sm mb-4">{t('product')}</h4>
             <ul className="space-y-3">
               {links.product.map((link) => (
                 <li key={link.labelKey}>
@@ -62,7 +62,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">{t('company')}</h4>
+            <h4 className="font-semibold text-sm mb-4">{t('company')}</h4>
             <ul className="space-y-3">
               {links.company.map((link) => (
                 <li key={link.labelKey}>
@@ -78,7 +78,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">{t('legal')}</h4>
+            <h4 className="font-semibold text-sm mb-4">{t('legal')}</h4>
             <ul className="space-y-3">
               {links.legal.map((link) => (
                 <li key={link.labelKey}>
