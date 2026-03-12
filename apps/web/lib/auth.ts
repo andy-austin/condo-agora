@@ -58,10 +58,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
       if (user) {
         token.sub = user.id;
         token.phone = (user as any).phone;
+        token.image = user.image || null;
       }
       if (account?.provider === "google" && user?.email) {
         try {
@@ -86,11 +87,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // Non-blocking
         }
       }
+      if (trigger === "update" && session) {
+        if ("image" in session) token.image = session.image;
+        if ("name" in session) token.name = session.name;
+      }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub as string;
+        session.user.image = (token.image as string) || null;
         (session.user as any).phone = token.phone;
       }
       return session;
