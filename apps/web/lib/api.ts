@@ -27,18 +27,13 @@ function getAuthToken(): Promise<string | null> {
  */
 export const getApiClient = () => {
   return new GraphQLClient(endpoint, {
-    requestMiddleware: async (request) => {
+    fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
       const token = await getAuthToken();
+      const headers = new Headers(init?.headers);
       if (token) {
-        return {
-          ...request,
-          headers: {
-            ...(request.headers as Record<string, string>),
-            Authorization: `Bearer ${token}`,
-          },
-        };
+        headers.set("Authorization", `Bearer ${token}`);
       }
-      return request;
+      return fetch(input, { ...init, headers });
     },
   });
 };
