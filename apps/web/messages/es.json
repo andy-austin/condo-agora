@@ -783,5 +783,34 @@
     "save": "Guardar y Continuar",
     "skip": "Omitir por ahora",
     "saving": "Guardando..."
+  },
+  "profile": {
+    "title": "Mi Perfil",
+    "subtitle": "Gestioná tu información personal",
+    "personalInfo": "Información Personal",
+    "firstName": "Nombre",
+    "firstNamePlaceholder": "Ingresá tu nombre",
+    "lastName": "Apellido",
+    "lastNamePlaceholder": "Ingresá tu apellido",
+    "contact": "Información de Contacto",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "phone": "Teléfono",
+    "account": "Cuenta",
+    "authProvider": "Método de inicio de sesión",
+    "memberSince": "Miembro desde",
+    "avatar": "Foto de Perfil",
+    "changeAvatar": "Cambiar foto",
+    "removeAvatar": "Quitar",
+    "avatarHint": "JPG, PNG o WebP. Máx 5MB.",
+    "save": "Guardar Cambios",
+    "saving": "Guardando...",
+    "saved": "Perfil actualizado correctamente",
+    "error": "Error al actualizar el perfil",
+    "uploadError": "Error al subir la imagen"
+  },
+  "userMenu": {
+    "profile": "Mi Perfil",
+    "signOut": "Cerrar Sesión"
   }
 }

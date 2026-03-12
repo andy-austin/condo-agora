@@ -310,7 +310,7 @@ async def resolve_create_organization(
 async def resolve_complete_profile(
     info: strawberry.types.Info, input: CompleteProfileInput
 ) -> User:
-    """Resolver for completing a user's profile after phone-based onboarding."""
+    """Resolver for completing/updating a user's profile."""
     user = info.context.get("user")
     if not user:
         raise Exception("Authentication required")
@@ -320,6 +320,8 @@ async def resolve_complete_profile(
         user_id=user_id,
         first_name=input.first_name,
         last_name=input.last_name,
+        email=input.email,
+        avatar_url=input.avatar_url,
     )
 
     return User(

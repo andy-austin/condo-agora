@@ -83,10 +83,12 @@ async def complete_user_profile(
     user_id: str,
     first_name: str = None,
     last_name: str = None,
+    email: str = None,
+    avatar_url: str = None,
 ) -> dict:
     """
-    Marks a user's profile as complete and optionally updates name fields.
-    Clears the requires_profile_completion flag in both MongoDB and Clerk.
+    Marks a user's profile as complete and optionally updates name, email, avatar fields.
+    Clears the requires_profile_completion flag.
     """
     if not db.is_connected():
         await db.connect()
@@ -105,6 +107,12 @@ async def complete_user_profile(
         update_fields["first_name"] = first_name
     if last_name is not None:
         update_fields["last_name"] = last_name
+    if email is not None:
+        if not EMAIL_REGEX.match(email):
+            raise Exception("Invalid email address format")
+        update_fields["email"] = email
+    if avatar_url is not None:
+        update_fields["avatar_url"] = avatar_url if avatar_url else None
 
     await db.db.users.update_one(
         {"_id": _ObjectId(user_id)},

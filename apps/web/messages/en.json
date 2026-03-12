@@ -783,5 +783,34 @@
     "save": "Save & Continue",
     "skip": "Skip for now",
     "saving": "Saving..."
+  },
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "Manage your personal information",
+    "personalInfo": "Personal Information",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "Enter your first name",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Enter your last name",
+    "contact": "Contact Information",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "phone": "Phone",
+    "account": "Account",
+    "authProvider": "Sign-in method",
+    "memberSince": "Member since",
+    "avatar": "Profile Photo",
+    "changeAvatar": "Change photo",
+    "removeAvatar": "Remove",
+    "avatarHint": "JPG, PNG or WebP. Max 5MB.",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "saved": "Profile updated successfully",
+    "error": "Failed to update profile",
+    "uploadError": "Failed to upload image"
+  },
+  "userMenu": {
+    "profile": "My Profile",
+    "signOut": "Sign Out"
   }
 }
