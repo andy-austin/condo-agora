@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { getApiClient } from '@/lib/api';
 import { ME_PROFILE_QUERY, UPDATE_PROFILE } from '@/lib/queries/profile';
@@ -35,6 +36,7 @@ const providerLabels: Record<string, string> = {
 
 export default function ProfilePage() {
   const t = useTranslations('profile');
+  const { update: updateSession } = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(true);
@@ -134,6 +136,17 @@ export default function ProfilePage() {
       }
 
       await client.request(UPDATE_PROFILE, { input });
+
+      // Update NextAuth session so avatar/name reflect everywhere
+      const sessionUpdate: Record<string, string | null> = {};
+      if ('avatarUrl' in input) sessionUpdate.image = avatarUrl || null;
+      if ('firstName' in input || 'lastName' in input) {
+        sessionUpdate.name = [firstName, lastName].filter(Boolean).join(' ') || null;
+      }
+      if (Object.keys(sessionUpdate).length > 0) {
+        await updateSession(sessionUpdate);
+      }
+
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
 
