@@ -67,7 +67,8 @@ class MemberWithUser:
     house_id: Optional[str] = None
     role: Role
     created_at: datetime
-    email: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     avatar_url: Optional[str] = None
