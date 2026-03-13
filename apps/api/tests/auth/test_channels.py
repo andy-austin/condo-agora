@@ -21,7 +21,7 @@ async def test_send_whatsapp_otp_calls_chasqui(mock_client_class):
     mock_client.post.assert_called_once()
     call_args = mock_client.post.call_args
     assert "/messages/send/text" in call_args[0][0]
-    assert call_args[1]["json"]["to"] == "+56912345678"
+    assert call_args[1]["json"]["to"] == "56912345678"
     assert "123456" in call_args[1]["json"]["body"]
 
 
