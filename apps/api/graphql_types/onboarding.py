@@ -20,6 +20,7 @@ class BulkSetupRow:
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     phone: Optional[str] = None
+    email: Optional[str] = None
 
 
 @strawberry.input
@@ -42,4 +43,7 @@ class BulkSetupResult:
     organization: Organization
     total_properties: int
     total_residents: int
+    whatsapp_invitations_sent: int
+    email_invitations_sent: int
+    properties_without_contact: int
     rows: List[BulkSetupRowResult]

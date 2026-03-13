@@ -11,12 +11,14 @@ from .organization_member import Role
 class InvitationMethod(str, Enum):
     EMAIL = "EMAIL"
     LINK = "LINK"
+    WHATSAPP = "WHATSAPP"
 
 
 class Invitation(BaseDocument):
     """Invitation document model."""
 
-    email: str = Field(..., description="Invitee email address")
+    email: Optional[str] = Field(default=None, description="Invitee email address")
+    phone: Optional[str] = Field(default=None, description="Invitee phone number")
     token: str = Field(..., description="Unique invitation token")
     organization_id: str = Field(..., description="Reference to organization")
     inviter_id: str = Field(..., description="Reference to inviting user")
