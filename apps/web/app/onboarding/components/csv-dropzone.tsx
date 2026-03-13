@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Upload, FileDown } from 'lucide-react';
 import { parseOnboardingCSV, type PropertyRow } from '../lib/csv-parser';
