@@ -1,155 +1,168 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 import { getApiClient } from '@/lib/api';
 import {
-  CREATE_ORGANIZATION,
-  type CreateOrganizationResponse,
-} from '@/lib/queries/organization';
-import { CREATE_HOUSE, type CreateHouseResponse } from '@/lib/queries/house';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+  BULK_SETUP_ORGANIZATION,
+  COMPLETE_PROFILE,
+  type BulkSetupResult,
+  type BulkSetupRow,
+} from '@/lib/queries/onboarding';
+import { type PropertyRow } from './lib/csv-parser';
+import { UserProfileStep } from './steps/user-profile-step';
+import { OrgNameStep } from './steps/org-name-step';
+import { PropertiesStep } from './steps/properties-step';
+import { ConfirmationStep } from './steps/confirmation-step';
 
-type Step = 1 | 2 | 3 | 4;
+export type ProfileData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+};
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { update: updateSession } = useSession();
+  const { data: session, update: updateSession } = useSession();
+  const t = useTranslations('onboarding');
 
-  const [step, setStep] = useState<Step>(1);
-  const [submitting, setSubmitting] = useState(false);
-
-  // Step 1: Organization
+  const [currentStep, setCurrentStep] = useState(0);
+  const [profileData, setProfileData] = useState<ProfileData>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+  });
   const [orgName, setOrgName] = useState('');
-  const [orgId, setOrgId] = useState<string | null>(null);
-  const [orgSlug, setOrgSlug] = useState('');
+  const [rows, setRows] = useState<PropertyRow[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState<BulkSetupResult | null>(null);
 
-  // Step 2: Houses
-  const [houseName, setHouseName] = useState('');
-  const [houses, setHouses] = useState<{ id: string; name: string }[]>([]);
-  const [bulkPrefix, setBulkPrefix] = useState('');
-  const [bulkStart, setBulkStart] = useState('');
-  const [bulkEnd, setBulkEnd] = useState('');
+  // Determine auth provider from session
+  const authProvider: string =
+    (session?.user as any)?.authProvider || 'phone';
 
-  const handleCreateOrg = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!orgName.trim()) return;
-
-    setSubmitting(true);
-    try {
-      const client = getApiClient();
-      const data = await client.request<CreateOrganizationResponse>(
-        CREATE_ORGANIZATION,
-        { name: orgName.trim() }
-      );
-
-      setOrgId(data.createOrganization.id);
-      setOrgSlug(data.createOrganization.slug);
-      setStep(2);
-    } catch (err) {
-      console.error('Failed to create organization:', err);
-      alert('Failed to create organization. Please try again.');
-    } finally {
-      setSubmitting(false);
+  // Pre-fill profile from session
+  useEffect(() => {
+    if (session?.user) {
+      const user = session.user as any;
+      const nameParts = (user.name || '').split(' ');
+      setProfileData({
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+        email: user.email || '',
+        phone: user.phone || '',
+      });
     }
-  };
-
-  const handleAddHouse = async (name: string) => {
-    if (!orgId || !name.trim()) return;
-
-    const client = getApiClient();
-    const data = await client.request<CreateHouseResponse>(CREATE_HOUSE, {
-      organizationId: orgId,
-      name: name.trim(),
-    });
-
-    setHouses((prev) => [...prev, { id: data.createHouse.id, name: data.createHouse.name }]);
-  };
-
-  const handleAddSingleHouse = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!houseName.trim()) return;
-
-    setSubmitting(true);
-    try {
-      await handleAddHouse(houseName.trim());
-      setHouseName('');
-    } catch (err) {
-      console.error('Failed to add house:', err);
-      alert('Failed to add property.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleBulkAdd = async (e: FormEvent) => {
-    e.preventDefault();
-    const start = parseInt(bulkStart);
-    const end = parseInt(bulkEnd);
-    if (isNaN(start) || isNaN(end) || start > end || !bulkPrefix.trim()) return;
-
-    setSubmitting(true);
-    try {
-      for (let i = start; i <= end; i++) {
-        await handleAddHouse(`${bulkPrefix.trim()} ${i}`);
-      }
-      setBulkPrefix('');
-      setBulkStart('');
-      setBulkEnd('');
-    } catch (err) {
-      console.error('Failed to bulk add:', err);
-      alert('Some properties may not have been created.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleFinish = async () => {
-    await updateSession({ hasMemberships: true });
-    router.push('/dashboard');
-  };
+  }, [session]);
 
   const steps = [
-    { num: 1, label: 'Organization' },
-    { num: 2, label: 'Properties' },
-    { num: 3, label: 'Done' },
+    { key: 'profile', label: t('stepProfile') },
+    { key: 'org', label: t('stepOrg') },
+    { key: 'properties', label: t('stepProperties') },
+    { key: 'confirm', label: t('stepConfirm') },
   ];
+
+  const handleProfileContinue = async () => {
+    try {
+      const client = getApiClient();
+      await client.request(COMPLETE_PROFILE, {
+        input: {
+          firstName: profileData.firstName.trim() || undefined,
+          lastName: profileData.lastName.trim() || undefined,
+          email: profileData.email.trim() || undefined,
+        },
+      });
+      await updateSession({ requiresProfileCompletion: false });
+    } catch (err) {
+      console.error('Failed to save profile:', err);
+    }
+    setCurrentStep(1);
+  };
+
+  const handleProfileSkip = async () => {
+    try {
+      const client = getApiClient();
+      await client.request(COMPLETE_PROFILE, {
+        input: {},
+      });
+      await updateSession({ requiresProfileCompletion: false });
+    } catch (err) {
+      console.error('Failed to skip profile:', err);
+    }
+    setCurrentStep(1);
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      const client = getApiClient();
+      const bulkRows: BulkSetupRow[] = rows.map((row) => ({
+        rowId: row.id,
+        propertyName: row.propertyName,
+        firstName: row.firstName || undefined,
+        lastName: row.lastName || undefined,
+        phone: row.phone || undefined,
+        email: row.email || undefined,
+      }));
+
+      const result = await client.request<BulkSetupResult>(
+        BULK_SETUP_ORGANIZATION,
+        {
+          input: {
+            organizationName: orgName.trim(),
+            rows: bulkRows,
+          },
+        }
+      );
+
+      setSubmitResult(result);
+      await updateSession({ hasMemberships: true });
+    } catch (err) {
+      console.error('Failed to create organization:', err);
+      setIsSubmitting(false);
+      throw err;
+    }
+  };
+
+  const handleGoToDashboard = () => {
+    router.push('/dashboard');
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto p-8">
-        <h1 className="text-3xl font-bold mb-2">Set Up Your Community</h1>
-        <p className="text-muted-foreground mb-8">
-          Get started by creating your organization and adding properties.
-        </p>
-
-        {/* Stepper */}
+        {/* Stepper indicator */}
         <div className="flex items-center gap-2 mb-8">
           {steps.map((s, i) => (
-            <div key={s.num} className="flex items-center gap-2">
+            <div key={s.key} className="flex items-center gap-2">
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  step >= s.num
+                  currentStep > i
                     ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground'
+                    : currentStep === i
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
                 }`}
               >
-                {step > s.num ? '✓' : s.num}
+                {currentStep > i ? '\u2713' : i + 1}
               </div>
               <span
-                className={`text-sm ${
-                  step >= s.num ? 'text-foreground font-medium' : 'text-muted-foreground'
+                className={`text-sm hidden sm:inline ${
+                  currentStep >= i
+                    ? 'text-foreground font-medium'
+                    : 'text-muted-foreground'
                 }`}
               >
                 {s.label}
               </span>
               {i < steps.length - 1 && (
                 <div
-                  className={`w-12 h-0.5 ${
-                    step > s.num ? 'bg-primary' : 'bg-muted'
+                  className={`w-8 sm:w-12 h-0.5 ${
+                    currentStep > i ? 'bg-primary' : 'bg-muted'
                   }`}
                 />
               )}
@@ -157,166 +170,46 @@ export default function OnboardingPage() {
           ))}
         </div>
 
-        {/* Step 1: Create Organization */}
-        {step === 1 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Create Your Organization</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleCreateOrg} className="space-y-4">
-                <div>
-                  <label htmlFor="org-name" className="block text-sm font-medium mb-2">
-                    Organization Name
-                  </label>
-                  <input
-                    id="org-name"
-                    type="text"
-                    placeholder="e.g. Torre del Sol, Residencial Las Palmas"
-                    className="w-full p-2.5 rounded-lg border bg-background"
-                    value={orgName}
-                    onChange={(e) => setOrgName(e.target.value)}
-                    required
-                    autoFocus
-                  />
-                </div>
-                <Button type="submit" disabled={submitting || !orgName.trim()}>
-                  {submitting ? 'Creating...' : 'Create Organization'}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+        {/* Step content */}
+        {currentStep === 0 && (
+          <UserProfileStep
+            data={profileData}
+            authProvider={authProvider}
+            onChange={setProfileData}
+            onContinue={handleProfileContinue}
+            onSkip={handleProfileSkip}
+          />
         )}
 
-        {/* Step 2: Add Houses */}
-        {step === 2 && (
-          <>
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Add Properties / Units</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Add the houses or units in your community. You can add them one by one
-                  or in bulk.
-                </p>
-
-                {/* Single add */}
-                <form onSubmit={handleAddSingleHouse} className="flex gap-2 mb-6">
-                  <input
-                    type="text"
-                    placeholder="e.g. Unit 101, Block A - 404"
-                    className="flex-1 p-2.5 rounded-lg border bg-background"
-                    value={houseName}
-                    onChange={(e) => setHouseName(e.target.value)}
-                  />
-                  <Button type="submit" disabled={submitting || !houseName.trim()}>
-                    Add
-                  </Button>
-                </form>
-
-                {/* Bulk add */}
-                <details className="border rounded-lg p-4">
-                  <summary className="text-sm font-medium cursor-pointer">
-                    Bulk add (e.g. Unit 101-120)
-                  </summary>
-                  <form onSubmit={handleBulkAdd} className="mt-4 space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Prefix</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Unit, Apt, Block A -"
-                        className="w-full p-2 rounded-lg border bg-background text-sm"
-                        value={bulkPrefix}
-                        onChange={(e) => setBulkPrefix(e.target.value)}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">From</label>
-                        <input
-                          type="number"
-                          placeholder="101"
-                          className="w-full p-2 rounded-lg border bg-background text-sm"
-                          value={bulkStart}
-                          onChange={(e) => setBulkStart(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">To</label>
-                        <input
-                          type="number"
-                          placeholder="120"
-                          className="w-full p-2 rounded-lg border bg-background text-sm"
-                          value={bulkEnd}
-                          onChange={(e) => setBulkEnd(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    <Button
-                      type="submit"
-                      variant="secondary"
-                      disabled={submitting || !bulkPrefix.trim() || !bulkStart || !bulkEnd}
-                    >
-                      {submitting ? 'Adding...' : 'Add Range'}
-                    </Button>
-                  </form>
-                </details>
-
-                {/* Added houses list */}
-                {houses.length > 0 && (
-                  <div className="mt-6">
-                    <p className="text-sm font-medium mb-2">
-                      Added properties ({houses.length}):
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {houses.map((h) => (
-                        <Badge key={h.id} variant="secondary">
-                          {h.name}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setStep(3)}>
-                Skip for now
-              </Button>
-              <Button onClick={() => setStep(3)} disabled={houses.length === 0}>
-                Continue
-              </Button>
-            </div>
-          </>
+        {currentStep === 1 && (
+          <OrgNameStep
+            orgName={orgName}
+            onChange={setOrgName}
+            onNext={() => setCurrentStep(2)}
+            onBack={() => setCurrentStep(0)}
+          />
         )}
 
-        {/* Step 3: Done */}
-        {step === 3 && (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">&#10003;</span>
-              </div>
-              <h2 className="text-2xl font-bold mb-2">You&apos;re All Set!</h2>
-              <p className="text-muted-foreground mb-2">
-                <span className="font-semibold text-foreground">{orgName}</span> has been
-                created{houses.length > 0 ? ` with ${houses.length} properties` : ''}.
-              </p>
-              {orgSlug && (
-                <p className="text-xs text-muted-foreground mb-6">
-                  Slug: {orgSlug}
-                </p>
-              )}
-              <p className="text-sm text-muted-foreground mb-8">
-                Head to your dashboard to invite members and start managing your community.
-              </p>
-              <Button onClick={handleFinish} size="lg">
-                Go to Dashboard
-              </Button>
-            </CardContent>
-          </Card>
+        {currentStep === 2 && (
+          <PropertiesStep
+            orgName={orgName}
+            rows={rows}
+            onChange={setRows}
+            onNext={() => setCurrentStep(3)}
+            onBack={() => setCurrentStep(1)}
+          />
+        )}
+
+        {currentStep === 3 && (
+          <ConfirmationStep
+            orgName={orgName}
+            rows={rows}
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+            result={submitResult}
+            onGoToDashboard={handleGoToDashboard}
+            onBack={() => setCurrentStep(2)}
+          />
         )}
       </div>
     </div>
