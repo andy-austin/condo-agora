@@ -8,6 +8,9 @@ export const BULK_SETUP_ORGANIZATION = `
       }
       totalProperties
       totalResidents
+      whatsappInvitationsSent
+      emailInvitationsSent
+      propertiesWithoutContact
       rows {
         rowId
         status
@@ -37,6 +40,7 @@ export type BulkSetupRow = {
   firstName?: string;
   lastName?: string;
   phone?: string;
+  email?: string;
 };
 
 export type BulkSetupInput = {
@@ -63,6 +67,9 @@ export type BulkSetupResult = {
     };
     totalProperties: number;
     totalResidents: number;
+    whatsappInvitationsSent: number;
+    emailInvitationsSent: number;
+    propertiesWithoutContact: number;
     rows: BulkSetupRowResult[];
   };
 };
