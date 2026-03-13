@@ -1,19 +1,17 @@
 import logging
-import os
 import re
 import uuid
 from datetime import datetime, timedelta
 
 from ...database import db
 from ..auth.channels import send_email_invitation, send_whatsapp_invitation
-from ..auth.service import create_organization
+from ..auth.service import _get_app_url, create_organization
 
 logger = logging.getLogger(__name__)
 
 E164_REGEX = re.compile(r"^\+[1-9]\d{6,14}$")
 EMAIL_REGEX = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 MAX_ROWS = 200
-BASE_URL = os.environ.get("NEXTAUTH_URL", "http://localhost:3000")
 
 
 async def bulk_setup_organization(
@@ -147,29 +145,52 @@ async def bulk_setup_organization(
                 row_result["user_id"] = user_id
                 total_residents += 1
 
-                # Create invitation and send via available channels
-                token = str(uuid.uuid4())
-                invite_url = f"{BASE_URL}/invite/{token}"
+                # Create invitation(s) and send via available channels
+                base_url = _get_app_url()
                 expires_at = now + timedelta(days=7)
 
-                invitation_doc = {
-                    "token": token,
-                    "email": email,
-                    "phone": phone,
-                    "organization_id": org_id,
-                    "house_id": house_id,
-                    "inviter_id": creator_user_id,
-                    "role": "RESIDENT",
-                    "method": "bulk_setup",
-                    "expires_at": expires_at,
-                    "created_at": now,
-                    "updated_at": now,
-                }
-                await db.db.invitations.insert_one(invitation_doc)
+                # Create one invitation per channel so each can be
+                # independently accepted via the invite router which
+                # matches identifier + channel.
+                if phone:
+                    phone_token = str(uuid.uuid4())
+                    await db.db.invitations.insert_one({
+                        "token": phone_token,
+                        "identifier": phone,
+                        "channel": "whatsapp",
+                        "organization_id": org_id,
+                        "house_id": house_id,
+                        "inviter_id": creator_user_id,
+                        "role": "RESIDENT",
+                        "status": "pending",
+                        "expires_at": expires_at,
+                        "accepted_at": None,
+                        "created_at": now,
+                        "updated_at": now,
+                    })
+
+                if email:
+                    email_token = str(uuid.uuid4())
+                    await db.db.invitations.insert_one({
+                        "token": email_token,
+                        "identifier": email,
+                        "channel": "email",
+                        "organization_id": org_id,
+                        "house_id": house_id,
+                        "inviter_id": creator_user_id,
+                        "role": "RESIDENT",
+                        "status": "pending",
+                        "expires_at": expires_at,
+                        "accepted_at": None,
+                        "created_at": now,
+                        "updated_at": now,
+                    })
 
                 if phone:
                     try:
-                        await send_whatsapp_invitation(phone, org_name, invite_url)
+                        await send_whatsapp_invitation(
+                            phone, org_name, f"{base_url}/invite/{phone_token}"
+                        )
                         whatsapp_sent += 1
                     except Exception as e:
                         logger.warning(
@@ -180,7 +201,9 @@ async def bulk_setup_organization(
 
                 if email:
                     try:
-                        await send_email_invitation(email, org_name, invite_url)
+                        await send_email_invitation(
+                            email, org_name, f"{base_url}/invite/{email_token}"
+                        )
                         email_sent += 1
                     except Exception as e:
                         logger.warning(

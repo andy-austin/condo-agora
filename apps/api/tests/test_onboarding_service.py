@@ -311,6 +311,17 @@ async def test_bulk_setup_sends_dual_channel_invitations():
     assert result["email_invitations_sent"] == 1
     mock_whatsapp.assert_called_once()
     mock_email.assert_called_once()
+    # Two invitation records: one per channel
+    inv_calls = mock_db.db.invitations.insert_one.call_args_list
+    assert len(inv_calls) == 2
+    wa_inv = inv_calls[0][0][0]
+    assert wa_inv["channel"] == "whatsapp"
+    assert wa_inv["identifier"] == "+584121234567"
+    assert wa_inv["status"] == "pending"
+    email_inv = inv_calls[1][0][0]
+    assert email_inv["channel"] == "email"
+    assert email_inv["identifier"] == "maria@example.com"
+    assert email_inv["status"] == "pending"
 
 
 @pytest.mark.asyncio
