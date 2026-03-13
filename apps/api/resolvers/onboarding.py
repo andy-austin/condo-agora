@@ -27,6 +27,7 @@ async def resolve_bulk_setup_organization(
             "first_name": row.first_name,
             "last_name": row.last_name,
             "phone": row.phone,
+            "email": row.email,
         }
         for row in input.rows
     ]
@@ -48,6 +49,9 @@ async def resolve_bulk_setup_organization(
         ),
         total_properties=result["total_properties"],
         total_residents=result["total_residents"],
+        whatsapp_invitations_sent=result.get("whatsapp_invitations_sent", 0),
+        email_invitations_sent=result.get("email_invitations_sent", 0),
+        properties_without_contact=result.get("properties_without_contact", 0),
         rows=[
             BulkSetupRowResult(
                 row_id=r["row_id"],
