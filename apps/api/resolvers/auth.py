@@ -45,7 +45,8 @@ def _mongo_invitation_to_graphql(inv: dict) -> Invitation:
     method_val = inv.get("method", "EMAIL")
     return Invitation(
         id=str(inv["_id"]),
-        email=inv["email"],
+        email=inv.get("email"),
+        phone=inv.get("phone"),
         organization_id=inv["organization_id"],
         inviter_id=inv["inviter_id"],
         role=Role(inv["role"]),

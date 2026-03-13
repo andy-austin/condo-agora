@@ -86,12 +86,14 @@ class CompleteProfileInput:
 class InvitationMethod(Enum):
     EMAIL = "EMAIL"
     LINK = "LINK"
+    WHATSAPP = "WHATSAPP"
 
 
 @strawberry.type
 class Invitation:
     id: str
-    email: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
     organization_id: str
     inviter_id: str
     house_id: Optional[str] = None
