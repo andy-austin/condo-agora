@@ -69,7 +69,8 @@ export default function VotingResultsPage() {
 
   if (error || !results) return <ErrorState message={error || t('voting.noResults')} />;
 
-  const maxScore = Math.max(...results.proposalScores.map((p) => p.score), 1);
+  const scores = results.proposalScores ?? [];
+  const maxScore = Math.max(...scores.map((p) => p.score), 1);
 
   return (
     <div className="p-8 max-w-3xl mx-auto">
@@ -152,13 +153,13 @@ export default function VotingResultsPage() {
           {t('voting.proposalRankings')}
         </h2>
         <div className="space-y-3">
-          {results.proposalScores.map((ps) => (
+          {scores.map((ps) => (
             <ProposalResultCard key={ps.proposalId} ps={ps} maxScore={maxScore} t={t} />
           ))}
         </div>
       </div>
 
-      {results.proposalScores.length === 0 && (
+      {scores.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
           {t('voting.noVotesYet')}
         </div>

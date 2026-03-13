@@ -400,7 +400,7 @@ function ResidentsTab({
     const member = memberMap.get(userId);
     if (!member) return { name: t('common.member'), detail: userId.slice(0, 12) + '...' };
     const name = [member.firstName, member.lastName].filter(Boolean).join(' ') || t('common.member');
-    return { name, detail: member.email };
+    return { name, detail: member.email ?? '' };
   };
 
   const handleRemove = async (userId: string) => {
