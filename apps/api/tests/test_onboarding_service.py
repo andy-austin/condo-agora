@@ -137,6 +137,67 @@ async def test_bulk_setup_invalid_phone_format():
         result = await bulk_setup_organization("Test", rows, "user_1")
     assert result["rows"][0]["status"] == "ERROR"
     assert "Invalid phone format" in result["rows"][0]["error"]
+    # Validation happens before house creation — no orphaned houses
+    mock_db.db.houses.insert_one.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_bulk_setup_normalizes_phone_whitespace():
+    """Phone numbers with spaces should be normalized before E164 validation."""
+    mock_db = MagicMock()
+    mock_db.is_connected.return_value = True
+    mock_db.db = MagicMock()
+    mock_org = {
+        "_id": "org_id_1",
+        "name": "Test Condo",
+        "slug": "test-condo",
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
+    }
+    mock_db.db.houses.insert_one = AsyncMock(
+        return_value=MagicMock(inserted_id="house_1")
+    )
+    mock_db.db.users.find_one = AsyncMock(return_value=None)
+    mock_db.db.users.insert_one = AsyncMock(
+        return_value=MagicMock(inserted_id="user_1")
+    )
+    mock_db.db.organization_members.insert_one = AsyncMock(
+        return_value=MagicMock(inserted_id="member_1")
+    )
+    mock_db.db.houses.update_one = AsyncMock()
+    mock_db.db.invitations.insert_one = AsyncMock(
+        return_value=MagicMock(inserted_id="inv_1")
+    )
+    rows = [
+        {
+            "row_id": "r1",
+            "property_name": "Apto 101",
+            "phone": "+58 412 123 4567",
+        }
+    ]
+    with (
+        patch(
+            "apps.api.src.onboarding.service.create_organization",
+            new=AsyncMock(return_value=mock_org),
+        ),
+        patch("apps.api.src.onboarding.service.db", mock_db),
+        patch(
+            "apps.api.src.onboarding.service.send_whatsapp_invitation",
+            new=AsyncMock(),
+        ),
+        patch(
+            "apps.api.src.onboarding.service.send_email_invitation",
+            new=AsyncMock(),
+        ),
+    ):
+        from apps.api.src.onboarding.service import bulk_setup_organization
+
+        result = await bulk_setup_organization("Test Condo", rows, "user_creator")
+    assert result["rows"][0]["status"] == "SUCCESS"
+    assert result["total_residents"] == 1
+    # Phone stored without spaces
+    call_args = mock_db.db.users.insert_one.call_args[0][0]
+    assert call_args["phone"] == "+584121234567"
 
 
 @pytest.mark.asyncio

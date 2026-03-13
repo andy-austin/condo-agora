@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
 import { type ProfileData } from '../page';
+import { PhoneInputField } from '../components/phone-input';
 
 type UserProfileStepProps = {
   data: ProfileData;
@@ -119,14 +120,9 @@ export function UserProfileStep({
             >
               {t('profilePhone')}
             </label>
-            <input
-              id="profile-phone"
-              type="tel"
-              className={inputClass}
+            <PhoneInputField
               value={data.phone}
-              onChange={(e) =>
-                onChange({ ...data, phone: e.target.value })
-              }
+              onChange={(value) => onChange({ ...data, phone: value })}
             />
           </div>
         </div>

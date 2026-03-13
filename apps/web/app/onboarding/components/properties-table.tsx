@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
 import { type PropertyRow } from '../lib/csv-parser';
 import { validateE164Phone, validateEmail } from '../lib/validation';
+import { PhoneInputField } from './phone-input';
 
 type PropertiesTableProps = {
   rows: PropertyRow[];
@@ -198,19 +199,16 @@ export function PropertiesTable({ rows, onChange }: PropertiesTableProps) {
                   />
                 </td>
                 <td className="px-1 py-1">
-                  <input
-                    type="tel"
-                    className={`${inputClass} ${
-                      isPhoneInvalid
-                        ? 'ring-1 ring-red-500 bg-red-50 dark:bg-red-950/20'
-                        : ''
-                    }`}
+                  <PhoneInputField
+                    compact
                     value={row.phone}
-                    onChange={(e) =>
-                      updateRow(row.id, 'phone', e.target.value)
-                    }
+                    onChange={(value) => updateRow(row.id, 'phone', value)}
                     onBlur={() => handlePhoneBlur(row.id, row.phone)}
-                    onPaste={(e) => handlePaste(e, index, 3)}
+                    className={
+                      isPhoneInvalid
+                        ? 'ring-1 ring-red-500 rounded bg-red-50 dark:bg-red-950/20'
+                        : ''
+                    }
                   />
                 </td>
                 <td className="px-1 py-1">

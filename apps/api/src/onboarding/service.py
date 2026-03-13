@@ -50,6 +50,26 @@ async def bulk_setup_organization(
         row_result = {"row_id": row_id, "status": "SUCCESS", "error": None}
 
         try:
+            # Normalize and validate contact fields before creating anything
+            if phone:
+                phone = re.sub(r"\s+", "", phone.strip())
+                if not E164_REGEX.match(phone):
+                    row_result["status"] = "ERROR"
+                    row_result["error"] = (
+                        f"Invalid phone format: {phone}. "
+                        "Expected E.164 format (e.g., +584121234567)"
+                    )
+                    results.append(row_result)
+                    continue
+
+            if email:
+                email = email.strip()
+                if not re.match(EMAIL_REGEX, email):
+                    row_result["status"] = "ERROR"
+                    row_result["error"] = f"Invalid email format: {email}"
+                    results.append(row_result)
+                    continue
+
             house_data = {
                 "name": property_name,
                 "organization_id": org_id,
@@ -65,16 +85,6 @@ async def bulk_setup_organization(
             user_id = None
 
             if phone:
-                phone = phone.strip()
-                if not E164_REGEX.match(phone):
-                    row_result["status"] = "ERROR"
-                    row_result["error"] = (
-                        f"Invalid phone format: {phone}. "
-                        "Expected E.164 format (e.g., +584121234567)"
-                    )
-                    results.append(row_result)
-                    continue
-
                 existing_user = await db.db.users.find_one({"phone": phone})
 
                 if existing_user:
@@ -98,13 +108,6 @@ async def bulk_setup_organization(
                     user_id = str(insert_result.inserted_id)
 
             elif email:
-                email = email.strip()
-                if not re.match(EMAIL_REGEX, email):
-                    row_result["status"] = "ERROR"
-                    row_result["error"] = f"Invalid email format: {email}"
-                    results.append(row_result)
-                    continue
-
                 existing_user = await db.db.users.find_one({"email": email})
 
                 if existing_user:
