@@ -2,7 +2,7 @@ import logging
 import os
 import re
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 from ...database import db
 from ..auth.channels import send_email_invitation, send_whatsapp_invitation
