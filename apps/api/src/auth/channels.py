@@ -16,6 +16,7 @@ resend.api_key = RESEND_API_KEY
 
 async def send_whatsapp_otp(to: str, code: str) -> None:
     """Send OTP code via WhatsApp using Chasqui text API."""
+    to = to.lstrip("+")
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{CHASQUI_API_URL}/messages/send/text",
@@ -53,6 +54,7 @@ async def send_email_otp(to: str, code: str) -> None:
 
 async def send_whatsapp_invitation(to: str, org_name: str, invite_url: str) -> None:
     """Send invitation via WhatsApp using Chasqui template API."""
+    to = to.lstrip("+")
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{CHASQUI_API_URL}/messages/send/template",
