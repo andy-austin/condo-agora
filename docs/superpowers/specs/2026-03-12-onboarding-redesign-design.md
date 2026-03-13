@@ -287,6 +287,8 @@ All user-facing strings must be added to both `apps/web/messages/en.json` and `a
 - **Partial row failures:** `bulkSetupOrganization` already handles per-row errors. On confirmation screen, show a warning if some rows failed with option to retry failed rows or continue to dashboard.
 - **Invalid CSV format:** Show error toast with details (e.g., "Missing required column: property_name"). Don't populate table.
 - **Duplicate phone/email in CSV:** Highlight duplicate rows in table, warn but don't block.
+- **Duplicate property names in CSV:** Highlight duplicate property names, warn but don't block (some buildings legitimately have duplicate unit names across towers).
+- **Invitation send rate limiting:** With up to 200 rows × 2 channels = 400 messages, use `asyncio.gather` with a concurrency limit (e.g., 10) to avoid overwhelming Chasqui/Resend and to stay within Vercel serverless timeout. Invitation sends should not block the mutation response — fire-and-forget with error logging.
 
 ## Testing Strategy
 
