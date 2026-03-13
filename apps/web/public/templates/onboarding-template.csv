@@ -1,4 +1,4 @@
-property,first_name,last_name,phone
-Apto 101,María,García,+584121234567
-Apto 102,Carlos,Rodríguez,+584147654321
-Apto 103,,,
+property_name,first_name,last_name,phone,email
+Apt 101,María,López,+584125550101,maria@example.com
+Apt 102,Carlos,Pérez,+584145550102,carlos@example.com
+Apt 103,,,,
