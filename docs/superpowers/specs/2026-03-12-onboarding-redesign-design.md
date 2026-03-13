@@ -106,9 +106,9 @@ No changes — reuses existing `completeProfile` mutation and session flag logic
 
 #### Three Input Methods
 
-1. **CSV Import:** Drag-drop or file picker. Parsed with PapaParse. Columns: `property_name`, `first_name`, `last_name`, `phone`, `email`. Downloadable template provided. Max 200 rows.
+1. **CSV Import:** Drag-drop or file picker. Parsed with PapaParse. Columns: `property_name`, `first_name`, `last_name`, `phone`, `email`. Parser also accepts `property` as an alias for `property_name` (backwards compatibility with older template). Downloadable template provided. Max 200 rows.
 
-2. **Bulk Range:** Modal with prefix + start/end number. Example: prefix "Apt", range 101–120 creates "Apt 101" through "Apt 120". Properties created with no voter info (admin fills in contact details after).
+2. **Bulk Range:** Modal with prefix + start/end number. Example: prefix "Apt", range 101–120 creates "Apt 101" through "Apt 120". Properties created with no voter info (admin fills in contact details after). Max 200 properties per range (same cap as CSV).
 
 3. **Manual Entry:** "+ Add Row" appends an empty row. All cells are inline-editable. Paste from Excel/Sheets supported (tab-separated parsing).
 
@@ -150,7 +150,7 @@ On "Go to Dashboard" click:
 
 1. Call `bulkSetupOrganization` mutation with org name + all rows
 2. Mutation creates org, houses, users, memberships, and invitation records
-3. Invitations sent via both WhatsApp (Twilio) and email (Resend) for each voter
+3. Invitations sent via both WhatsApp (Chasqui API) and email (Resend) for each voter
 4. Update session: `hasMemberships = true`
 5. Redirect to `/dashboard`
 
@@ -201,18 +201,55 @@ class BulkSetupResult:
     rows: List[BulkSetupRowResult]
 ```
 
+### Extend `InvitationMethod` Enum
+
+Add `WHATSAPP` to the invitation method enum in both the Pydantic model and GraphQL type:
+
+```python
+# apps/api/models/invitation.py
+class InvitationMethod(str, Enum):
+    EMAIL = "EMAIL"
+    LINK = "LINK"
+    WHATSAPP = "WHATSAPP"  # NEW
+
+# apps/api/graphql_types/auth.py — Strawberry enum must match
+```
+
+### Make `Invitation.email` Optional + Add `phone` Field
+
+The current `Invitation` model requires `email` as mandatory. WhatsApp-only invitations won't have an email:
+
+```python
+# apps/api/models/invitation.py
+class Invitation(BaseDocument):
+    email: Optional[str] = None    # Was required, now optional
+    phone: Optional[str] = None    # NEW — for WhatsApp invitations
+    # ... rest unchanged
+```
+
+At least one of `email` or `phone` must be present — validated in the resolver, not the model.
+
 ### Extend Onboarding Service
 
 Update `apps/api/src/onboarding/service.py`:
 
 1. **User creation by email:** Currently only finds/creates users by phone. Add logic to find/create by email when only email is provided.
 
-2. **Dual-channel invitation sending:** For each row with contact info:
-   - Create invitation record with `method: "WHATSAPP"` if phone present → send via Twilio
-   - Create invitation record with `method: "EMAIL"` if email present → send via Resend
-   - Voters with both get two invitation records (one per channel), same token so either activates the account
+2. **Dual-channel invitation sending:** For each row with contact info, create a single invitation record with a unique token, then send via available channels:
+   - If phone present → send via Chasqui WhatsApp API (`send_whatsapp_invitation`)
+   - If email present → send via Resend (`send_email_invitation`)
+   - Voters with both get a single invitation record but the invite is delivered on both channels. The same token/accept link works regardless of which channel the voter clicks.
+   - Invitation record fields: `email` (if available), `phone` (if available), `method` set to `WHATSAPP` if phone-only, `EMAIL` if email-only, or `EMAIL` as default when both present (the record tracks the primary method; both channels are sent regardless).
+   - `inviter_id`: the current admin user's ID
+   - `token`: generated UUID (same as existing invitation flow)
+   - `expires_at`: 7 days from creation (same as existing)
+   - `organization_id`: the newly created org
+   - `house_id`: the corresponding house
+   - `role`: RESIDENT
 
 3. **Count tracking:** Track and return `whatsapp_invitations_sent`, `email_invitations_sent`, `properties_without_contact` in the result.
+
+4. **Acceptance behavior:** No changes — the existing `/api/invite/{token}/accept` endpoint already handles acceptance by token. Since each voter has one invitation record with one token, accepting it marks that single record as accepted.
 
 ### Update CSV Template
 
@@ -235,9 +272,9 @@ Apt 103,,,,
 | Session flags (`hasMemberships`, `requiresProfileCompletion`) | Reuse as-is |
 | Onboarding service (`src/onboarding/service.py`) | Extend (email users, dual invitations) |
 | CSV template | Update (add email column) |
-| Frontend `/onboarding` page | Rewrite UI (3-step stepper) |
-| Invitation model | Reuse as-is (supports email + link methods) |
-| Twilio WhatsApp sending | Reuse existing infrastructure |
+| Frontend `/onboarding` page | Rewrite UI (3-step stepper). Note: current page uses `createOrganization` + `createHouse` separately; new version uses `bulkSetupOrganization` — this is effectively a full rewrite of the page. |
+| Invitation model | Extend (add WHATSAPP method, make email optional, add phone field) |
+| Chasqui WhatsApp sending | Reuse existing `send_whatsapp_invitation` infrastructure |
 | Resend email sending | Reuse existing infrastructure |
 
 ## i18n
