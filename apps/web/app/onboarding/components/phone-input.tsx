@@ -1,8 +1,32 @@
 'use client';
 
+import { useMemo } from 'react';
 import PhoneInput from 'react-phone-number-input';
 import type { Country } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
+
+const FALLBACK_COUNTRY: Country = 'UY';
+
+// Map browser locale/language to country code
+const LOCALE_TO_COUNTRY: Record<string, Country> = {
+  UY: 'UY', VE: 'VE', AR: 'AR', BR: 'BR', CL: 'CL',
+  CO: 'CO', PE: 'PE', EC: 'EC', MX: 'MX', ES: 'ES',
+  US: 'US', GB: 'GB', PY: 'PY', BO: 'BO', CR: 'CR',
+  PA: 'PA', DO: 'DO', GT: 'GT', HN: 'HN', SV: 'SV',
+  NI: 'NI', CU: 'CU', PR: 'PR',
+};
+
+function detectCountryFromBrowser(): Country {
+  if (typeof navigator === 'undefined') return FALLBACK_COUNTRY;
+  // navigator.language is like "es-UY", "en-US", "pt-BR"
+  const lang = navigator.language || (navigator as any).userLanguage || '';
+  const parts = lang.split('-');
+  if (parts.length >= 2) {
+    const region = parts[parts.length - 1].toUpperCase();
+    if (LOCALE_TO_COUNTRY[region]) return LOCALE_TO_COUNTRY[region];
+  }
+  return FALLBACK_COUNTRY;
+}
 
 type PhoneInputFieldProps = {
   value: string;
@@ -18,9 +42,13 @@ export function PhoneInputField({
   onChange,
   onBlur,
   className = '',
-  defaultCountry = 'VE',
+  defaultCountry,
   compact = false,
 }: PhoneInputFieldProps) {
+  const resolvedCountry = useMemo(
+    () => defaultCountry || detectCountryFromBrowser(),
+    [defaultCountry]
+  );
   return (
     <div
       className={`phone-input-wrapper ${compact ? 'phone-input-compact' : ''} ${className}`}
@@ -28,7 +56,7 @@ export function PhoneInputField({
       <PhoneInput
         international
         countryCallingCodeEditable={false}
-        defaultCountry={defaultCountry}
+        defaultCountry={resolvedCountry}
         value={value || undefined}
         onChange={(v) => onChange(v || '')}
         onBlur={onBlur}
