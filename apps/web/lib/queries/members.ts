@@ -35,7 +35,7 @@ export type Member = {
   organizationId: string;
   houseId: string | null;
   role: string;
-  email: string;
+  email: string | null;
   firstName: string | null;
   lastName: string | null;
   avatarUrl: string | null;

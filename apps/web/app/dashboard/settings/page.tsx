@@ -274,7 +274,7 @@ function MembersTab({
   const filteredMembers = members.filter((m) => {
     const q = search.toLowerCase();
     return (
-      m.email.toLowerCase().includes(q) ||
+      (m.email ?? '').toLowerCase().includes(q) ||
       m.firstName?.toLowerCase().includes(q) ||
       m.lastName?.toLowerCase().includes(q) ||
       m.role.toLowerCase().includes(q)
@@ -313,7 +313,7 @@ function MembersTab({
   const handleRemoveMember = async (member: Member) => {
     const name = member.firstName || member.lastName
       ? [member.firstName, member.lastName].filter(Boolean).join(' ')
-      : member.email;
+      : member.email ?? '';
     if (!confirm(t('settings.removeMemberConfirm', { name }))) return;
 
     setRemovingId(member.id);
@@ -333,7 +333,7 @@ function MembersTab({
     if (m.firstName || m.lastName) {
       return [m.firstName, m.lastName].filter(Boolean).join(' ');
     }
-    return m.email;
+    return m.email ?? '';
   };
 
   return (
@@ -400,19 +400,19 @@ function MembersTab({
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                             <span className="text-xs font-semibold text-primary">
-                              {(member.firstName?.[0] || member.email[0]).toUpperCase()}
+                              {(member.firstName?.[0] || member.email?.[0] || '?').toUpperCase()}
                             </span>
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm font-medium truncate">{getMemberName(member)}</p>
                             <p className="text-xs text-muted-foreground truncate sm:hidden">
-                              {member.email}
+                              {member.email ?? ''}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground hidden sm:table-cell">
-                        {member.email}
+                        {member.email ?? ''}
                       </td>
                       <td className="px-4 py-3">
                         <Badge

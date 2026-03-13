@@ -307,7 +307,7 @@ export default function DashboardPage() {
                   const name =
                     member.firstName || member.lastName
                       ? [member.firstName, member.lastName].filter(Boolean).join(' ')
-                      : member.email;
+                      : member.email ?? '';
                   return (
                     <div
                       key={member.id}
@@ -316,7 +316,7 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                           <span className="text-xs font-semibold text-primary">
-                            {(member.firstName?.[0] || member.email[0]).toUpperCase()}
+                            {(member.firstName?.[0] || member.email?.[0] || '?').toUpperCase()}
                           </span>
                         </div>
                         <div className="min-w-0">

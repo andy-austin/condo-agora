@@ -137,7 +137,7 @@ export default function CommitteePage() {
     if (m.firstName || m.lastName) {
       return [m.firstName, m.lastName].filter(Boolean).join(' ');
     }
-    return m.email;
+    return m.email ?? '';
   };
 
   const roleBadgeVariant = (role: string) => {
@@ -248,7 +248,7 @@ function MemberRow({
     <div className="flex items-center justify-between p-3 rounded-lg border">
       <div>
         <p className="text-sm font-medium">{displayName}</p>
-        <p className="text-xs text-muted-foreground">{member.email}</p>
+        <p className="text-xs text-muted-foreground">{member.email ?? ''}</p>
         {member.houseName && (
           <p className="text-xs text-muted-foreground mt-0.5">
             {t('overview.unitLabel', { name: member.houseName })}
