@@ -154,37 +154,41 @@ async def bulk_setup_organization(
                 # matches identifier + channel.
                 if phone:
                     phone_token = str(uuid.uuid4())
-                    await db.db.invitations.insert_one({
-                        "token": phone_token,
-                        "identifier": phone,
-                        "channel": "whatsapp",
-                        "organization_id": org_id,
-                        "house_id": house_id,
-                        "inviter_id": creator_user_id,
-                        "role": "RESIDENT",
-                        "status": "pending",
-                        "expires_at": expires_at,
-                        "accepted_at": None,
-                        "created_at": now,
-                        "updated_at": now,
-                    })
+                    await db.db.invitations.insert_one(
+                        {
+                            "token": phone_token,
+                            "identifier": phone,
+                            "channel": "whatsapp",
+                            "organization_id": org_id,
+                            "house_id": house_id,
+                            "inviter_id": creator_user_id,
+                            "role": "RESIDENT",
+                            "status": "pending",
+                            "expires_at": expires_at,
+                            "accepted_at": None,
+                            "created_at": now,
+                            "updated_at": now,
+                        }
+                    )
 
                 if email:
                     email_token = str(uuid.uuid4())
-                    await db.db.invitations.insert_one({
-                        "token": email_token,
-                        "identifier": email,
-                        "channel": "email",
-                        "organization_id": org_id,
-                        "house_id": house_id,
-                        "inviter_id": creator_user_id,
-                        "role": "RESIDENT",
-                        "status": "pending",
-                        "expires_at": expires_at,
-                        "accepted_at": None,
-                        "created_at": now,
-                        "updated_at": now,
-                    })
+                    await db.db.invitations.insert_one(
+                        {
+                            "token": email_token,
+                            "identifier": email,
+                            "channel": "email",
+                            "organization_id": org_id,
+                            "house_id": house_id,
+                            "inviter_id": creator_user_id,
+                            "role": "RESIDENT",
+                            "status": "pending",
+                            "expires_at": expires_at,
+                            "accepted_at": None,
+                            "created_at": now,
+                            "updated_at": now,
+                        }
+                    )
 
                 if phone:
                     try:
